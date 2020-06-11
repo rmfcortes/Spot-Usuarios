@@ -1,7 +1,9 @@
 import { Producto } from './producto';
+import { Direccion } from './direcciones';
 
 export interface Negocio {
     abierto: boolean;
+    calificaciones;
     foto: string;
     id: string;
     nombre: string;
@@ -9,6 +11,11 @@ export interface Negocio {
     subCategoria: string;
     tipo: string;
     valoraciones: number;
+    envio: number;
+    envio_costo_fijo: boolean;
+    envio_gratis_pedMin: number;
+    repartidores_propios: boolean;
+    direccion: Direccion;
 }
 
 export interface DetallesNegocio {
@@ -18,6 +25,7 @@ export interface DetallesNegocio {
     lng: number;
     telefono: number;
     horario: Horario[];
+    envio_desp_pedMin: number;
 }
 
 export interface ProductoPasillo {
@@ -71,7 +79,7 @@ export interface Pasillo {
 export interface InfoGral {
     abierto: boolean;
     categoria: string;
-    cuenta: string;
+    plan: string;
     foto: string;
     idNegocio: string;
     nombre: string;
@@ -81,6 +89,12 @@ export interface InfoGral {
     productos: number;
     promedio?: number;
     calificaciones?: number;
+    envio: number;
+    envio_costo_fijo: boolean;
+    envio_gratis_pedMin: number;
+    repartidores_propios: boolean;
+    direccion: Direccion;
+
 }
 
 export interface NegocioBusqueda{
@@ -90,6 +104,11 @@ export interface NegocioBusqueda{
     nombre: string;
     palabras: string;
     promedio?: number;
+    envio: number;
+    envio_costo_fijo: boolean;
+    envio_gratis_pedMin: number;
+    repartidores_propios: boolean;
+    direccion: Direccion;
 }
 
 export interface visistasNegocio {

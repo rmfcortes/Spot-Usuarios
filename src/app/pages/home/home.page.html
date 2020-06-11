@@ -184,8 +184,8 @@
 
     <!-- + visitados por ti -->
     <ng-container *ngIf="pedidosReady && catsReady && promosReady && catsReady && visitadosReady; else visTemplate">
-        <ion-card>
-            <h2 style="margin-left: 1rem; color: var(--ion-color-primary)" *ngIf="negociosVisitados.length > 0">+ Visitados por ti</h2>
+        <ion-card *ngIf="negociosVisitados.length > 0">
+            <h2 style="margin-left: 1rem; color: var(--ion-color-primary)">+ Visitados por ti</h2>
             <ion-card *ngFor="let item of negociosVisitados">
                 <ion-item detail lines="none" (click)="verProductoConInfo(item)">
                     <ng-container *ngIf="item.abierto; else visitadosOpen">
@@ -194,7 +194,7 @@
                         </ion-thumbnail>
                         <ion-label style="margin-left: 0.5rem;">
                             <h2>{{item.nombre}}</h2>
-                            <p *ngIf="item.promedio" style="color: darkorange;">{{item.promedio}}
+                            <p *ngIf="item.promedio" style="color: darkorange;">Envio: {{item.envio | currency:'CAD':'symbol-narrow':'1.0-2'}} / {{item.promedio}}
                                 <ion-icon slot="end" name="star"></ion-icon>
                             </p>
                         </ion-label>
@@ -205,7 +205,7 @@
                         </ion-thumbnail>
                         <ion-label style="margin-left: 0.5rem;" color="medium">
                             <h2>{{item.nombre}}</h2>
-                            <p *ngIf="item.promedio">{{item.promedio}}
+                            <p *ngIf="item.promedio">Envio: {{item.envio | currency:'CAD':'symbol-narrow':'1.0-2'}} / {{item.promedio}}
                                 <ion-icon slot="end" name="star"></ion-icon>
                             </p>
                         </ion-label>
@@ -240,7 +240,7 @@
                         </ion-thumbnail>
                         <ion-label style="margin-left: 0.5rem;">
                             <h2>{{item.nombre}}</h2>
-                            <p *ngIf="item.promedio" style="color: darkorange;">{{item.promedio}}
+                            <p *ngIf="item.promedio" style="color: darkorange;">Envio: {{item.envio | currency:'CAD':'symbol-narrow':'1.0-2'}} / {{item.promedio}}
                                 <ion-icon slot="end" name="star"></ion-icon>
                             </p>
                         </ion-label>

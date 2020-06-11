@@ -4,8 +4,9 @@ import { AngularFireDatabase } from '@angular/fire/database';
 import { UidService } from './uid.service';
 
 import { Negocio, DetallesNegocio, NegocioBusqueda } from '../interfaces/negocio';
-import { Dia } from '../interfaces/horario.interface';
 import { Producto, Cart } from '../interfaces/producto';
+import { Dia } from '../interfaces/horario.interface';
+import { Direccion } from '../interfaces/direcciones';
 
 
 @Injectable({
@@ -29,58 +30,58 @@ export class NegocioService {
         .subscribe((negocio: Negocio) => {
           negSub.unsubscribe();
           if (negocio) {
-            this.count = 0;
-            return resolve(negocio);
+            this.count = 0
+            return resolve(negocio)
           } else {
-            this.count++;
-            if (this.count === 2) return resolve(null);
+            this.count++
+            if (this.count === 2) return resolve(null)
             if (status === 'abiertos') status = 'cerrados'
             else status = 'abiertos'
             return resolve(this.getNegocioPreview(id, categoria, status))
           }
-        });
-    });
+        })
+    })
   }
 
   getOfertas(categoria: string, idNegocio: string): Promise<Producto[]> {
     return new Promise((resolve, reject) => {
       const x = this.db.list(`negocios/productos/${categoria}/${idNegocio}/Ofertas`)
         .valueChanges().subscribe(async (productos: Producto[]) => {
-          x.unsubscribe();
+          x.unsubscribe()
           if (this.cart && this.cart.detalles) {
-            productos = await this.comparaCart(productos);
+            productos = await this.comparaCart(productos)
           }
-          resolve(productos);
-        });
-    });
+          resolve(productos)
+        })
+    })
   }
 
   getPasillos(categoria, id): Promise<any> {
     return new Promise((resolve, reject) => {
       const detSub = this.db.object(`negocios/pasillos/${categoria}/${id}`).valueChanges()
         .subscribe((pasillos: {}) => {
-          detSub.unsubscribe();
-          resolve(pasillos);
-        });
-    });
+          detSub.unsubscribe()
+          resolve(pasillos)
+        })
+    })
   }
 
   getCart(uid, idNegocio): Promise<number> {
     return new Promise((resolve, reject) => {
       const cartSub = this.db.object(`usuarios/${uid}/cart/${idNegocio}`).valueChanges().subscribe((cart: Cart) => {
         cartSub.unsubscribe();
-        this.cart = cart;
+        this.cart = cart
         if (cart && cart.detalles) {
-          let cuenta = 0;
+          let cuenta = 0
           Object.values(cart.detalles).forEach(c => {
-            cuenta += c.total;
+            cuenta += c.total
           });
-          resolve(cuenta);
+          resolve(cuenta)
         } else {
-          resolve(0);
+          resolve(0)
         }
-      });
-    });
+      })
+    })
   }
 
   getProductosLista(categoria, id, pasillo, batch, lastKey): Promise<Producto[]> {
@@ -88,23 +89,23 @@ export class NegocioService {
       if (lastKey) {
         const x = this.db.list(`negocios/productos/${categoria}/${id}/${pasillo}`, data =>
           data.orderByKey().limitToFirst(batch).startAt(lastKey)).valueChanges().subscribe(async (productos: Producto[]) => {
-            x.unsubscribe();
+            x.unsubscribe()
             if (this.cart && this.cart.detalles) {
-              productos = await this.comparaCart(productos);
+              productos = await this.comparaCart(productos)
             }
-            resolve(productos);
-          });
+            resolve(productos)
+          })
       } else {
         const x = this.db.list(`negocios/productos/${categoria}/${id}/${pasillo}`, data =>
           data.orderByKey().limitToFirst(batch)).valueChanges().subscribe(async (productos: Producto[]) => {
-            x.unsubscribe();
+            x.unsubscribe()
             if (this.cart && this.cart.detalles) {
-              productos = await this.comparaCart(productos);
+              productos = await this.comparaCart(productos)
             }
-            resolve(productos);
-          });
+            resolve(productos)
+          })
       }
-    });
+    })
   }
 
   comparaCart(productos: Producto[]): Promise<Producto[]> {
@@ -115,9 +116,9 @@ export class NegocioService {
         }
         resolve(productos)
       } else {
-        resolve(productos);
+        resolve(productos)
       }
-    });
+    })
   }
 
   // Para info modal
@@ -126,20 +127,20 @@ export class NegocioService {
     return new Promise((resolve, reject) => {
       const detSub = this.db.object(`negocios/detalles/${categoria}/${id}`).valueChanges()
         .subscribe((detalles: DetallesNegocio) => {
-          detSub.unsubscribe();
-          resolve(detalles);
-        });
-    });
+          detSub.unsubscribe()
+          resolve(detalles)
+        })
+    })
   }
 
   getHorario(idNegocio: string): Promise<Dia[]> {
     return new Promise((resolve, reject) => {
       const horSub = this.db.object(`horario/fechas/${idNegocio}`).valueChanges()
         .subscribe((horario: Dia[]) => {
-          horSub.unsubscribe();
-          resolve(horario);
-        });
-    });
+          horSub.unsubscribe()
+          resolve(horario)
+        })
+    })
   }
 
   // Para barra búsqueda en Home
@@ -151,6 +152,17 @@ export class NegocioService {
         negSub.unsubscribe()
         neg = neg.filter(n => n.idNegocio)
         resolve(neg)
+      })
+    })
+  }
+
+  // Para Home page, calcular costo de envíos
+  getUltimaDireccion(): Promise<Direccion> {
+    return new Promise((resolve, reject) => {
+      const uid = this.uidService.getUid()
+      const dirSub = this.db.object(`usuarios/${uid}/direcciones/ultima`).valueChanges().subscribe((dir: Direccion) => {
+        dirSub.unsubscribe()
+        resolve(dir)
       })
     })
   }

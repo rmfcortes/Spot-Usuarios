@@ -64,39 +64,39 @@ export class CategoriaPage implements OnInit, OnDestroy{
   // Carga datos iniciales
 
   ngOnInit() {
-    this.categoria = this.activatedRoute.snapshot.paramMap.get('cat');
-    this.getSubCategorias();
-    this.getOfertas();
-    this.getNegocios();
-    this.listenCambios();
+    this.categoria = this.activatedRoute.snapshot.paramMap.get('cat')
+    this.getSubCategorias()
+    this.getOfertas()
+    this.getNegocios()
+    this.listenCambios()
   }
 
   ionViewWillEnter() {
     this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-      this.router.navigate(['/home']);
-    });
+      this.router.navigate(['/home'])
+    })
   }
 
   getSubCategorias() {
     this.categoriaService.getSubCategorias(this.categoria)
     .then(subcategorias => {
-      this.subCategorias = subcategorias;
-      this.subCategorias.unshift('todos');
+      this.subCategorias = subcategorias
+      this.subCategorias.unshift('todos')
     })
-    .catch((err) => console.log(err));
+    .catch((err) => console.log(err))
   }
 
   async getOfertas() {
     this.ofertaService.getOfertas(this.batchOfertas + 1, this.categoria)
     .then((ofertas: Oferta[]) => {
       if (ofertas.length === this.batchOfertas + 1) {
-        this.hayMas = true;
-        ofertas.shift();
+        this.hayMas = true
+        ofertas.shift()
       }
-      this.ofertas = ofertas.reverse();
-      this.promosReady = true;
+      this.ofertas = ofertas.reverse()
+      this.promosReady = true
     })
-    .catch((err) => console.log(err));;
+    .catch((err) => console.log(err))
   }
 
   async getNegocios(event?) {
@@ -104,25 +104,25 @@ export class CategoriaPage implements OnInit, OnDestroy{
       .getNegocios(this.status, this.categoria, this.subCategoria, this.batch + 1, this.lastKey, this.lastValue)
       .then(negocios => {
         if (negocios.length === this.batch + 1) {
-          this.lastKey = negocios[0].id;
-          this.lastValue = negocios[0].promedio;
+          this.lastKey = negocios[0].id
+          this.lastValue = negocios[0].promedio
           negocios.shift();
         } else if (this.status === 'abiertos') {
-          this.status = 'cerrados';
-          this.lastKey = '';
-          this.lastValue = '';
-          this.negocios = this.negocios.concat(negocios.reverse());
-          if (event) { event.target.complete(); }
-          this.getNegocios(event);
-          return;
+          this.status = 'cerrados'
+          this.lastKey = ''
+          this.lastValue = ''
+          this.negocios = this.negocios.concat(negocios.reverse())
+          if (event) event.target.complete()
+          this.getNegocios(event)
+          return
         } else {
-          this.noMore = true;
+          this.noMore = true
         }
-        this.negocios = this.negocios.concat(negocios.reverse());
-        if (event) { event.target.complete(); }
-        this.negociosReady = true;
+        this.negocios = this.negocios.concat(negocios.reverse())
+        if (event) event.target.complete()
+        this.negociosReady = true
       })
-      .catch((err) => console.log(err));;
+      .catch((err) => console.log(err))
   }
 
   // Listeners
@@ -130,30 +130,28 @@ export class CategoriaPage implements OnInit, OnDestroy{
   listenCambios() {
     this.categoriaService.isOpen().query.ref.on('child_changed', data => {
       this.ngZone.run(() => {
-        const negocio = data.val();
+        const negocio = data.val()
         if (this.negocios.length > 0) {
-          const i = this.negocios.findIndex(n => n.id === negocio.idNegocio);
+          const i = this.negocios.findIndex(n => n.id === negocio.idNegocio)
           if (i >= 0) {
             this.negocios[i].abierto = negocio.abierto;
           }
         }
-      });
-    });
+      })
+    })
   }
   
   // Ver negocio
 
   async verNegocio(negocio: Negocio) {
-    const infoNeg: InfoGral = await this.ofertaService.getStatus(negocio.id);
-    const uid = this.uidService.getUid();
-    if (uid) {
-      this.categoriaService.setVisitaNegocio(uid, infoNeg.idNegocio);
-    }
-    this.categoriaService.setVisita(infoNeg);
+    const infoNeg: InfoGral = await this.ofertaService.getStatus(negocio.id)
+    const uid = this.uidService.getUid()
+    if (uid) this.categoriaService.setVisitaNegocio(uid, infoNeg.idNegocio)
+    this.categoriaService.setVisita(infoNeg)
     if (negocio.tipo === 'productos') {
-      this.router.navigate([`negocio/${this.categoria}/${negocio.id}/${infoNeg.abierto}`]);
+      this.router.navigate([`negocio/${this.categoria}/${negocio.id}/${infoNeg.abierto}`])
     } else {
-      this.router.navigate([`negocio-servicios/${this.categoria}/${negocio.id}/${infoNeg.abierto}`]);
+      this.router.navigate([`negocio-servicios/${this.categoria}/${negocio.id}/${infoNeg.abierto}`])
     }
   }
 
@@ -161,19 +159,17 @@ export class CategoriaPage implements OnInit, OnDestroy{
     const modal = await this.modalController.create({
       component: OfertasPage,
       componentProps: {categoria: this.categoria, batch: this.batchOfertas}
-    });
+    })
 
-    return modal.present();
+    return modal.present()
   }
 
   async irAOferta(oferta: Oferta) {
-    const uid = this.uidService.getUid();
-    const infoNeg: InfoGral = await this.ofertaService.getStatus(oferta.idNegocio);
-    if (uid) {
-      this.categoriaService.setVisitaNegocio(uid, oferta.idNegocio);
-    }
-    this.categoriaService.setVisita(infoNeg);
-    this.router.navigate(['/negocio', infoNeg.categoria, oferta.idNegocio, infoNeg.abierto]);
+    const uid = this.uidService.getUid()
+    const infoNeg: InfoGral = await this.ofertaService.getStatus(oferta.idNegocio)
+    if (uid) this.categoriaService.setVisitaNegocio(uid, oferta.idNegocio)
+    this.categoriaService.setVisita(infoNeg)
+    this.router.navigate(['/negocio', infoNeg.categoria, oferta.idNegocio, infoNeg.abierto])
   }
 
   // Filtra por categoria

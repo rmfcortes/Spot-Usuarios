@@ -59,10 +59,10 @@ export class CartService {
     return new Promise((resolve, reject) => {
       const uid = this.uidService.getUid();
       const dirSub = this.db.object(`usuarios/${uid}/direcciones/ultima`).valueChanges().subscribe((dir: Direccion) => {
-        dirSub.unsubscribe();
-        resolve(dir);
-      });
-    });
+        dirSub.unsubscribe()
+        resolve(dir)
+      })
+    })
   }
 
   getUltimaFormaPago(): Promise<FormaPago> {
