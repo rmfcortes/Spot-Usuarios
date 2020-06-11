@@ -1,0 +1,37 @@
+ion-content {
+    --background: white;
+}
+
+.btn-face {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    --background: #3b5998;
+}
+
+.input-usuario {
+    border: solid 1px #ff9238;
+    border-radius: 15px;
+    margin-bottom: 1rem;
+}
+
+.back-icon {
+    margin-top: 1rem;
+    margin-left: 1rem;
+    color: #ff9238;
+    font-size: 18pt;
+    float: left;
+}
+
+.botones {
+    text-align: center;
+    width: 80%;
+    margin: auto;
+}
+
+.mr-5 {
+    margin-right: 5px;
+}
+
+.titulo {
+    color: var(--ion-color-primary);
+}

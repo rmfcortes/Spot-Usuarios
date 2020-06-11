@@ -1,0 +1,87 @@
+<ion-header *ngIf="!hasPermission && mapReady">
+    <ion-toolbar color="primary" (click)="muestraPermisos()">
+        <ion-buttons slot="start">
+            <ion-button>
+                <ion-icon slot="icon-only" name="notifications"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+        <ion-title>Activar notificaciones</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <div style="position: relative; height: 100%; width: 100%;">
+        <agm-map *ngIf="pedido" style="height: 100%" [latitude]="pedido.cliente.direccion.lat" [longitude]="pedido.cliente.direccion.lng" [disableDefaultUI]="true" [streetViewControl]="false" maxZoom="17" [zoomControl]="false" [fitBounds]="true" (mapReady)="mapLoaded()">
+            <agm-marker [agmFitBounds]="true" [iconUrl]='{"url": icon,"scaledSize": {"height": 75, "width": 50}}' [latitude]="pedido.cliente.direccion.lat" [longitude]="pedido.cliente.direccion.lng" [animation]="'DROP'"></agm-marker>
+            <agm-marker [agmFitBounds]="true" [iconUrl]='{"url": tienda,"scaledSize": {"height": 50, "width": 50}}' [latitude]="pedido.negocio.direccion.lat" [longitude]="pedido.negocio.direccion.lng" [animation]="'DROP'"></agm-marker>
+            <agm-marker [agmFitBounds]="true" *ngIf="pedido.repartidor && pedido.repartidor.lat" [iconUrl]='{"url": repartidor,"scaledSize": {"height": 50, "width": 50}}' [latitude]="pedido.repartidor.lat" [longitude]="pedido.repartidor.lng" [animation]="'DROP'"></agm-marker>
+        </agm-map>
+        <div class="arrow" *ngIf="mapReady">
+            <ion-button (click)="regresar()" fill="clear">
+                <ion-icon slot="start" name="arrow-back"></ion-icon>
+            </ion-button>
+        </div>
+        <div class="cuadro-tel" *ngIf="!telReady">
+            <ion-item>
+                <ion-label lines="none" style="text-align: center">
+                    <h2 style="color: var(--ion-color-primary);">Teléfono de contacto</h2>
+                    <p class="ion-text-wrap">Mientras esperas tu pedido, por favor dinos un teléfono de contacto</p>
+                </ion-label>
+            </ion-item>
+            <ion-item lines="none">
+                <ion-label>Tel:
+                    <ion-text color="danger">*</ion-text>
+                </ion-label>
+                <ion-input (keyup.enter)="$event.target.blur();" placeholder="Ej. 4581125978" style="border-bottom: solid 1px var(--ion-color-primary);" (keyup.enter)="$event.target.blur();" [(ngModel)]="tel" type="tel"></ion-input>
+                <ion-button [disabled]="!tel" (click)="guardaTel()" slot="end" size="small">
+                    Guardar
+                </ion-button>
+            </ion-item>
+        </div>
+        <div class="cuadro" *ngIf="pedido && pedido.cliente">
+            <ng-container *ngIf="!pedido.aceptado; else repaTemplate">
+                <div style="width: 100%; text-align: center;">
+                    <ion-spinner style="margin: auto" color="primary" name="dots"></ion-spinner>
+                </div>
+                <ion-item lines="none" style="text-align: center">
+                    <ion-label>
+                        <h2>Esperando confirmación del pedido</h2>
+                    </ion-label>
+                </ion-item>
+            </ng-container>
+            <ng-template #repaTemplate>
+                <div style="width: 100%; height: 100%;">
+                    <ion-item lines="none" style="margin-top: 0.5rem">
+                        <ion-label *ngIf="pedido.aceptado">Entrega aproximada: {{pedido.aceptado | date:'shortTime'}}</ion-label>
+                    </ion-item>
+                    <ion-item lines="none" style="margin-top: 0.3rem">
+                        <ion-thumbnail slot="start">
+                            <img [src]="pedido.negocio.logo" />
+                        </ion-thumbnail>
+                        <ion-label color="medium">{{pedido.negocio.nombreNegocio}}</ion-label>
+                        <ion-icon slot="end" name="call" (click)="llamar(pedido.negocio.telefono)"></ion-icon>
+                    </ion-item>
+                    <ion-item *ngIf="pedido.repartidor" lines="none" style="margin-top: 0.3rem">
+                        <ion-avatar slot="start">
+                            <img [src]="pedido.repartidor.foto" />
+                        </ion-avatar>
+                        <ion-label color="medium">{{pedido.repartidor.nombre}}</ion-label>
+                        <ng-container *ngIf="newMsg; else msgTemplate">
+                            <ion-icon color="primary" slot="end" name="chatbubbles-sharp" (click)="muestraChat()"></ion-icon>
+                        </ng-container>
+                        <ng-template #msgTemplate>
+                            <ion-icon slot="end" name="chatbubble-sharp" (click)="muestraChat()"></ion-icon>
+                        </ng-template>
+                        <ion-icon slot="end" name="call" (click)="llamar(pedido.repartidor.telefono)"></ion-icon>
+                    </ion-item>
+                    <ion-button (click)="verPedido()" expand="block" fill="clear" shape="round">
+                        Ver detalles
+                    </ion-button>
+                </div>
+            </ng-template>
+        </div>
+    </div>
+    <ion-spinner *ngIf="!mapReady" class="spinner" name="dots"></ion-spinner>
+</ion-content>
+
+<app-no-network></app-no-network>

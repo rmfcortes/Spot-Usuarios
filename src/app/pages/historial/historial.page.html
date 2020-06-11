@@ -1,0 +1,59 @@
+<ion-header>
+    <ion-toolbar color="primary">
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+        <ion-title>Historial</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <ng-container *ngIf="historialReady; else hisTemplate">
+        <ion-list>
+            <ion-card class="card-shadow">
+                <ion-item *ngFor="let item of historial" detail (click)="verPedido(item)">
+                    <ion-thumbnail class="logo">
+                        <img [src]="item.negocio.logo" />
+                    </ion-thumbnail>
+                    <ion-label color="medium">
+                        <h2>{{item.negocio.nombreNegocio}}</h2>
+                        <p>{{item.aceptado | date:'short'}}</p>
+                        <ng-container *ngIf="item.entregado; else entregadoTemplate">
+                            <p>Entregado</p>
+                        </ng-container>
+                        <ng-template #entregadoTemplate>
+                            <p>Cancelado</p>
+                        </ng-template>
+                    </ion-label>
+                    <ion-badge color="primary" *ngIf="!item.calificacion">Calificar</ion-badge>
+                </ion-item>
+            </ion-card>
+        </ion-list>
+    </ng-container>
+    <ng-template #hisTemplate>
+        <ion-item *ngFor="let item of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]">
+            <ion-thumbnail slot="start">
+                <ion-skeleton-text></ion-skeleton-text>
+            </ion-thumbnail>
+            <ion-label>
+                <h3>
+                    <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                </h3>
+                <p>
+                    <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+                </p>
+                <p>
+                    <ion-skeleton-text animated style="width: 30%"></ion-skeleton-text>
+                </p>
+            </ion-label>
+        </ion-item>
+    </ng-template>
+
+
+    <ion-infinite-scroll threshold="100px" (ionInfinite)="loadData($event)">
+        <ion-infinite-scroll-content loadingSpinner="bubbles">
+        </ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+</ion-content>
+
+<app-no-network></app-no-network>

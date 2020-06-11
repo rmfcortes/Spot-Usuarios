@@ -1,0 +1,64 @@
+<ion-header class="ion-no-border">
+    <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-button (click)="regresar()">
+                <ion-icon slot="start" name="arrow-back"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+        <ion-title>Tarjeta de crédito/débito</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <ion-card style="margin-top: 2rem;">
+        <form #forma="ngForm" (ngSubmit)="agregarTarjeta()" class="boton-margen" style="margin-top: 2rem;">
+            <ion-item>
+                <ion-label position="floating">Número de tarjeta</ion-label>
+                <ion-input [(ngModel)]="tarjeta.numero" placeholder="0000 0000 0000 0000" required name="email" type="tel" maxlength="19" minlength="18" tabindex="1" (keyup.enter)="moveFocus(b)" (keyup.space)="spaceKey('numero')" (ionChange)="numeroCambio()" (keydown.backspace)="borraNum()"></ion-input>
+            </ion-item>
+            <ion-item>
+                <ion-label position="floating">Vigencia</ion-label>
+                <ion-input [(ngModel)]="tarjeta.expiracion" placeholder="MM/AA" required name="vigencia" type="tel" maxlength="5" minlength="5" tabindex="2" #b (keyup.enter)="moveFocus(c)" (keyup.space)="spaceKey('expiracion')" (ionChange)="vigenciaCambio()" (keydown.backspace)="borraVigencia()"></ion-input>
+                <ion-icon name="help-circle-outline" slot="end" size="small" (click)="ayuda('Vigencia', 'La fecha de vencimiento se ubica en la parte frontal de su tarjeta, debajo del número de tarjeta', 'fecha')"></ion-icon>
+            </ion-item>
+            <ion-item>
+                <ion-label position="floating">Código de seguridad</ion-label>
+                <ion-input [(ngModel)]="tarjeta.cvv" placeholder="CVC" required name="cvv" type="tel" maxlength="4" minlength="3" tabindex="3" #c (keyup.enter)="moveFocus(d)"></ion-input>
+                <ion-icon name="help-circle-outline" slot="end" size="small" (click)="ayuda('Código de seguridad', 'El código de seguridad son los 3-4 dígitos que están en la parte posterior de tu tarjeta en la banda de firma', 'cvc')"></ion-icon>
+            </ion-item>
+            <ion-item>
+                <ion-label position="floating">Nombre del titular</ion-label>
+                <ion-input [(ngModel)]="tarjeta.nombre" placeholder="Juan Perez" required name="nombre" type="text" tabindex="4" #d (keyup.enter)="$event.target.blur();"></ion-input>
+            </ion-item>
+            <ion-button color="primary" type="submit" [disabled]="!forma.valid || loading" expand="block" shape="round" class="margen-boton" style="margin: 1.5rem 0;">
+                <ng-container *ngIf="loading; else loadingTemp">
+                    <ion-spinner name="dots" color="light"></ion-spinner>
+                </ng-container>
+                <ng-template #loadingTemp>
+                    Guardar
+                </ng-template>
+            </ion-button>
+            <ion-item lines="none" style="text-align: center;">
+                <ion-label color="medium" style="font-size: x-small;" class="ion-text-wrap">Por seguridad, preautorizaremos un cargo menor a MXN$10.00 en tu tarjeta.</ion-label>
+            </ion-item>
+        </form>
+    </ion-card>
+    <div class="cuadro-ayuda shadow-large" id="ayuda">
+        <div>
+            <h2 style="color: var(--ion-color-primary); text-align: center;">{{titulo}}</h2>
+            <ion-grid fixed>
+                <ion-row>
+                    <ion-col size="8">
+                        <p style="color: var(--ion-color-medium); text-align: left;" class="boton-margen">{{mensaje}}</p>
+                    </ion-col>
+                    <ion-col size="4">
+                        <ion-img [src]="imagen"></ion-img>
+                    </ion-col>
+                </ion-row>
+            </ion-grid>
+        </div>
+        <ion-button (click)="quitaAyuda()" expand="block" shape="round" class="boton-margen" style="margin-bottom: 1rem;">
+            Entendido
+        </ion-button>
+    </div>
+</ion-content>

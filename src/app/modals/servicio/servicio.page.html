@@ -1,0 +1,28 @@
+<ion-header *ngIf="servicio">
+    <ion-toolbar *ngIf="servicio.url">
+        <ion-icon color="light" class="topleft" (click)="regresar()" name="arrow-back"></ion-icon>
+        <img style="width: 100%;" [src]="servicio.url" alt="">
+    </ion-toolbar>
+    <ion-toolbar>
+        <ion-buttons slot="start" *ngIf="!servicio.url">
+            <ion-button (click)="regresar()" color="primary">
+                <ion-icon slot="start" name="arrow-back"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+        <ion-title color="primary" class="comfortaa">{{servicio.nombre | titlecase}}</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+    <ion-item lines="none" class="boton-margen">
+        <ion-label color="medium" style="text-align: center;" class="ion-text-wrap">{{servicio.descripcion}}</ion-label>
+    </ion-item>
+</ion-content>
+
+<ion-footer *ngIf="servicio">
+    <ion-toolbar>
+        <ion-button class="boton-margen" (click)="contactViaWhatsApp()" expand="block" shape="round">
+            Contactar
+        </ion-button>
+    </ion-toolbar>
+</ion-footer>

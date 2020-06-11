@@ -1,0 +1,93 @@
+<ion-header class="ion-no-border">
+    <ion-toolbar style="--background: #e7e7e7e5;">
+        <ion-buttons slot="start">
+            <ion-button (click)="cerrar()">
+                <ion-icon slot="icon-only" name="close"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <ion-card>
+        <ion-item lines="none">
+            <ion-thumbnail>
+                <img [src]="producto.url" />
+            </ion-thumbnail>
+            <ion-label class="ion-text-wrap" style="padding: 0.5rem;">{{producto.nombre}}</ion-label>
+            <ng-container *ngIf="showDesc; else cheTemp">
+                <ion-icon slot="end" name="chevron-up" (click)="showDesc = false"></ion-icon>
+            </ng-container>
+            <ng-template #cheTemp>
+                <ion-icon slot="end" name="chevron-down" (click)="showDesc = true"></ion-icon>
+            </ng-template>
+        </ion-item>
+        <ion-item lines="none" style="text-align: center;" *ngIf="showDesc">
+            <ion-label color="medium" class="ion-text-wrap">{{producto.descripcion}}</ion-label>
+        </ion-item>
+    </ion-card>
+    <ion-card *ngFor="let item of variables; let i = index">
+        <ng-container *ngIf="item.limite > 1; else limTemplate">
+            <ion-list-header>
+                <ion-label color="primary">
+                    <h2>{{item.titulo | titlecase}}</h2>
+                    <p>Elige máximo {{item.limite}} opciones</p>
+                </ion-label>
+                <ion-badge color="primary" style="margin-right: 0.75rem;" *ngIf="item.obligatorio">Obligatorio</ion-badge>
+            </ion-list-header>
+            <ion-item *ngFor="let prod of item.productos; let y = index">
+                <ion-label>{{prod.nombre | titlecase}}</ion-label>
+                <ion-note slot="end" *ngIf="prod.precio > 0">+{{prod.precio}}</ion-note>
+                <ion-checkbox slot="end" [(ngModel)]="prod.isChecked" [disabled]="prod.deshabilitado" (ionChange)="checkChange(i, y, prod.isChecked)"></ion-checkbox>
+            </ion-item>
+        </ng-container>
+        <ng-template #limTemplate>
+            <ion-radio-group (ionChange)="radioSelected($event, i)" [(ngModel)]="item.radioSelected">
+                <ion-list-header>
+                    <ion-label color="primary">{{item.titulo | titlecase}}</ion-label>
+                    <ion-badge color="primary" style="margin-right: 0.75rem;" *ngIf="item.obligatorio">Obligatorio</ion-badge>
+                </ion-list-header>
+                <ion-item *ngFor="let c of item.productos; let y = index">
+                    <ion-label>{{c.nombre | titlecase}}</ion-label>
+                    <ion-note slot="end" *ngIf="c.precio > 0">+{{c.precio}}</ion-note>
+                    <ion-radio slot="end" color="primary" [value]="y"></ion-radio>
+                </ion-item>
+            </ion-radio-group>
+        </ng-template>
+    </ion-card>
+    <ion-card>
+        <ion-list-header>
+            <ion-label color="primary">Agregar comentarios</ion-label>
+        </ion-list-header>
+        <ion-item lines="none" style="margin-bottom: 1rem;">
+            <ion-textarea style="border: 1px rgb(184, 184, 184) solid; padding: 0.5rem;" (keyup.enter)="$event.target.blur();" [(ngModel)]="producto.observaciones" placeholder="Agrega observaciones (especifica tus preferencias en los productos)"></ion-textarea>
+        </ion-item>
+    </ion-card>
+    <ion-button class="boton-add" fill="clear" style="--ripple-color: transparent; --background: white" shape="round">
+        <ion-grid fixed class="ion-no-padding">
+            <ion-row class="ion-no-padding">
+                <ion-col class="ion-no-padding ion-align-self-center" size="3" (click)="minusProduct()">
+                    <div style="color: var(--ion-color-medium)">-</div>
+                </ion-col>
+                <ion-col class="ion-no-padding ion-align-self-center" size="6">
+                    <div #brinca>
+                        <ion-input color="primary" readonly="true" type="number" [(ngModel)]="producto.cantidad"></ion-input>
+                    </div>
+                </ion-col>
+                <ion-col class="ion-no-padding ion-align-self-center" size="3" (click)="plusProduct()">
+                    <strong style="color: var(--ion-color-primary)">+</strong>
+                </ion-col>
+            </ion-row>
+        </ion-grid>
+    </ion-button>
+</ion-content>
+
+<app-no-network></app-no-network>
+
+<ion-footer>
+    <ion-toolbar>
+        <ion-button class="boton-cart" expand="block" color="primary" (click)="agregarProducto()" [disabled]="!canContinue" shape="round">
+            <strong style="margin-right: 0.5rem;">Agregar:</strong> {{producto.total | currency:'CAD':'symbol-narrow':'1.0-0'}}
+        </ion-button>
+    </ion-toolbar>
+</ion-footer>

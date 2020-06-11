@@ -1,0 +1,134 @@
+<ng-container *ngIf="!error; else errorTemplate">
+    <ng-container *ngIf="infoReady; else infoTemplate">
+        <ion-header *ngIf="portada">
+            <ion-toolbar [appScrollVanish]="scrollArea">
+                <ion-icon color="light" class="topleft" (click)="regresar()" name="arrow-back"></ion-icon>
+                <img style="width: 100%;" [src]="portada" alt="">
+            </ion-toolbar>
+            <ion-toolbar [appTitleScrollVanish]="scrollArea">
+                <ion-title color="primary" class="comfortaa">{{negocio.nombre}}</ion-title>
+                <ion-buttons slot="end">
+                    <ion-button fill="clear" (click)="verInfo()">
+                        Ver más
+                    </ion-button>
+                </ion-buttons>
+            </ion-toolbar>
+            <ion-segment scrollable>
+                <ion-segment-button (click)="resetProds()">
+                    Todos
+                </ion-segment-button>
+                <ion-segment-button (click)="resetProds('Ofertas')" *ngIf="hasOfertas">
+                    Ofertas
+                </ion-segment-button>
+                <ion-segment-button (click)="resetProds(item.nombre)" *ngFor="let item of pasillos.pasillos" class="ion-text-wrap">
+                    {{item.nombre}}
+                </ion-segment-button>
+            </ion-segment>
+        </ion-header>
+
+        <ion-content #scrollArea scrollEvents="true" class="ion-padding">
+            <ng-container *ngIf="cargandoProds; else cargandoTemp">
+                <ion-item lines="none">
+                    <ion-spinner style="margin: auto;" name="dots" color="primary"></ion-spinner>
+                </ion-item>
+            </ng-container>
+            <ng-template #cargandoTemp>
+                <div *ngIf="servicios.length > 0" style="margin-bottom: 135px;">
+                    <div [ngSwitch]="vista">
+                        <div *ngSwitchCase="'list-img'">
+                            <app-list-img [sections]="servicios" (showProduct)="verServicio($event)"></app-list-img>
+                        </div>
+                        <div *ngSwitchCase="'block'">
+                            <app-block [sections]="servicios" (showProduct)="verServicio($event)"></app-block>
+                        </div>
+                        <div *ngSwitchCase="'cards'">
+                            <app-cards [sections]="servicios" (showProduct)="verServicio($event)"></app-cards>
+                        </div>
+                        <div *ngSwitchCase="'list'">
+                            <app-list [sections]="servicios" (showProduct)="verServicio($event)"></app-list>
+                        </div>
+                        <div *ngSwitchCase="'gallery'">
+                            <app-gallery [sections]="servicios" (showProduct)="verServicio($event)"></app-gallery>
+                        </div>
+                        <div *ngSwitchDefault>
+                            <app-list-img [sections]="servicios" (showProduct)="verServicio($event)"></app-list-img>
+                        </div>
+                    </div>
+                </div>
+                <ion-item lines="none" style="text-align: center;">
+                    <ion-label color="medium">No hay más resultados</ion-label>
+                </ion-item>
+            </ng-template>
+
+
+            <ng-container *ngIf="pasilloFiltro; else elseTemplate">
+                <ion-infinite-scroll threshold="100px" (ionInfinite)="loadDataListaFiltrada($event)">
+                    <ion-infinite-scroll-content loadingSpinner="bubbles">
+                    </ion-infinite-scroll-content>
+                </ion-infinite-scroll>
+            </ng-container>
+            <ng-template #elseTemplate>
+                <ion-infinite-scroll threshold="100px" (ionInfinite)="loadDataLista($event)">
+                    <ion-infinite-scroll-content loadingSpinner="bubbles">
+                    </ion-infinite-scroll-content>
+                </ion-infinite-scroll>
+            </ng-template>
+        </ion-content>
+
+        <app-no-network></app-no-network>
+
+        <ion-footer>
+            <ion-toolbar color="light" style="text-align:center;">
+                <ng-container *ngIf="negocio.abierto; else footTemplate">
+                    <ion-grid fixed class="ion-no-padding">
+                        <ion-row>
+                            <ion-col size="4">
+                                <ion-button shape="round" (click)="llamar()" shape="round">
+                                    <ion-icon slot="icon-only" name="call"></ion-icon>
+                                </ion-button>
+                            </ion-col>
+                            <ion-col size="4">
+                                <ion-button shape="round" (click)="contactViaWhatsApp()" shape="round">
+                                    <ion-icon slot="icon-only" name="logo-whatsapp"></ion-icon>
+                                </ion-button>
+                            </ion-col>
+                            <ion-col size="4">
+                                <ion-button shape="round" (click)="verInfo()" shape="round">
+                                    <ion-icon slot="icon-only" name="location"></ion-icon>
+                                </ion-button>
+                            </ion-col>
+                        </ion-row>
+                    </ion-grid>
+                </ng-container>
+                <ng-template #footTemplate>
+                    <ion-button class="boton-margen" expand="block" color="danger" fill="clear">
+                        Negocio cerrado
+                    </ion-button>
+                    <ion-button class="boton-margen" expand="block" color="danger" (click)="verInfo()" shape="round">
+                        Ver horario
+                    </ion-button>
+                </ng-template>
+            </ion-toolbar>
+        </ion-footer>
+    </ng-container>
+    <ng-template #infoTemplate>
+        <ion-spinner class="spinner" name="dots"></ion-spinner>
+    </ng-template>
+</ng-container>
+<ng-template #errorTemplate>
+    <ion-content>
+    </ion-content>
+    <ion-footer>
+        <ion-item class="boton-margen" lines="none" style="text-align: center; margin-top: 3rem;">
+            <ion-label>
+                <h2 class="ion-text-wrap">Lo sentimos, surgió un problema al cargar la información de este negocio.</h2>
+            </ion-label>
+        </ion-item>
+        <ion-button class="boton-margen" (click)="reintentar()" expand="block" shape="round">
+            Intenar de nuevo
+        </ion-button>
+        <ion-button (click)="regresar()" expand="block" fill="clear" shape="round">
+            Regresar
+        </ion-button>
+    </ion-footer>
+</ng-template>

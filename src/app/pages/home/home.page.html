@@ -1,0 +1,297 @@
+<ion-content>
+    <div class="profile">
+        <ng-container *ngIf="uid; else menuTemplate">
+            <ion-buttons slot="start">
+                <ion-menu-button color="light"></ion-menu-button>
+            </ion-buttons>
+        </ng-container>
+        <ng-template #menuTemplate>
+            <ion-buttons slot="start">
+                <ion-button (click)="login()" color="light" style="margin-bottom: 1rem;">
+                    Iniciar sesión
+                    <ion-icon slot="start" name="log-in"></ion-icon>
+                </ion-button>
+            </ion-buttons>
+        </ng-template>
+    </div>
+    <div class="cuadro-opciones">
+        <ion-item style="text-align: center;">
+            <ion-input #inputSearch [disabled]="!catsReady" (keyup.enter)="buscar($event)" [(ngModel)]="busqueda" type="text" placeholder="Busca servicios o productos"></ion-input>
+            <ng-container *ngIf="buscando; else buscandoTemplate">
+                <ion-spinner color="primary" name="dots"></ion-spinner>
+            </ng-container>
+            <ng-template #buscandoTemplate>
+                <ion-icon slot="end" name="search" color="primary" (click)="buscar()"></ion-icon>
+            </ng-template>
+        </ion-item>
+    </div>
+
+    <!-- Busqueda -->
+
+    <ion-card *ngIf="negMatch.length > 0" id="cardBusqueda">
+        <ion-grid>
+            <div id="tituloBusqueda">
+                <ion-row>
+                    <ion-col size="8">
+                        <h2 style="margin-left: 1rem; color: var(--ion-color-primary);">Resultados búsqueda</h2>
+                    </ion-col>
+                    <ion-col size="4" (click)="resetBusqueda()" class="ion-align-self-center">
+                        <ion-label color="primary" style="font-size: smaller; float: right; margin-right: 0.5rem;">Limpiar</ion-label>
+                    </ion-col>
+                </ion-row>
+            </div>
+        </ion-grid>
+        <ion-card>
+            <div *ngFor="let item of negMatch; let i = index" id="{{item.idNegocio}}">
+                <ion-card class="card-shadow">
+                    <ng-container *ngIf="item.abierto; else searchTemplate">
+                        <ion-item detail lines="none" (click)="verProducto(item)">
+                            <ion-thumbnail>
+                                <preload-image [ratio]="{w: 1, h: 1}" [src]="item.foto"></preload-image>
+                            </ion-thumbnail>
+                            <ion-label style="margin-left: 0.5rem;">
+                                <h2>{{item.nombre}}</h2>
+                                <p *ngIf="item.promedio" style="color: darkorange;">{{item.promedio}}
+                                    <ion-icon slot="end" name="star"></ion-icon>
+                                </p>
+                            </ion-label>
+                        </ion-item>
+                    </ng-container>
+                    <ng-template #searchTemplate>
+                        <ion-item detail lines="none" (click)="verProducto(item)">
+                            <ion-thumbnail>
+                                <preload-image [ratio]="{w: 1, h: 1}" [src]="item.foto" style="opacity: 0.5;"></preload-image>
+                            </ion-thumbnail>
+                            <ion-label color="medium" style="margin-left: 0.5rem;">
+                                <h2>{{item.nombre}}</h2>
+                                <p *ngIf="item.promedio">{{item.promedio}}
+                                    <ion-icon slot="end" name="star"></ion-icon>
+                                </p>
+                            </ion-label>
+                            <ion-badge color="primary">Cerrado</ion-badge>
+                        </ion-item>
+                    </ng-template>
+
+                </ion-card>
+            </div>
+        </ion-card>
+    </ion-card>
+
+
+
+    <!-- Categorias -->
+    <ng-container *ngIf="catsReady; else catsTemplate">
+        <ion-card>
+            <ion-grid *ngIf="categorias.length > 0" class="ion-no-padding">
+                <ion-row>
+                    <ion-col size="8">
+                        <h2 style="margin-left: 1rem; color: var(--ion-color-primary)">Categorías</h2>
+                    </ion-col>
+                    <ion-col size="4" (click)="verCategorias()" class="ion-align-self-center">
+                        <ion-label color="primary" style="font-size: smaller; float: right; margin-right: 1.2rem;">Ver todas</ion-label>
+                    </ion-col>
+                </ion-row>
+            </ion-grid>
+            <ion-slides [options]="sld" style="margin-bottom: 1.1rem;">
+                <ion-slide *ngFor="let item of categorias; let i = index" (click)="irACategoria(item.categoria)">
+                    <preload-image [ratio]="{w: 1, h: 1}" [src]="item.foto"></preload-image>
+                </ion-slide>
+            </ion-slides>
+        </ion-card>
+    </ng-container>
+    <ng-template #catsTemplate>
+        <ion-list style="margin-top: 1rem;">
+            <ion-list-header>
+                <ion-skeleton-text animated class="radius skeleton-titulo"></ion-skeleton-text>
+            </ion-list-header>
+            <ion-grid fixed>
+                <ion-row>
+                    <ion-col size="4" *ngFor="let item of [1,2,3]">
+                        <ion-skeleton-text animated style="width: 100%; height: 7rem" class="radius"></ion-skeleton-text>
+                    </ion-col>
+                </ion-row>
+            </ion-grid>
+        </ion-list>
+    </ng-template>
+
+    <!-- Pedidos -->
+    <ion-card *ngIf="pedidosReady && catsReady && pedidos.length > 0">
+        <h2 style="margin-left: 1rem; color: var(--ion-color-primary)" *ngIf="pedidos.length > 0">Pedidos</h2>
+        <ion-card>
+            <ng-container *ngIf="!verPedidos; else pedidosTemplate">
+                <ion-item *ngIf="pedidos.length > 0" (click)="verPedido(pedidos[0])" detail style="--detail-icon-color: var(--ion-color-primary)">
+                    <ion-label color="medium">{{pedidos[0].negocio.nombreNegocio}}</ion-label>
+                    <ion-badge color="primary" *ngIf="pedidos[0].unRead > 0">{{pedidos[0].unRead}}</ion-badge>
+                </ion-item>
+                <ion-item *ngIf="pedidos.length > 1" (click)="verPedido(pedidos[1])" detail style="--detail-icon-color: var(--ion-color-primary)">
+                    <ion-label color="medium">{{pedidos[1].negocio.nombreNegocio}}</ion-label>
+                    <ion-badge color="primary" *ngIf="pedidos[1].unRead > 0">{{pedidos[1].unRead}}</ion-badge>
+                </ion-item>
+                <ion-item *ngIf="pedidos.length > 2" (click)="verPedidos = true">
+                    <ion-label color="medium" slot="end">Ver más
+                        <ion-icon style="margin-left: 0.5rem;" name="chevron-down"></ion-icon>
+                    </ion-label>
+                </ion-item>
+            </ng-container>
+            <ng-template #pedidosTemplate>
+                <ion-item *ngFor="let item of pedidos" detail (click)="verPedido(item)" style="--detail-icon-color: var(--ion-color-primary)">
+                    <ion-label color="medium">{{item.negocio.nombreNegocio}}</ion-label>
+                    <ion-badge color="primary" *ngIf="item.unRead > 0">{{item.unRead}}</ion-badge>
+                </ion-item>
+                <ion-item (click)="verPedidos = false" lines="none">
+                    <ion-label color="medium" slot="end">Ocultar
+                        <ion-icon style="margin-left: 0.5rem;" name="chevron-up"></ion-icon>
+                    </ion-label>
+                </ion-item>
+            </ng-template>
+
+        </ion-card>
+
+    </ion-card>
+
+    <!-- Ofertas -->
+    <ng-container *ngIf="pedidosReady && catsReady && promosReady; else promoTemplate">
+        <ion-card>
+            <ion-grid *ngIf="ofertas.length > 0" class="ion-no-padding">
+                <ion-row>
+                    <ion-col size="8">
+                        <h2 style="margin-left: 1rem; color: var(--ion-color-primary)">Promociones</h2>
+                    </ion-col>
+                    <ion-col size="4" *ngIf="hayMas" (click)="verOfertas()" class="ion-align-self-center">
+                        <ion-label color="primary" style="font-size: smaller; float: right; ; margin-right: 1.2rem;">Ver todas</ion-label>
+                    </ion-col>
+                </ion-row>
+            </ion-grid>
+            <ion-slides [options]="slideOpts" *ngIf="ofertas.length > 0" style="margin-bottom: 1.1rem;">
+                <ion-slide *ngFor="let item of ofertas" (click)="irAOferta(item)" style="padding: 0 0.5rem;">
+                    <preload-image [ratio]="{w: 1, h: 0.45}" [src]="item.foto" class="radius"></preload-image>
+                </ion-slide>
+                <ion-slide *ngIf="hayMas" (click)="verOfertas()" style="padding: 0 0.5rem;">
+                    <ion-img src="../../../assets/img/botones/verTodas.png"></ion-img>
+                </ion-slide>
+            </ion-slides>
+        </ion-card>
+    </ng-container>
+    <ng-template #promoTemplate>
+        <ion-list>
+            <ion-list-header>
+                <ion-skeleton-text animated class="radius skeleton-titulo"></ion-skeleton-text>
+            </ion-list-header>
+            <ion-skeleton-text animated class="radius skeleton-oferta"></ion-skeleton-text>
+        </ion-list>
+    </ng-template>
+
+
+    <!-- + visitados por ti -->
+    <ng-container *ngIf="pedidosReady && catsReady && promosReady && catsReady && visitadosReady; else visTemplate">
+        <ion-card>
+            <h2 style="margin-left: 1rem; color: var(--ion-color-primary)" *ngIf="negociosVisitados.length > 0">+ Visitados por ti</h2>
+            <ion-card *ngFor="let item of negociosVisitados">
+                <ion-item detail lines="none" (click)="verProductoConInfo(item)">
+                    <ng-container *ngIf="item.abierto; else visitadosOpen">
+                        <ion-thumbnail>
+                            <preload-image [ratio]="{w: 1, h: 1}" [src]="item.foto"></preload-image>
+                        </ion-thumbnail>
+                        <ion-label style="margin-left: 0.5rem;">
+                            <h2>{{item.nombre}}</h2>
+                            <p *ngIf="item.promedio" style="color: darkorange;">{{item.promedio}}
+                                <ion-icon slot="end" name="star"></ion-icon>
+                            </p>
+                        </ion-label>
+                    </ng-container>
+                    <ng-template #visitadosOpen>
+                        <ion-thumbnail>
+                            <preload-image [ratio]="{w: 1, h: 1}" [src]="item.foto" style="opacity: 0.5;"></preload-image>
+                        </ion-thumbnail>
+                        <ion-label style="margin-left: 0.5rem;" color="medium">
+                            <h2>{{item.nombre}}</h2>
+                            <p *ngIf="item.promedio">{{item.promedio}}
+                                <ion-icon slot="end" name="star"></ion-icon>
+                            </p>
+                        </ion-label>
+                        <ion-badge color="primary" mode="ios">Cerrado</ion-badge>
+                    </ng-template>
+                </ion-item>
+            </ion-card>
+            <div style="height: 1rem;"></div>
+        </ion-card>
+    </ng-container>
+    <ng-template #visTemplate>
+        <ion-list>
+            <ion-list-header>
+                <ion-skeleton-text animated class="radius skeleton-titulo"></ion-skeleton-text>
+            </ion-list-header>
+            <ion-item *ngFor="let item of [1,2,3,4,5]" lines="none">
+                <ion-skeleton-text animated class="radius skeleton-item"></ion-skeleton-text>
+            </ion-item>
+        </ion-list>
+    </ng-template>
+
+
+    <!-- + Populares -->
+    <div *ngIf="pedidosReady && catsReady && promosReady && catsReady && visitadosReady && popularesReady">
+        <ion-card style="margin-top: 0.75rem;">
+            <h2 style="margin-left: 1rem; color: var(--ion-color-primary)" *ngIf="negociosPopulares.length > 0">Los más populares</h2>
+            <ion-card *ngFor="let item of negociosPopulares">
+                <ion-item detail lines="none" (click)="verProductoConInfo(item)">
+                    <ng-container *ngIf="item.abierto; else popularesOpen">
+                        <ion-thumbnail>
+                            <ion-img [src]="item.foto" style="height: 100%; width: 100%; max-height: 7rem; object-fit: cover;" (ionImgWillLoad)="ionImgWillLoad($event)"></ion-img>
+                        </ion-thumbnail>
+                        <ion-label style="margin-left: 0.5rem;">
+                            <h2>{{item.nombre}}</h2>
+                            <p *ngIf="item.promedio" style="color: darkorange;">{{item.promedio}}
+                                <ion-icon slot="end" name="star"></ion-icon>
+                            </p>
+                        </ion-label>
+                    </ng-container>
+                    <ng-template #popularesOpen>
+                        <ion-thumbnail>
+                            <preload-image [ratio]="{w: 1, h: 1}" [src]="item.foto" style="opacity: 0.5;"></preload-image>
+                        </ion-thumbnail>
+                        <ion-label style="margin-left: 0.5rem;" color="medium">
+                            <h2>{{item.nombre}}</h2>
+                            <p *ngIf="item.promedio">{{item.promedio}}
+                                <ion-icon slot="end" name="star"></ion-icon>
+                            </p>
+                        </ion-label>
+                        <ion-badge color="primary" mode="ios">Cerrado</ion-badge>
+                    </ng-template>
+                </ion-item>
+            </ion-card>
+            <div style="height: 1rem;"></div>
+        </ion-card>
+    </div>
+
+    <!-- + vendidos -->
+
+    <div *ngIf="pedidosReady && catsReady && promosReady && catsReady && visitadosReady && popularesReady && vendidosReady">
+        <ion-card>
+            <h2 style="margin-left: 1rem; color: var(--ion-color-primary)" *ngIf="masVendidos.length > 0">Lo más vendido</h2>
+            <ion-card *ngFor="let prod of masVendidos; let y = index" style="--padding: 0; margin-top: 1rem;">
+                <ion-item style="--padding-start: 0; cursor: pointer;" lines="none" detail (click)="verProducto(prod)">
+                    <ion-grid class="ion-no-padding">
+                        <ion-row>
+                            <ion-col size="4">
+                                <ion-img [src]="prod.url" style="height: 100%; width: 100%; max-height: 7rem; object-fit: cover;" (ionImgWillLoad)="ionImgWillLoad($event)"></ion-img>
+                            </ion-col>
+                            <ion-col size="8">
+                                <ion-item lines="none">
+                                    <ion-label class="ion-text-wrap">
+                                        <h2>{{(prod.nombre.length > 25) ? (prod.nombre | slice:0:25) + '...' : prod.nombre}}</h2>
+                                        <h2 class="medium">{{prod.nombreNegocio}}</h2>
+                                        <h2 *ngIf="prod.precio" style="color: var(--ion-color-primary)">{{prod.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}</h2>
+                                    </ion-label>
+                                </ion-item>
+                            </ion-col>
+                        </ion-row>
+                    </ion-grid>
+                </ion-item>
+            </ion-card>
+            <div style="height: 1rem;"></div>
+        </ion-card>
+    </div>
+
+</ion-content>
+
+<app-no-network></app-no-network>

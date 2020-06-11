@@ -1,0 +1,66 @@
+<ion-header>
+    <ion-toolbar *ngIf="infoReady" color="primary">
+        <ion-buttons slot="start">
+            <ion-button (click)="regresar()">
+                <ion-icon color="light" slot="icon-only" name="arrow-back"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+        <ion-title>{{negocio.datos.nombreNegocio}}</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <div *ngIf="infoReady">
+        <ion-grid class="linea">
+            <ion-row>
+                <ion-col size="2" class="ion-align-self-center">
+                    <ion-icon class="icono-lista" name="location"></ion-icon> <br>
+                </ion-col>
+                <ion-col size="10" class="ion-align-self-center">
+                    {{negocio.detalles.direccion}}
+                </ion-col>
+            </ion-row>
+        </ion-grid>
+
+        <ion-grid class="linea">
+            <ion-row>
+                <ion-col size="2">
+                    <ion-icon class="icono-lista" name="calendar"></ion-icon> <br>
+                </ion-col>
+                <ion-col size="10" *ngIf="!despliegueHorario" (click)="despliegueHorario = true">
+                    {{negocio.status}}
+                    <ion-icon name="chevron-down"></ion-icon>
+                </ion-col>
+                <ion-col size="10" *ngIf="despliegueHorario" (click)="despliegueHorario = false">
+                    <ion-item *ngFor="let item of horario">
+                        <ion-label>
+                            <h2>{{item.nombre | titlecase}}:</h2>
+                            <p>
+                                <ion-label *ngIf="item.activo === true" color="medium">{{item.apertura | date:'shortTime' }}-{{item.cierre | date:'shortTime'}}</ion-label>
+                                <ion-label *ngIf="item.activo === false" color="medium">Cerrado</ion-label>
+                            </p>
+                            <h4 *ngIf="item.comida === 'comida'">Horario comida:</h4>
+                            <p *ngIf="item.comida === 'comida'">
+                                <ion-label *ngIf="item.activo === true" color="medium">{{item.inicioComida | date:'shortTime' }}-{{item.finComida | date:'shortTime'}}</ion-label>
+                            </p>
+                        </ion-label>
+                    </ion-item>
+                </ion-col>
+            </ion-row>
+        </ion-grid>
+
+        <ion-grid class="linea">
+            <ion-row>
+                <ion-col size="2">
+                    <ion-icon class="icono-lista" name="call"></ion-icon> <br>
+                </ion-col>
+                <ion-col size="10">
+                    {{negocio.detalles.telefono}}
+                </ion-col>
+            </ion-row>
+        </ion-grid>
+        <agm-map [latitude]="negocio.detalles.lat" [longitude]="negocio.detalles.lng" [zoom]="17">
+            <agm-marker [latitude]="negocio.detalles.lat" [longitude]="negocio.detalles.lng"></agm-marker>
+        </agm-map>
+    </div>
+</ion-content>

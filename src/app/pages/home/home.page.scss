@@ -1,0 +1,28 @@
+.cuadro-opciones {
+    height: 3rem;
+    width: 90vw;
+    margin-left: 5vw;
+    margin-top: -1.5rem;
+    border-radius: 500px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.15), 0 6px 20px 0 rgba(0, 0, 0, 0.10);
+    background: white;
+    z-index: 30;
+    overflow: hidden;
+}
+
+.profile {
+    margin-top: 0vh;
+    padding-top: 0.5rem;
+    padding-bottom: 1rem;
+    --background: var(--ion-color-primary);
+    background: var(--ion-color-primary);
+}
+
+.card-shadow {
+    border-left: solid 3px #f0b12b;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.15), 0 6px 20px 0 rgba(0, 0, 0, 0.10);
+}
+
+h2 {
+    font-family: 'Comfortaa';
+}

@@ -1,0 +1,155 @@
+<ion-content>
+    <ng-container *ngIf="infoReady; else elseTemplate">
+        <!-- Contacto -->
+        <ion-item lines="none">
+            <ion-icon color="primary" slot="start" name="arrow-back" (click)="regresar()"></ion-icon>
+            <ion-button (click)="verPedido()" expand="block" fill="clear" slot="end">
+                Ver detalles
+            </ion-button>
+        </ion-item>
+        <ion-card>
+            <h2 class="comfortaa">Contacto</h2>
+            <ion-item>
+                <ion-thumbnail slot="start">
+                    <img [src]="pedido.negocio.logo" />
+                </ion-thumbnail>
+                <ion-label>
+                    <h3 class="comfortaa">{{pedido.negocio.nombreNegocio}}</h3>
+                </ion-label>
+                <ion-icon slot="end" name="call"></ion-icon>
+            </ion-item>
+            <ion-item lines="none" *ngIf="pedido.repartidor">
+                <ion-avatar slot="start">
+                    <img [src]="pedido.repartidor.foto" />
+                </ion-avatar>
+                <ion-label>
+                    <h3 class="comfortaa">{{pedido.repartidor.nombre}}</h3>
+                    <p>Repartidor</p>
+                </ion-label>
+                <ng-container *ngIf="newMsg; else msgTemplate">
+                    <ion-icon color="primary" slot="end" name="chatbubbles-sharp" (click)="muestraChat()"></ion-icon>
+                </ng-container>
+                <ng-template #msgTemplate>
+                    <ion-icon slot="end" name="chatbubble-sharp" (click)="muestraChat()"></ion-icon>
+                </ng-template>
+                <ion-icon slot="end" name="call" (click)="llamar(pedido.repartidor.telefono)"></ion-icon>
+            </ion-item>
+            <ion-item lines="none" *ngIf="pedido.aceptado && !pedido.repartidor">
+                <ion-icon slot="start" color="warning" name="time"></ion-icon>
+                <ion-label color="medium">Asignando repartidor</ion-label>
+            </ion-item>
+        </ion-card>
+
+        <!-- Status -->
+        <ion-card>
+            <h2 class="comfortaa">Status</h2>
+
+            <h3 *ngIf="pedido.aceptado && pedido.entrega === 'inmediato'" style="margin-left: 1rem;">Entrega: {{pedido.aceptado | date:'h:mm a'}}</h3>
+            <h3 *ngIf="pedido.aceptado && pedido.entrega === 'planeado'" style="margin-left: 1rem;">Entrega: {{pedido.aceptado | date:'EEEE d/MMMM/y'}}</h3>
+            <ion-grid class="ion-no-padding">
+                <ng-container *ngIf="pedido.aceptado; else avancesTemp">
+                    <ion-row *ngFor="let avance of pedido.avances; let first = first; let last = last">
+                        <ng-container *ngIf="avance.fecha; else avanceTemp">
+                            <ion-col size="2" class="ion-align-self-center">
+                                <div style="height: 3rem; position: relative;">
+                                    <div [ngClass]="{
+                                    'first-linea': first && pedido.avances.length > 1,
+                                    'linea' : !first && !last,
+                                    'last-linea': last
+                                    }">
+                                    </div>
+                                    <ion-icon class="icono" name="radio-button-on" color="primary"></ion-icon>
+                                </div>
+                            </ion-col>
+                            <ion-col size="10" class="ion-align-self-center">
+                                <ion-label color="dark" style="padding: 1.5rem 0;">{{avance.concepto}}</ion-label>
+                            </ion-col>
+                        </ng-container>
+                        <ng-template #avanceTemp>
+                            <ion-col size="2" class="ion-align-self-center">
+                                <div [ngClass]="{
+                                    'first-linea': first && pedido.avances.length > 1,
+                                    'linea' : !first && !last,
+                                    'last-linea': last
+                                }">
+                                </div>
+                                <ion-icon class="icono" name="ellipse" color="medium"></ion-icon>
+                            </ion-col>
+                            <ion-col size="10" class="ion-align-self-center">
+                                <ion-label color="medium" style="padding: 1.5rem 0;">{{avance.concepto}}</ion-label>
+                            </ion-col>
+                        </ng-template>
+                    </ion-row>
+                </ng-container>
+                <ng-template #avancesTemp>
+                    <!-- Sin avances -->
+                    <ion-progress-bar style="width: 80%; margin-left: 10%;" type="indeterminate"></ion-progress-bar>
+                    <ion-item style="text-align: center;">
+                        <ion-label class="ion-text-wrap" color="medium">Esperando confirmación de {{pedido.negocio.nombreNegocio}}</ion-label>
+                    </ion-item>
+                </ng-template>
+            </ion-grid>
+            <div style="height: 1.5rem;"></div>
+        </ion-card>
+
+
+        <!-- Mapa -->
+        <ion-card *ngIf="pedido.entrega === 'inmediato'">
+            <h2>Rastreo</h2>
+            <div class="marco">
+                <agm-map style="height: 45vh" [latitude]="20.627006" [longitude]="-103.416554" [disableDefaultUI]="true" [streetViewControl]="false" [zoomControl]="false" [fitBounds]="true">
+                    <agm-marker [agmFitBounds]="true" [iconUrl]='{"url": icon,"scaledSize": {"height": 75, "width": 50}}' [latitude]="pedido.cliente.direccion.lat" [longitude]="pedido.cliente.direccion.lng" [animation]="'DROP'"></agm-marker>
+                    <agm-marker [agmFitBounds]="true" [iconUrl]='{"url": tienda,"scaledSize": {"height": 50, "width": 50}}' [latitude]="pedido.negocio.direccion.lat" [longitude]="pedido.negocio.direccion.lng" [animation]="'DROP'"></agm-marker>
+                    <agm-marker [agmFitBounds]="true" *ngIf="pedido.repartidor && pedido.repartidor.lat" [iconUrl]='{"url": repartidor,"scaledSize": {"height": 50, "width": 50}}' [latitude]="pedido.repartidor.lat" [longitude]="pedido.repartidor.lng" [animation]="'DROP'"></agm-marker>
+                </agm-map>
+            </div>
+        </ion-card>
+
+    </ng-container>
+
+
+
+    <!-- Cargando información -->
+    <ng-template #elseTemplate>
+        <ion-card>
+            <h2 class="comfortaa">Contacto</h2>
+            <h2>
+                <ion-skeleton-text animated style="width: 35%"></ion-skeleton-text>
+            </h2>
+            <ion-item>
+                <ion-thumbnail slot="start">
+                    <ion-skeleton-text animated style="width: 100%"></ion-skeleton-text>
+                </ion-thumbnail>
+                <ion-label>
+                    <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+                </ion-label>
+                <ion-icon slot="end" name="call"></ion-icon>
+            </ion-item>
+            <ion-item>
+                <ion-thumbnail slot="start">
+                    <ion-skeleton-text animated style="width: 100%"></ion-skeleton-text>
+                </ion-thumbnail>
+                <ion-label>
+                    <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+                </ion-label>
+                <ion-icon slot="end" name="call"></ion-icon>
+            </ion-item>
+        </ion-card>
+
+        <!-- Status -->
+        <ion-card>
+            <h2 class="comfortaa">Status</h2>
+            <ion-item lines="none">
+                <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+            </ion-item>
+            <ion-item lines="none">
+                <ion-skeleton-text animated style="width: 90%"></ion-skeleton-text>
+            </ion-item>
+            <ion-item lines="none">
+                <ion-skeleton-text animated style="width: 75%"></ion-skeleton-text>
+            </ion-item>
+        </ion-card>
+
+    </ng-template>
+
+</ion-content>

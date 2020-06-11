@@ -1,0 +1,48 @@
+<ion-header class="ion-no-border">
+    <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-button (click)="regresar()">
+                <ion-icon slot="start" name="arrow-back"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+        <ion-title>Formas de pago</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <ion-card (click)="nuevaTarjeta()" style="border: 500px;">
+        <ion-item detail lines="none" *ngIf="formas_pago_aceptadas && formas_pago_aceptadas.tarjeta">
+            <ion-icon slot="start" name="add" color="primary"></ion-icon>
+            <ion-label class="ion-text-wrap">Agregar tarjeta de crédito/débito</ion-label>
+        </ion-item>
+    </ion-card>
+    <ion-card style="margin-top: 1rem;">
+        <!-- Aquí irían la lista de tarjetas -->
+        <div *ngIf="formas_pago_aceptadas && formas_pago_aceptadas.tarjeta">
+            <ion-item detail *ngFor="let item of tarjetas" (click)="selFormaPago(item.forma, item.tipo, item.id)">
+                <div [ngSwitch]="item.tipo">
+                    <div *ngSwitchCase="'visa'">
+                        <ion-thumbnail>
+                            <img style="padding: 0.5rem;" src="../../../assets/img/iconos/Visa_Inc._logo.svg.png" />
+                        </ion-thumbnail>
+                    </div>
+                    <div *ngSwitchCase="'mastercard'">
+                        <ion-thumbnail>
+                            <img style="padding: 0.5rem;" src="../../../assets/img/iconos/mastercard.png" />
+                        </ion-thumbnail>
+                    </div>
+                    <div *ngSwitchCase="'amex'">
+                        <ion-thumbnail>
+                            <img style="padding: 0.5rem;" src="../../../assets/img/iconos/amex.jpg" />
+                        </ion-thumbnail>
+                    </div>
+                </div>
+                <ion-label style="margin-left: 2rem;">**** {{item.forma}}</ion-label>
+            </ion-item>
+        </div>
+        <ion-item detail (click)="selFormaPago('efectivo', 'efectivo', 'efectivo')">
+            <ion-icon style="margin-left: 0.5rem;" slot="start" name="cash" color="success"></ion-icon>
+            <ion-label style="margin-left: 1.75rem;" class="ion-text-wrap">Efectivo</ion-label>
+        </ion-item>
+    </ion-card>
+</ion-content>

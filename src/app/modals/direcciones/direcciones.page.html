@@ -1,0 +1,60 @@
+<ion-header class="ion-no-border">
+    <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-button (click)="regresar()">
+                <ion-icon color="primary" slot="icon-only" name="arrow-back"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+        <ion-title color="primary" class="comfortaa">Entregar en:</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <div style="margin-bottom: 1rem;">
+        <ng-container *ngIf="dirReady; else elseTemplate">
+            <ion-item lines="none">
+                <ion-label style="text-align: center" class="ion-text-wrap">{{direccion.direccion}}</ion-label>
+            </ion-item>
+            <ion-button class="btn-change" shape="round" fill="outline" color="medium" (click)="dirReady = false">
+                Cambiar dirección
+            </ion-button>
+            <div class="marco">
+                <agm-map style="height: 55vh" [latitude]="direccion.lat" [longitude]="direccion.lng" [disableDefaultUI]="true" [streetViewControl]="false" [zoom]="zoom">
+                    <!-- <agm-polygon *ngIf="paths.length > 0" [fillColor]="'red'" [paths]="paths"></agm-polygon> -->
+                    <agm-marker [iconUrl]='{"url": icon,"scaledSize": {"height": 120, "width": 80}}' [latitude]="direccion.lat" [longitude]="direccion.lng" [animation]="'DROP'" (dragEnd)="guardaLoc($event)" [markerDraggable]="true"></agm-marker>
+                </agm-map>
+            </div>
+        </ng-container>
+        <ng-template #elseTemplate>
+            <ion-item style="width: 80vw; margin-left: 10vw">
+                <ion-label color="primary" position="stacked">Agrega la dirección de entrega
+                    <ion-text color="danger">*</ion-text>
+                </ion-label>
+                <ion-input (keyup.enter)="$event.target.blur();" id="txtHome" #txtHome type="text" (ionInput)="updateSearchResults()" [(ngModel)]="inputDir" name="direccion" placeholder="Ej. Independecia 16, Centro, Ojocaliente"></ion-input>
+            </ion-item>
+        </ng-template>
+    </div>
+
+    <ion-item *ngFor="let item of sugerencias" class="margen-boton" detail (click)="dirSelected(item.place_id)">
+        <ion-label class="ion-text-wrap">
+            <h2 class="comfortaa">{{item.description}}</h2>
+        </ion-label>
+    </ion-item>
+    <div *ngIf="!dirReady">
+        <ion-item *ngFor="let item of direcciones" class="margen-boton" detail (click)="dirSelectedGuardada(item)">
+            <ion-label class="ion-text-wrap">
+                <h2 class="comfortaa">{{item.direccion}}</h2>
+            </ion-label>
+        </ion-item>
+    </div>
+</ion-content>
+
+<app-no-network></app-no-network>
+
+<ion-footer no-border *ngIf="dirReady">
+    <ion-toolbar>
+        <ion-button class="boton-margen" [disabled]="lejos || !direccion" (click)="setDireccion()" style="margin-top: 0.5rem" shape="round" expand="block">
+            Aceptar
+        </ion-button>
+    </ion-toolbar>
+</ion-footer>

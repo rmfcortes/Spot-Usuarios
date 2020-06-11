@@ -1,0 +1,31 @@
+$spinner-size: 45px;
+$spinner-color: #e0a331;
+.topleft {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    font-size: 18pt;
+    background: #fb04044d;
+    border-radius: 100%;
+}
+
+.spinner {
+    position: absolute;
+    top: calc(50% - #{ ($spinner-size/2) });
+    left: calc(50% - #{ ($spinner-size/2) });
+    width: $spinner-size;
+    height: $spinner-size;
+    font-size: $spinner-size;
+    line-height: $spinner-size;
+    color: $spinner-color;
+}
+
+h2 {
+    font-family: 'Comfortaa';
+}
+
+.descripcion {
+    max-height: 5rem;
+    line-height: 1.5em;
+    overflow: scroll;
+}

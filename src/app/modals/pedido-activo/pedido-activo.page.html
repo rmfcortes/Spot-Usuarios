@@ -1,0 +1,107 @@
+<ion-header>
+    <ion-toolbar color="primary">
+        <ion-buttons slot="start">
+            <ion-button (click)="regresar()">
+                <ion-icon slot="start" name="arrow-back"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+        <ion-title>
+            <h3 class="comfortaa">{{pedido.cliente.nombre}}</h3>
+        </ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <ion-list *ngIf="pedido.entregado">
+        <ng-container *ngIf="pedido.calificacion; else calificacionTemplate">
+            <ion-card>
+                <ion-list-header>
+                    <ion-label color="primary">Calificacion</ion-label>
+                </ion-list-header>
+                <ion-item lines="none">
+                    <ion-thumbnail>
+                        <img [src]="pedido.negocio.logo" />
+                    </ion-thumbnail>
+                    <ion-label color="medium">
+                        <h2>{{pedido.negocio.nombreNegocio}}</h2>
+                        <p class="ion-text-wrap">{{pedido.calificacion.negocio.comentarios}}</p>
+                        <p>
+                            <app-stars style="margin: auto;" [calificacion]="pedido.calificacion.negocio.puntos" [readOnly]="true" (calficar)="repartidor.puntos = $event"></app-stars>
+                        </p>
+                    </ion-label>
+                </ion-item>
+                <ion-item lines="none">
+                    <ion-thumbnail>
+                        <img [src]="pedido.repartidor.foto" />
+                    </ion-thumbnail>
+                    <ion-label color="medium">
+                        <h2>{{pedido.repartidor.nombre}}</h2>
+                        <p class="ion-text-wrap">{{pedido.calificacion.repartidor.comentarios}}</p>
+                        <p>
+                            <app-stars style="margin: auto;" [calificacion]="pedido.calificacion.repartidor.puntos" [readOnly]="true" (calficar)="repartidor.puntos = $event"></app-stars>
+                        </p>
+                    </ion-label>
+                </ion-item>
+            </ion-card>
+        </ng-container>
+        <ng-template #calificacionTemplate>
+            <ion-card (click)="verCalificar()">
+                <ion-list-header>
+                    <ion-label color="primary">Calificacion</ion-label>
+                </ion-list-header>
+                <ion-item lines="none">
+                    <ion-label color="medium">
+                        Pendiente de calificación
+                    </ion-label>
+                </ion-item>
+                <ion-item style="text-align: center;" lines="none" color="primary">
+                    <ion-label>Calificar</ion-label>
+                </ion-item>
+            </ion-card>
+        </ng-template>
+
+
+    </ion-list>
+    <ion-list>
+        <ion-card>
+            <ion-list-header>
+                <h2 class="comfortaa" style="color: var(--ion-color-primary);">Entrega</h2>
+            </ion-list-header>
+            <ion-item *ngIf="pedido.cliente.telefono" lines="none">
+                <ion-label class="comfortaa">{{pedido.cliente.nombre}}: {{pedido.cliente.telefono}}</ion-label>
+            </ion-item>
+            <ion-item lines="none">
+                <ion-label class="ion-text-wrap" color="medium">{{pedido.cliente.direccion.direccion}}</ion-label>
+            </ion-item>
+        </ion-card>
+    </ion-list>
+    <ion-list>
+        <ion-card>
+            <ion-list-header>
+                <h2 class="comfortaa" style="color: var(--ion-color-primary);">Productos</h2>
+            </ion-list-header>
+            <div *ngFor="let producto of pedido.productos let i = index">
+                <img style="width: 100%;" [src]="producto.url">
+                <ion-item lines="full">
+                    <ion-badge color="primary" slot="start">{{producto.cantidad}}</ion-badge>
+                    <ion-label>
+                        <h2 class="ion-text-wrap">{{producto.nombre | titlecase}}
+                            <ion-text color="primary">{{producto.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}</ion-text>
+                        </h2>
+                        <p>{{producto.observaciones | titlecase}}</p>
+                        <div *ngFor="let item of producto.complementos">
+                            <h4>+ {{item.titulo | titlecase}}</h4>
+                            <p style="color: var(--ion-color-medium); margin-left: 0.5rem;" *ngFor="let com of item.complementos">{{com.nombre}}: {{com.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}</p>
+                        </div>
+                        <h2 class="ion-text-wrap">Total
+                            <ion-text color="primary">{{producto.total | currency:'CAD':'symbol-narrow':'1.0-2'}}</ion-text>
+                        </h2>
+                    </ion-label>
+                </ion-item>
+            </div>
+            <ion-item style="text-align: center;" lines="none" color="primary">
+                <ion-label>Total: {{pedido.total | currency:'CAD':'symbol-narrow':'1.0-2'}}</ion-label>
+            </ion-item>
+        </ion-card>
+    </ion-list>
+</ion-content>

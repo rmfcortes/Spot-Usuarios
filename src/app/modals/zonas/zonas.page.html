@@ -1,0 +1,41 @@
+<ion-header class="ion-no-border">
+    <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-button (click)="regresar()">
+                <ion-icon slot="start" name="arrow-back"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+        <ion-title color="primary">Regiones</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <ng-container *ngIf="region; else regionTemp">
+        <ion-item lines="none">
+            <ion-label style="text-align: center" class="ion-text-wrap">{{region.ciudad}}</ion-label>
+        </ion-item>
+        <ion-button class="btn-change" shape="round" fill="outline" color="medium" (click)="region = null">
+            Cambiar dirección
+        </ion-button>
+        <div class="marco">
+            <agm-map style="height: 55vh" [latitude]="region.centro.lat" [longitude]="region.centro.lng" [disableDefaultUI]="true" [streetViewControl]="false" [zoom]="13">
+                <agm-polygon [fillColor]="'red'" [paths]="region.ubicacion"></agm-polygon>
+            </agm-map>
+        </div>
+    </ng-container>
+    <ng-template #regionTemp>
+        <ion-item *ngFor="let item of regiones" detail (click)="zonaSelected(item)">
+            <ion-label class="boton-margen">
+                <h2 class="comfortaa">{{item.ciudad}}</h2>
+            </ion-label>
+        </ion-item>
+    </ng-template>
+</ion-content>
+
+<ion-footer no-border *ngIf="region">
+    <ion-toolbar>
+        <ion-button class="boton-margen" (click)="setRegion()" style="margin-top: 0.5rem" shape="round" expand="block">
+            Aceptar
+        </ion-button>
+    </ion-toolbar>
+</ion-footer>
