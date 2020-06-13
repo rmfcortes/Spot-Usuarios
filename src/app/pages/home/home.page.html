@@ -41,40 +41,8 @@
                 </ion-row>
             </div>
         </ion-grid>
-        <ion-card>
-            <div *ngFor="let item of negMatch; let i = index" id="{{item.idNegocio}}">
-                <ion-card class="card-shadow">
-                    <ng-container *ngIf="item.abierto; else searchTemplate">
-                        <ion-item detail lines="none" (click)="verProducto(item)">
-                            <ion-thumbnail>
-                                <preload-image [ratio]="{w: 1, h: 1}" [src]="item.foto"></preload-image>
-                            </ion-thumbnail>
-                            <ion-label style="margin-left: 0.5rem;">
-                                <h2>{{item.nombre}}</h2>
-                                <p *ngIf="item.promedio" style="color: darkorange;">{{item.promedio}}
-                                    <ion-icon slot="end" name="star"></ion-icon>
-                                </p>
-                            </ion-label>
-                        </ion-item>
-                    </ng-container>
-                    <ng-template #searchTemplate>
-                        <ion-item detail lines="none" (click)="verProducto(item)">
-                            <ion-thumbnail>
-                                <preload-image [ratio]="{w: 1, h: 1}" [src]="item.foto" style="opacity: 0.5;"></preload-image>
-                            </ion-thumbnail>
-                            <ion-label color="medium" style="margin-left: 0.5rem;">
-                                <h2>{{item.nombre}}</h2>
-                                <p *ngIf="item.promedio">{{item.promedio}}
-                                    <ion-icon slot="end" name="star"></ion-icon>
-                                </p>
-                            </ion-label>
-                            <ion-badge color="primary">Cerrado</ion-badge>
-                        </ion-item>
-                    </ng-template>
+        <app-negocio [negocios]="negMatch" (verNeg)="verProducto($event)"></app-negocio>
 
-                </ion-card>
-            </div>
-        </ion-card>
     </ion-card>
 
 
@@ -186,33 +154,7 @@
     <ng-container *ngIf="pedidosReady && catsReady && promosReady && catsReady && visitadosReady; else visTemplate">
         <ion-card *ngIf="negociosVisitados.length > 0">
             <h2 style="margin-left: 1rem; color: var(--ion-color-primary)">+ Visitados por ti</h2>
-            <ion-card *ngFor="let item of negociosVisitados">
-                <ion-item detail lines="none" (click)="verProductoConInfo(item)">
-                    <ng-container *ngIf="item.abierto; else visitadosOpen">
-                        <ion-thumbnail>
-                            <preload-image [ratio]="{w: 1, h: 1}" [src]="item.foto"></preload-image>
-                        </ion-thumbnail>
-                        <ion-label style="margin-left: 0.5rem;">
-                            <h2>{{item.nombre}}</h2>
-                            <p *ngIf="item.promedio" style="color: darkorange;">Envio: {{item.envio | currency:'CAD':'symbol-narrow':'1.0-2'}} / {{item.promedio}}
-                                <ion-icon slot="end" name="star"></ion-icon>
-                            </p>
-                        </ion-label>
-                    </ng-container>
-                    <ng-template #visitadosOpen>
-                        <ion-thumbnail>
-                            <preload-image [ratio]="{w: 1, h: 1}" [src]="item.foto" style="opacity: 0.5;"></preload-image>
-                        </ion-thumbnail>
-                        <ion-label style="margin-left: 0.5rem;" color="medium">
-                            <h2>{{item.nombre}}</h2>
-                            <p *ngIf="item.promedio">Envio: {{item.envio | currency:'CAD':'symbol-narrow':'1.0-2'}} / {{item.promedio}}
-                                <ion-icon slot="end" name="star"></ion-icon>
-                            </p>
-                        </ion-label>
-                        <ion-badge color="primary" mode="ios">Cerrado</ion-badge>
-                    </ng-template>
-                </ion-item>
-            </ion-card>
+            <app-negocio [negocios]="negociosVisitados" (verNeg)="verProductoConInfo($event)"></app-negocio>
             <div style="height: 1rem;"></div>
         </ion-card>
     </ng-container>
@@ -232,33 +174,7 @@
     <div *ngIf="pedidosReady && catsReady && promosReady && catsReady && visitadosReady && popularesReady">
         <ion-card style="margin-top: 0.75rem;">
             <h2 style="margin-left: 1rem; color: var(--ion-color-primary)" *ngIf="negociosPopulares.length > 0">Los más populares</h2>
-            <ion-card *ngFor="let item of negociosPopulares">
-                <ion-item detail lines="none" (click)="verProductoConInfo(item)">
-                    <ng-container *ngIf="item.abierto; else popularesOpen">
-                        <ion-thumbnail>
-                            <ion-img [src]="item.foto" style="height: 100%; width: 100%; max-height: 7rem; object-fit: cover;" (ionImgWillLoad)="ionImgWillLoad($event)"></ion-img>
-                        </ion-thumbnail>
-                        <ion-label style="margin-left: 0.5rem;">
-                            <h2>{{item.nombre}}</h2>
-                            <p *ngIf="item.promedio" style="color: darkorange;">Envio: {{item.envio | currency:'CAD':'symbol-narrow':'1.0-2'}} / {{item.promedio}}
-                                <ion-icon slot="end" name="star"></ion-icon>
-                            </p>
-                        </ion-label>
-                    </ng-container>
-                    <ng-template #popularesOpen>
-                        <ion-thumbnail>
-                            <preload-image [ratio]="{w: 1, h: 1}" [src]="item.foto" style="opacity: 0.5;"></preload-image>
-                        </ion-thumbnail>
-                        <ion-label style="margin-left: 0.5rem;" color="medium">
-                            <h2>{{item.nombre}}</h2>
-                            <p *ngIf="item.promedio">{{item.promedio}}
-                                <ion-icon slot="end" name="star"></ion-icon>
-                            </p>
-                        </ion-label>
-                        <ion-badge color="primary" mode="ios">Cerrado</ion-badge>
-                    </ng-template>
-                </ion-item>
-            </ion-card>
+            <app-negocio [negocios]="negociosPopulares" (verNeg)="verProductoConInfo($event)"></app-negocio>
             <div style="height: 1rem;"></div>
         </ion-card>
     </div>

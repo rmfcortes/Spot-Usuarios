@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 
 import { StarsComponent } from '../components/stars/stars.component';
+import { NegocioComponent } from '../components/negocio/negocio.component';
 
 @NgModule({
     imports: [
@@ -12,9 +13,11 @@ import { StarsComponent } from '../components/stars/stars.component';
     ],
     declarations: [
       StarsComponent,
+      NegocioComponent,
     ],
     exports: [
       StarsComponent,
+      NegocioComponent,
     ]
   })
 

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { createAnimation, Animation} from '@ionic/core';
+import { GestureController } from '@ionic/angular';
+import { createAnimation, Animation, Gesture} from '@ionic/core';
 
 
 @Injectable({
@@ -7,7 +8,77 @@ import { createAnimation, Animation} from '@ionic/core';
 })
 export class AnimationsService {
 
-  constructor( ) { }
+  hidePortadaGesture: Gesture
+  delta: number
+  delta_anterior: number
+  ultima_altura: number
+
+  constructor(
+    private gestureCtrl: GestureController,
+  ) { }
+
+  hidePortada(contenido: HTMLElement, portada: HTMLElement, heightPortada: number, segment: HTMLElement) {
+    console.log('Anima');
+    this.hidePortadaGesture = this.gestureCtrl.create({
+      el: contenido,
+      gestureName: 'hide',
+      direction: 'y',
+      onMove: ev => {
+        const alturaActual = portada.clientHeight
+        if (ev.deltaY > 0 && alturaActual === heightPortada) {
+          console.log('Nada que hacer')
+          console.log('////////')
+          return
+        }
+        let nuevaH
+        console.log(this.delta_anterior);
+        if (!this.delta_anterior) nuevaH = heightPortada + ev.deltaY
+        else if (this.delta_anterior < 0 && ev.deltaY < 0 || this.delta_anterior > 0 && ev.deltaY > 0)nuevaH = heightPortada + ev.deltaY + this.delta_anterior
+        else nuevaH = this.ultima_altura + ev.deltaY
+        console.log('///////////');
+        console.log('Altura actual' + alturaActual);
+        console.log('Delta Y' + ev.deltaY);
+        console.log('Nueva altura' + nuevaH);
+        console.log('Altura inicial' + heightPortada);
+        console.log('CurrentY' + ev.currentY);
+        if (ev.deltaY < 0) { // Baja, oculta portada
+          if (alturaActual <= 0) return
+          if (nuevaH > 0) { // Está bajando
+            console.log('Baja');
+            const opacity = nuevaH / heightPortada
+            portada.style.height = nuevaH.toString() + 'px'
+            portada.style.opacity = opacity.toString()
+            segment.style.top = nuevaH.toString() + 'px'
+          } else { // Ya no está en la vista
+            console.log('Tope mínimo');
+            portada.style.height = '0px'
+            portada.style.opacity = '0'
+            segment.style.top = '0px'
+          }
+        } else { // Sube, muestra portada
+          if (nuevaH > heightPortada) {  // Sobrepasaría la altura inicial
+            console.log('Tope máximo');
+            portada.style.height = heightPortada + 'px'
+            portada.style.opacity = '1'
+            segment.style.top = heightPortada + 'px'
+          }
+          else if (nuevaH > 0) { // está creciendo
+            console.log('Sube');
+            const opacity = nuevaH / heightPortada
+            portada.style.height = nuevaH.toString() + 'px !important'
+            portada.style.opacity = opacity.toString()
+            segment.style.top = nuevaH.toString() + 'px !important'
+          }
+        }
+        this.delta = ev.deltaY
+        this.ultima_altura = alturaActual
+      },
+      onEnd: ev => {
+        this.delta_anterior = this.delta
+      }
+    })
+    this.hidePortadaGesture.enable(true)
+  }
 
   enterAnimation(element) {
     createAnimation()
@@ -123,10 +194,10 @@ export class AnimationsService {
       .keyframes([
         { offset: 0, transform: 'scale(1)', opacity: '0.99' },
         { offset: 1, transform: 'scale(0)', opacity: '0' }
-      ]);
+      ])
       anim.play()
       anim.onFinish(() => resolve())
-    });
+    })
     
   }
 

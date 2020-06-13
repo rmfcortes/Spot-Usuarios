@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, AfterContentInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AlertController, ModalController, IonInfiniteScroll, NavController, Platform } from '@ionic/angular';
 import { Subscription } from 'rxjs';
@@ -60,7 +60,7 @@ export class NegocioPage {
   infoReady = false;
   error = false;
 
-  back: Subscription;
+  back: Subscription
 
   constructor(
     private platform: Platform,
@@ -77,42 +77,56 @@ export class NegocioPage {
   // Get info inicial
 
   ionViewWillEnter() {
-    this.uid = this.uidService.getUid();
+    this.uid = this.uidService.getUid()
     this.categoria = this.activatedRoute.snapshot.paramMap.get('cat');
-    this.getNegocio();
+    this.getNegocio()
     this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-      this.regresar();
-    });
+      this.regresar()
+    })
   }
 
   async getNegocio() {
     const id = this.activatedRoute.snapshot.paramMap.get('id');
     const abierto = this.activatedRoute.snapshot.paramMap.get('status');
-    let status;
-    if (abierto === 'true') {
-      status = 'abiertos';
-    } else {
-      status = 'cerrados';
-    }
-    this.negocio = await this.negocioService.getNegocioPreview(id, this.categoria, status);
+    let status
+    if (abierto === 'true')status = 'abiertos'
+    else status = 'cerrados'
+    this.negocio = await this.negocioService.getNegocioPreview(id, this.categoria, status)
     if (!this.negocio) {
-      this.infoReady = true;
-      this.error = true;
-      return;
+      this.infoReady = true
+      this.error = true
+      return
     }
     if (this.uid) {
-      this.cuenta = await this.negocioService.getCart(this.uid, this.negocio.id);
+      this.cuenta = await this.negocioService.getCart(this.uid, this.negocio.id)
     }
-    this.getPasillos();
+    this.getPasillos()
   }
 
   async getPasillos() {
-    const detalles: InfoPasillos = await this.negocioService.getPasillos(this.categoria, this.negocio.id);
-    this.portada = detalles.portada;
-    this.vista = detalles.vista || 'lista';
-    this.pasillos.pasillos = detalles.pasillos;
-    this.pasillos.pasillos = this.pasillos.pasillos.sort((a, b) => a.prioridad - b.prioridad);
-    this.getOfertas();
+    const detalles: InfoPasillos = await this.negocioService.getPasillos(this.categoria, this.negocio.id)
+    this.portada = detalles.portada
+    this.vista = detalles.vista || 'lista'
+    this.pasillos.pasillos = detalles.pasillos
+    this.pasillos.pasillos = this.pasillos.pasillos.sort((a, b) => a.prioridad - b.prioridad)
+    setTimeout(() => {
+      this.animPortada()
+    }, 350)
+    this.getOfertas()
+  }
+
+  animPortada() {
+    const portada = document.getElementById('portada')
+    if (!portada) {
+      this.animPortada()
+      return
+    }
+    const heigth = portada.clientHeight
+    const segment = document.getElementById('segment')
+    segment.style.marginTop = heigth.toString() + 'px'
+    segment.style.visibility = 'visible'
+    const contenido = document.getElementById('contenido')
+    this.animationService.hidePortada(contenido, portada, heigth, segment)
   }
 
   // Get Productos

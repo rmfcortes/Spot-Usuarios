@@ -1,32 +1,43 @@
 <ng-container *ngIf="!error; else errorTemplate">
     <ng-container *ngIf="portada; else infoTemplate">
-        <ion-header>
-            <ion-toolbar [appScrollVanish]="scrollArea">
-                <ion-icon color="light" class="topleft" (click)="regresar()" name="arrow-back"></ion-icon>
-                <img style="width: 100%;" [src]="portada" alt="">
-            </ion-toolbar>
-            <ion-toolbar [appTitleScrollVanish]="scrollArea">
-                <ion-title color="primary" class="comfortaa">{{negocio.nombre}}</ion-title>
-                <ion-buttons slot="end">
-                    <ion-button fill="clear" (click)="verInfo()" class="comfortaa">
-                        Ver más
-                    </ion-button>
-                </ion-buttons>
-            </ion-toolbar>
-            <ion-segment scrollable>
-                <ion-segment-button (click)="resetProds()">
-                    Todos
-                </ion-segment-button>
-                <ion-segment-button (click)="resetProds('Ofertas')" *ngIf="hasOfertas">
-                    Ofertas
-                </ion-segment-button>
-                <ion-segment-button (click)="resetProds(item.nombre)" *ngFor="let item of pasillos.pasillos" class="ion-text-wrap">
-                    {{item.nombre}}
-                </ion-segment-button>
-            </ion-segment>
-        </ion-header>
+        <ion-content>
+            <div id="portada" style="overflow: hidden !important; background: white; position: fixed; top: 0; transition: 0.2s; z-index: 100;">
+                <div class="portada_box">
+                    <ion-icon color="light" class="topleft" (click)="regresar()" name="arrow-back"></ion-icon>
+                    <img style="width: 100%;" [src]="portada" alt="">
+                </div>
+                <div class="logo_box shadow">
+                    <ion-label color="primary" class="comfortaa">{{negocio.nombre}}</ion-label>
+                    <ion-grid>
+                        <ion-row style="font-size: xx-small;">
+                            <ion-col size="4">
+                                Envío
+                            </ion-col>
+                            <ion-col size="4">
+                                Pedido mínimo
+                            </ion-col>
+                            <ion-col size="4" (click)="verInfo()">
+                                Detalles
+                            </ion-col>
+                        </ion-row>
+                    </ion-grid>
+                </div>
+                <div style="height: 3rem;"></div>
+            </div>
+            <div id="segment" style="visibility: hidden; background: white; z-index: 150; position: sticky; transition: 0.2s;">
+                <ion-segment scrollable>
+                    <ion-segment-button (click)="resetProds()">
+                        Todos
+                    </ion-segment-button>
+                    <ion-segment-button (click)="resetProds('Ofertas')" *ngIf="hasOfertas">
+                        Ofertas
+                    </ion-segment-button>
+                    <ion-segment-button (click)="resetProds(item.nombre)" *ngFor="let item of pasillos.pasillos">
+                        {{item.nombre}}
+                    </ion-segment-button>
+                </ion-segment>
+            </div>
 
-        <ion-content #scrollArea scrollEvents="true" class="ion-padding">
             <ng-container *ngIf="cargandoProds; else cargandoTemp">
                 <ion-item lines="none">
                     <ion-spinner style="margin: auto;" name="dots" color="primary"></ion-spinner>
@@ -34,7 +45,7 @@
             </ng-container>
             <ng-template #cargandoTemp>
                 <!-- Vista de lista -->
-                <div [ngSwitch]="vista">
+                <div [ngSwitch]="vista" id="contenido">
                     <div *ngSwitchCase="'list-img'">
                         <app-list-img [sections]="productos" (showProduct)="muestraProducto($event)"></app-list-img>
                     </div>

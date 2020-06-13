@@ -262,28 +262,25 @@ export class HomePage implements OnInit, OnDestroy {
     this.categoriaService.getPopulares().then(async (populares)  => {
       this.negociosPopulares = populares
       this.negociosPopulares.sort((a, b) => b.visitas - a.visitas)
-      if (this.uid && this.direccion) {
-        for (const negocio of this.negociosPopulares) {
-          await this.costoEnvio(negocio)
-        }
-      } 
+      this.costoEnvio(this.negociosPopulares)
       this.popularesReady = true
     })
   }
 
-  costoEnvio(n) {
-    return new Promise(async (resolve, reject) => {      
-      if (n.repartidores_propios) {
-        if (!n.envio_costo_fijo) {
-          const distancia: number = await this.alertService.calculaDistancia(this.direccion.lat, this.direccion.lng, n.direccion.lat, n.direccion.lng)
-          console.log(distancia)
-          n.envio = distancia * 6
-        }
-      } else {
-        if (n.direccion) {
-          const distancia: number = await this.alertService.calculaDistancia(this.direccion.lat, this.direccion.lng, n.direccion.lat, n.direccion.lng)
-          console.log(distancia)
-          n.envio = distancia * 6
+  costoEnvio(negocios) {
+    return new Promise(async (resolve, reject) => {
+      if (!this.uid || !this.direccion) return resolve()
+      for (const n of negocios) {
+        if (n.repartidores_propios) {
+          if (!n.envio_costo_fijo) {
+            const distancia: number = await this.alertService.calculaDistancia(this.direccion.lat, this.direccion.lng, n.direccion.lat, n.direccion.lng)
+            n.envio =  Math.ceil(distancia * 6 + 10)
+          }
+        } else {
+          if (n.direccion) {
+            const distancia: number = await this.alertService.calculaDistancia(this.direccion.lat, this.direccion.lng, n.direccion.lat, n.direccion.lng)
+            n.envio = Math.ceil(distancia * 6 + 25)
+          }
         }
       }
       resolve()
@@ -321,7 +318,7 @@ export class HomePage implements OnInit, OnDestroy {
             info.visitas = x.visitas
             this.negociosVisitados.push(info)
             this.negociosVisitados.sort((a, b) => b.visitas - a.visitas)
-            if (this.direccion) this.costoEnvio(info)
+            this.costoEnvio(this.negociosVisitados)
           })
         })
       }
@@ -359,50 +356,41 @@ export class HomePage implements OnInit, OnDestroy {
   listenCambios() {
     this.categoriaService.isOpen().query.ref.on('child_changed', data => {
       this.ngZone.run(() => {
-        const status = data.val();
+        const status = data.val()
         if (this.negociosVisitados.length > 0) {
-          const i = this.negociosVisitados.findIndex(n => n.idNegocio === status.idNegocio);
-          if (i >= 0) {
-            this.negociosVisitados[i].abierto = status.abierto;
-          }
+          const i = this.negociosVisitados.findIndex(n => n.idNegocio === status.idNegocio)
+          if (i >= 0) this.negociosVisitados[i].abierto = status.abierto
         }
         if (this.negociosPopulares.length > 0) {
-          const y = this.negociosPopulares.findIndex(n => n.idNegocio === status.idNegocio);
-          if (y >= 0) {
-            this.negociosPopulares[y].abierto = status.abierto;
-          }
+          const y = this.negociosPopulares.findIndex(n => n.idNegocio === status.idNegocio)
+          if (y >= 0) this.negociosPopulares[y].abierto = status.abierto
         }
         if (this.negMatch.length > 0) {
-          const x = this.negMatch.findIndex(n => n.idNegocio = status.idNegocio);
-          if (x >= 0) {
-            this.negMatch[x].abierto = status.abierto;
-          }
+          const x = this.negMatch.findIndex(n => n.idNegocio = status.idNegocio)
+          if (x >= 0) this.negMatch[x].abierto = status.abierto
         }
-      });
-    });
+      })
+    })
   }
 
   listenNewMsg() {
     this.msgSub = this.chatService.listenMsg().subscribe((unReadmsg: UnreadMsg[]) => {
       this.pedidos.forEach(p => {
-        const i = unReadmsg.findIndex(u => u.idPedido === p.id);
-        if (i >= 0) {
-          p.unRead = unReadmsg[i].cantidad;
-        } else {
-          p.unRead = 0;
-        }
-      });
-    });
+        const i = unReadmsg.findIndex(u => u.idPedido === p.id)
+        if (i >= 0) p.unRead = unReadmsg[i].cantidad
+        else  p.unRead = 0
+      })
+    })
   }
 
   listenEntregados() {
     this.pedidoService.listenEntregados().query.ref.on('child_removed', snapshot => {
       this.ngZone.run(() => {
-        const pedidoEliminado = snapshot.val();
-        const index = this.pedidos.findIndex(p => p.id === pedidoEliminado.id);
-        this.pedidos.splice(index, 1);
-      });
-    });
+        const pedidoEliminado = snapshot.val()
+        const index = this.pedidos.findIndex(p => p.id === pedidoEliminado.id)
+        this.pedidos.splice(index, 1)
+      })
+    })
   }
 
   // Acciones
@@ -451,9 +439,8 @@ export class HomePage implements OnInit, OnDestroy {
         }
       }
     }
-    if (this.negMatch.length === 0) {
-      this.alertService.presentAlert('No hay resultados', 'No se encontraron coincidencias con ' + this.busqueda)
-    }
+    if (this.negMatch.length === 0) this.alertService.presentAlert('No hay resultados', 'No se encontraron coincidencias con ' + this.busqueda)
+    await this.costoEnvio(this.negMatch)
     this.buscando = false
   }
 

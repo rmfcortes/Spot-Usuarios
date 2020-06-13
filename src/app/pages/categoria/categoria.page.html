@@ -9,7 +9,7 @@
     </ion-toolbar>
     <ion-toolbar color="light">
         <ion-segment scrollable>
-            <ion-segment-button *ngFor="let item of subCategorias" (click)="getNegociosSub(item)">
+            <ion-segment-button *ngFor="let item of subCategorias" (click)="getNegociosSub(item)" class="ion-text-wrap">
                 <ion-label>{{item | titlecase}}</ion-label>
             </ion-segment-button>
         </ion-segment>
@@ -57,33 +57,7 @@
         <ng-container *ngIf="negocios.length > 0; else hayNegTemplate">
             <ion-card>
                 <h2 style="margin-left: 1rem; color: var(--ion-color-primary)">Recomendados para ti</h2>
-                <ion-card *ngFor="let item of negocios; trackBy: trackNegocios" class="card-shadow">
-                    <ion-item detail lines="none" (click)="verNegocio(item)">
-                        <ng-container *ngIf="item.abierto; else openTemplate">
-                            <ion-thumbnail>
-                                <ion-img [src]="item.foto" style="height: 100%; width: 100%; max-height: 7rem; object-fit: cover;" (ionImgWillLoad)="ionImgWillLoad($event)"></ion-img>
-                            </ion-thumbnail>
-                            <ion-label style="margin-left: 0.5rem;">
-                                <h2>{{item.nombre}}</h2>
-                                <p *ngIf="item.promedio" style="color: darkorange;">{{item.promedio}}
-                                    <ion-icon slot="end" name="star"></ion-icon>
-                                </p>
-                            </ion-label>
-                        </ng-container>
-                        <ng-template #openTemplate>
-                            <ion-thumbnail>
-                                <ion-img [src]="item.foto" style="height: 100%; width: 100%; max-height: 7rem; object-fit: cover;" (ionImgWillLoad)="ionImgWillLoad($event)"></ion-img>
-                            </ion-thumbnail>
-                            <ion-label style="margin-left: 0.5rem;" color="medium">
-                                <h2>{{item.nombre}}</h2>
-                                <p *ngIf="item.promedio">{{item.promedio}}
-                                    <ion-icon slot="end" name="star"></ion-icon>
-                                </p>
-                            </ion-label>
-                            <ion-badge color="primary" mode="ios">Cerrado</ion-badge>
-                        </ng-template>
-                    </ion-item>
-                </ion-card>
+                <app-negocio [negocios]="negocios" (verNeg)="verNegocio($event)"></app-negocio>
                 <div style="height: 1rem;"></div>
             </ion-card>
         </ng-container>

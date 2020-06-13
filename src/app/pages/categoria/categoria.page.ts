@@ -10,7 +10,6 @@ import { OfertasService } from 'src/app/services/ofertas.service';
 import { UidService } from 'src/app/services/uid.service';
 
 import { Negocio, Oferta, InfoGral } from 'src/app/interfaces/negocio';
-import { AnimationsService } from 'src/app/services/animations.service';
 
 @Component({
   selector: 'app-categoria',
@@ -55,7 +54,6 @@ export class CategoriaPage implements OnInit, OnDestroy{
     private platform: Platform,
     private activatedRoute: ActivatedRoute,
     private modalController: ModalController,
-    private animationService: AnimationsService,
     private categoriaService: CategoriasService,
     private ofertaService: OfertasService,
     private uidService: UidService,
@@ -211,15 +209,5 @@ export class CategoriaPage implements OnInit, OnDestroy{
     if (this.back) { this.back.unsubscribe(); }
   }
 
-  // Tracks
-
-  trackNegocios(index:number, el:Negocio): string {
-    return el.id;
-  }
-
-  // Animation
-  ionImgWillLoad(image) {
-    this.animationService.enterAnimation(image.target)
-  }
 
 }

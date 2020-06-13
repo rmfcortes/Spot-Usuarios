@@ -12,12 +12,14 @@ import { LoginPageModule } from 'src/app/modals/login/login.module';
 import { CategoriasPageModule } from 'src/app/modals/categorias/categorias.module';
 
 import { TarjetaPageModule } from 'src/app/modals/tarjeta/tarjeta.module';
+import { StarsModule } from 'src/app/shared/stars.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
+    StarsModule,
     SharedModule,
     LoginPageModule,
     OfertasPageModule,

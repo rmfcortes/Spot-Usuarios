@@ -9,12 +9,14 @@ import { CategoriaPageRoutingModule } from './categoria-routing.module';
 import { CategoriaPage } from './categoria.page';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { OfertasPageModule } from 'src/app/modals/ofertas/ofertas.module';
+import { StarsModule } from 'src/app/shared/stars.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
+    StarsModule,
     SharedModule,
     OfertasPageModule,
     CategoriaPageRoutingModule
