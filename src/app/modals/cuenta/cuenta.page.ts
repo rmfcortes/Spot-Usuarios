@@ -49,6 +49,33 @@ export class CuentaPage implements OnInit {
   infoReady = false
 
   comision: number
+  envio: number
+
+  botones_propina = [
+    {
+      texto: '0%',
+      valor: 0.00
+    },     
+    {
+      texto: '5%',
+      valor: 0.05
+    },    
+    {
+      texto: '10%',
+      valor: 0.1
+    },    
+    {
+      texto: '15%',
+      valor: 0.15
+    },    
+    {
+      texto: '20%',
+      valor: 0.2
+    }
+  ]
+
+  propina_sel = 2
+  propina = 0
 
   constructor(
     private router: Router,
@@ -66,31 +93,52 @@ export class CuentaPage implements OnInit {
 
   ngOnInit() {
     this.getDireccion()
+    this.getCart()
+    this.calculaPropina(this.propina_sel)
     this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
       this.closeCart()
-    });
+    })
   }
   
   getDireccion() {
-    this.cartService.getUltimaDireccion().then(dir => {
-      this.direccion = dir;
-      this.getCart()
-    });
+    this.direccion = this.uidService.getDireccion()
   }
 
   getCart() {
     this.cartService.getCart(this.datos.idNegocio).then((cart: Producto[]) => {
-      this.cart = cart;
+      this.cart = cart
       this.getInfo()
-    });
+    })
   }
 
   getInfo() {
-    this.cartService.getInfoNegocio(this.datos.categoria, this.datos.idNegocio).then(neg => {
+    this.cartService.getInfoNegocio(this.datos.categoria, this.datos.idNegocio).then(async (neg) => {
       this.datosNegocio = neg
       this.getFormaPago()
       Object.assign(this.datosNegocio, this.datos)
-    });
+      this.datosNegocio.envio = await this.costoEnvio()
+    })
+  }
+
+  costoEnvio(): Promise<number> {
+    return new Promise(async (resolve, reject) => {
+      if (!this.datos.repartidores_propios) {
+        const distancia: number = await this.alertSerivce.calculaDistancia(this.direccion.lat, this.direccion.lng, this.datosNegocio.direccion.lat, this.datosNegocio.direccion.lng)
+        return resolve(Math.ceil(distancia * 6 + 25))
+      }
+      if (this.datos.envio_gratis_pedMin && this.cuenta > this.datos.envio_gratis_pedMin) return resolve(0)
+      if (!this.datos.envio_costo_fijo) {
+        const distancia: number = await this.alertSerivce.calculaDistancia(this.direccion.lat, this.direccion.lng, this.datosNegocio.direccion.lat, this.datosNegocio.direccion.lng)
+        return resolve(Math.ceil(distancia * 6 + 10))
+      } else {
+        return resolve(this.datos.envio)
+      }
+    })
+  }
+
+  calculaPropina(i: number) {
+    this.propina_sel = i
+    this.propina = this.cuenta * this.botones_propina[i].valor
   }
 
   getFormaPago() {
@@ -117,51 +165,51 @@ export class CuentaPage implements OnInit {
       enterAnimation,
       leaveAnimation,
       componentProps: {producto, idNegocio: this.datos.idNegocio}
-    });
+    })
     modal.onWillDismiss().then(async (resp) => {
       if (resp.data) {
         const uid = this.uidService.getUid()
-        await this.cartService.editProduct(this.datos.idNegocio, producto);
-        this.cuenta = await this.negocioService.getCart(uid, this.datos.idNegocio);
+        await this.cartService.editProduct(this.datos.idNegocio, producto)
+        this.cuenta = await this.negocioService.getCart(uid, this.datos.idNegocio)
+        producto.cantidad = resp.data
+        this.datosNegocio.envio = await this.costoEnvio()
+        this.calculaPropina(this.propina_sel)
       }
-    });
-    return await modal.present();
+    })
+    return await modal.present()
   }
 
   async mostrarDirecciones() {
     const modal = await this.modalCtrl.create({
       component: DireccionesPage,
       enterAnimation,
-    });
-    modal.onWillDismiss().then(resp => {
+    })
+    modal.onWillDismiss().then(async (resp) => {
       if (resp.data) {
-        this.direccion = resp.data;
+        this.direccion = resp.data
+        this.datosNegocio.envio = await this.costoEnvio()
       }
-    });
-    return await modal.present();
+    })
+    return await modal.present()
   }
 
   deleteProducto(i) {
     this.alertSerivce.presentAlertAction('Quitar artículo', '¿Estás seguro que deseas eliminar este artículo?')
-    .then(resp => {
+    .then(async (resp) => {
       if (resp) {
-        this.cartService.deleteProd(this.datosNegocio.idNegocio, this.cart[i]);
-        this.cuenta -= this.cart[i].total;
-        this.cart[i].cantidad = 0;
-        this.cart[i].total = 0;
+        this.cartService.deleteProd(this.datosNegocio.idNegocio, this.cart[i])
+        this.cuenta -= this.cart[i].total
+        this.cart[i].cantidad = 0
+        this.cart[i].total = 0
         this.productos.forEach(p => {
-          const index = p.productos.findIndex(x => x.id === this.cart[i].id);
-          if (index >= 0) {
-            p.productos[index] = this.cart[i];
-          }
-        });
-        this.cart.splice(i, 1);
-        if (this.cuenta === 0) {
-          this.closeCart();
-        }
+          const index = p.productos.findIndex(x => x.id === this.cart[i].id)
+          if (index >= 0) p.productos[index] = this.cart[i]
+        })
+        this.cart.splice(i, 1)
+        if (this.cuenta === 0) this.closeCart()
+        this.datosNegocio.envio = await this.costoEnvio()
       }
-    });
-
+    })
   }
 
   async formasPago() {
@@ -209,17 +257,17 @@ export class CuentaPage implements OnInit {
       return
     }
     try {      
-      const telefono: string = await this.pedidoService.getTelefono();
+      const telefono: string = await this.pedidoService.getTelefono()
       if (!telefono) {
-        const resp: any = await this.alertSerivce.presentPromptTelefono();
-        let tel;
+        const resp: any = await this.alertSerivce.presentPromptTelefono()
+        let tel
         if (resp) {
-          tel = resp.telefono.replace(/ /g, "");
+          tel = resp.telefono.replace(/ /g, "")
           if (tel.length === 10) {
-            this.pedidoService.guardarTelefono(resp.telefono);
+            this.pedidoService.guardarTelefono(resp.telefono)
           } else {
-            this.alertSerivce.presentAlert('Número incorrecto', 'El teléfono agregado es incorrecto, por favor intenta de nuevo');
-            return;
+            this.alertSerivce.presentAlert('Número incorrecto', 'El teléfono agregado es incorrecto, por favor intenta de nuevo')
+            return
           }
         }
       }
@@ -250,7 +298,7 @@ export class CuentaPage implements OnInit {
       await this.pedidoService.createPedido(pedido)
       this.alertSerivce.dismissLoading()
       this.router.navigate(['/avances', pedido.id])
-      this.closeCart();
+      this.closeCart()
     } catch (error) {
       this.alertSerivce.dismissLoading()
       this.alertSerivce.presentAlert('Error', 'Lo sentimos algo salió mal, por favor intenta de nuevo ' + error)
@@ -258,7 +306,7 @@ export class CuentaPage implements OnInit {
   }
 
   closeCart() {
-    if (this.back) {this.back.unsubscribe()}
+    if (this.back) this.back.unsubscribe()
     this.modalCtrl.dismiss(this.cuenta)
   }
 
@@ -286,26 +334,30 @@ export class CuentaPage implements OnInit {
           role: 'cancel'
         },
       ]
-    });
-    await actionSheet.present();
+    })
+    await actionSheet.present()
   }
 
   ionImgWillLoad(image) {
     this.animationService.enterAnimation(image.target)
   }
 
+  comisionInfo() {
+    this.alertSerivce.presentToastconBoton('Cargo realizado por pago con tarjeta')
+  }
+
   // Track by
 
   trackCart(index:number, el: Producto): string {
-    return el.id;
+    return el.id
   }
 
   trackProdComplementos(index:number, el: ListaComplementosElegidos): number {
-    return index;
+    return index
   }
 
   trackComplementos(index:number, el: Complemento): number {
-    return index;
+    return index
   }
 
 }

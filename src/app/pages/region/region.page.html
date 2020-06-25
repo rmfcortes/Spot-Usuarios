@@ -1,16 +1,18 @@
-<ion-content class="bg">
-    <ion-img src="../../../assets/img/backgrounds/region.jpg" style="margin-top: 1.5rem;"></ion-img>
+<ion-content class="fondo">
+    <div class="boton-margen">
+    </div>
+    <ion-img src="../../../assets/img/backgrounds/inicio.jpg" style="margin-top: 1.5rem;"></ion-img>
+    <h1 style="margin: 2rem auto 0 2rem; text-align: justify;">Dirección de <br> entrega:</h1>
     <ion-item lines="none" style="text-align: center;">
-        <ion-label color="light" class="ion-text-wrap" style="font-size: 10pt;">
-            Para disfrutar al máximo todo lo que Spot tiene para ti, y mostrar los negocios cercanos a tu zona y/o dirección de entrega, dale acceso a Spot acceso a tu ubicación o ingresa una dirección de entrega
+        <ion-label color="medium" class="ion-text-wrap" style="font-size: 10pt;">
+            Registra una dirección de entrega para mostrar los mejores negocios cercanos a tu zona.
         </ion-label>
     </ion-item>
-    <div class="foot">
-        <ion-button (click)="mostrarDirecciones()" expand="block" shape="round" class="boton-margen" style="--color: var(--ion-color-primary); --background: white">
-            Ingresar dirección de entrega
-        </ion-button>
-        <ion-button (click)="mostrarZonas()" expand="block" shape="round" class="boton-margen" color="light" fill="clear">
-            Elegir zona
-        </ion-button>
-    </div>
 </ion-content>
+<ion-footer class="ion-no-border">
+    <ion-toolbar>
+        <ion-button (click)="mostrarDirecciones()" shape="round" class="boton-margen" color="primary">
+            Ingresar dirección
+        </ion-button>
+    </ion-toolbar>
+</ion-footer>

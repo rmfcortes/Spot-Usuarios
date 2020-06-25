@@ -34,6 +34,12 @@
             </ion-item>
         </ng-template>
     </div>
+    <ion-item (click)="getLocation()" lines="full" *ngIf="!dirReady">
+        <ion-icon slot="start" name="locate"></ion-icon>
+        <ion-label>
+            <h2 class="comfortaa"> Usar mi ubicación</h2>
+        </ion-label>
+    </ion-item>
 
     <ion-item *ngFor="let item of sugerencias" class="margen-boton" detail (click)="dirSelected(item.place_id)">
         <ion-label class="ion-text-wrap">

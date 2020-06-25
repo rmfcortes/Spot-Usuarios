@@ -20,12 +20,8 @@ export interface Negocio {
 
 export interface DetallesNegocio {
     descripcion: string;
-    direccion: string;
-    lat: number;
-    lng: number;
     telefono: number;
     horario: Horario[];
-    envio_desp_pedMin: number;
 }
 
 export interface ProductoPasillo {
@@ -35,10 +31,15 @@ export interface ProductoPasillo {
 
 export interface DatosParaCuenta {
     logo: string;
+    direccion: Direccion;
     idNegocio: string;
     nombreNegocio: string;
     categoria: string;
     abierto?: boolean;
+    envio?: number;
+    envio_gratis_pedMin?: number;
+    repartidores_propios?: boolean;
+    envio_costo_fijo?: boolean;
 }
 
 export interface Horario {

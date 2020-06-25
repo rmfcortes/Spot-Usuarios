@@ -15,16 +15,16 @@ import { Dia } from 'src/app/interfaces/horario.interface';
 })
 export class InfoSucursalPage implements OnInit {
 
-  @Input() datos: DatosParaCuenta;
-  @Input() abierto: boolean;
+  @Input() datos: DatosParaCuenta
+  @Input() abierto: boolean
 
-  negocio: NegocioInfo;
-  despliegueHorario = false;
-  infoReady = false;
+  negocio: NegocioInfo
+  despliegueHorario = false
+  infoReady = false
 
-  horario: Dia[] = [];
+  horario: Dia[] = []
 
-  back: Subscription;
+  back: Subscription
 
   constructor(
     private platform: Platform,
@@ -33,32 +33,29 @@ export class InfoSucursalPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.getInfo();
+    this.getInfo()
     this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-      this.regresar();
-    });
+      this.regresar()
+    })
   }
 
   async getInfo() {
-    this.horario = await this.negocioService.getHorario(this.datos.idNegocio);
-    const result: DetallesNegocio = await this.negocioService.getSucursalNegocio(this.datos.categoria, this.datos.idNegocio);
-    let status;
-    if (this.abierto) {
-      status = 'Abierto';
-    } else {
-      status = 'Cerrado';
-    }
+    this.horario = await this.negocioService.getHorario(this.datos.idNegocio)
+    const result: DetallesNegocio = await this.negocioService.getSucursalNegocio(this.datos.categoria, this.datos.idNegocio)
+    let status
+    if (this.abierto) status = 'Abierto'
+    else status = 'Cerrado'
     this.negocio = {
       datos: this.datos,
       detalles: result,
       status
-    };
-    this.infoReady = true;
+    }
+    this.infoReady = true
   }
 
   async regresar() {
-    if (this.back) {this.back.unsubscribe()}
-    await this.modalController.dismiss();
+    if (this.back) this.back.unsubscribe()
+    await this.modalController.dismiss()
   }
 
 }

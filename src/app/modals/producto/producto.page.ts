@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, ElementRef, ViewChildren } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
 import { ModalController, Platform } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 
@@ -36,15 +36,17 @@ export class ProductoPage implements OnInit {
   // Info entrada
 
   ngOnInit() {
-    this.getVariables();
+    this.getVariables()
     this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-      this.cerrar();
-    });
+      this.cerrar()
+    })
   }
 
   ionViewWillEnter() {
-    this.producto.total = this.producto.precio;
-    this.producto.cantidad = 1;
+    if (!this.producto.cantidad) {
+      this.producto.total = this.producto.precio
+      this.producto.cantidad = 1
+    }
   }
 
   async getVariables() {
@@ -72,15 +74,15 @@ export class ProductoPage implements OnInit {
           })
         }
       })
-    }, 500);
+    }, 500)
   }
 
   radioSelected(event, i) {
-    const y = event.detail.value;
-    let unidad = this.producto.total / this.producto.cantidad;
+    const y = event.detail.value
+    let unidad = this.producto.total / this.producto.cantidad
     if (!this.variables[i].elegido) {
-      this.variables[i].elegido = true;
-      unidad += this.variables[i].productos[y].precio;
+      this.variables[i].elegido = true
+      unidad += this.variables[i].productos[y].precio
       this.elegidos[i] = {
         titulo: this.variables[i].titulo,
         radioSelected: y,
@@ -88,10 +90,10 @@ export class ProductoPage implements OnInit {
           nombre: this.variables[i].productos[y].nombre,
           precio: this.variables[i].productos[y].precio,
         }]
-      };
+      }
     } else {
-      unidad -= this.elegidos[i].complementos[0].precio;
-      unidad += this.variables[i].productos[y].precio;
+      unidad -= this.elegidos[i].complementos[0].precio
+      unidad += this.variables[i].productos[y].precio
       this.elegidos[i] = {
         titulo: this.variables[i].titulo,
         radioSelected: y,
@@ -99,15 +101,15 @@ export class ProductoPage implements OnInit {
           nombre: this.variables[i].productos[y].nombre,
           precio: this.variables[i].productos[y].precio,
         }]
-      };
+      }
     }
-    this.producto.total = this.producto.cantidad * unidad;
-    this.obligatoriosPendientes[i] = false;
+    this.producto.total = this.producto.cantidad * unidad
+    this.obligatoriosPendientes[i] = false
     this.checkObligatorios()
   }
 
   checkChange(i: number, y: number, isChecked: boolean) {
-    let checados = 0;
+    let checados = 0
     this.variables[i].productos.forEach(p => {
       if (p.isChecked) {
         checados++
@@ -130,33 +132,29 @@ export class ProductoPage implements OnInit {
     let unidad = this.producto.total / this.producto.cantidad
     if (isChecked)  unidad += this.variables[i].productos[y].precio
     else unidad -= this.variables[i].productos[y].precio
-    this.producto.total = this.producto.cantidad * unidad;
+    this.producto.total = this.producto.cantidad * unidad
   }
 
   checkObligatorios() {
     this.canContinue = true
-    this.obligatoriosPendientes.forEach(o => {
-      if (o) this.canContinue = false
-    })
+    this.obligatoriosPendientes.forEach(o => o ? this.canContinue = false : null)
   }
 
   plusProduct() {
     const ele = this.inputCant.nativeElement
     this.animationService.animBrinca(ele)
-    const unidad = this.producto.total / this.producto.cantidad;
-    this.producto.cantidad++;
-    this.producto.total = this.producto.cantidad * unidad;
+    const unidad = this.producto.total / this.producto.cantidad
+    this.producto.cantidad++
+    this.producto.total = this.producto.cantidad * unidad
   }
 
   minusProduct() {
-    if (this.producto.cantidad === 1) {
-      return;
-    }
+    if (this.producto.cantidad === 1) return
     const ele = this.inputCant.nativeElement
     this.animationService.animBrinca(ele)
-    const unidad = this.producto.total / this.producto.cantidad;
-    this.producto.cantidad--;
-    this.producto.total = this.producto.cantidad * unidad;
+    const unidad = this.producto.total / this.producto.cantidad
+    this.producto.cantidad--
+    this.producto.total = this.producto.cantidad * unidad
   }
 
 
@@ -188,15 +186,15 @@ export class ProductoPage implements OnInit {
         })
       }
     })
-    this.producto.cantidad = this.producto.cantidad;
-    this.producto.complementos = this.elegidos;
-    this.modalCtrl.dismiss(this.producto.cantidad);
+    this.producto.cantidad = this.producto.cantidad
+    this.producto.complementos = this.elegidos
+    this.modalCtrl.dismiss(this.producto.cantidad)
   }
 
   cerrar() {
-    if (this.back) {this.back.unsubscribe()}
+    if (this.back) this.back.unsubscribe()
     // this.producto.cantidad = 0;
-    this.modalCtrl.dismiss(null);
+    this.modalCtrl.dismiss(null)
   }
 
 }

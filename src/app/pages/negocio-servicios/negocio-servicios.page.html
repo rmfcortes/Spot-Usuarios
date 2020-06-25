@@ -1,18 +1,28 @@
 <ng-container *ngIf="!error; else errorTemplate">
     <ng-container *ngIf="infoReady; else infoTemplate">
-        <ion-header *ngIf="portada">
-            <ion-toolbar [appScrollVanish]="scrollArea">
-                <ion-icon color="light" class="topleft" (click)="regresar()" name="arrow-back"></ion-icon>
+        <ion-content>
+        <div *ngIf="portada" style="background: white;">
+            <div  class="portada_box"> 
                 <img style="width: 100%;" [src]="portada" alt="">
-            </ion-toolbar>
-            <ion-toolbar [appTitleScrollVanish]="scrollArea">
-                <ion-title color="primary" class="comfortaa">{{negocio.nombre}}</ion-title>
+            </div>
+            <!-- <div class="logo_box shadow">
                 <ion-buttons slot="end">
                     <ion-button fill="clear" (click)="verInfo()">
                         Ver más
                     </ion-button>
                 </ion-buttons>
-            </ion-toolbar>
+            </div> -->
+            <div class="header">
+                <ion-item lines="none">
+                    <ion-icon slot="start" color="primary" name="chevron-back" style="font-size: medium;" (click)="regresar()"></ion-icon>
+                    <ion-label>
+                        <h2 class="comfortaa primario">{{negocio.nombre}}</h2>
+                    </ion-label>
+                    <ion-button slot="end" (click)="verInfo()" fill="clear">
+                        Ver más
+                    </ion-button>
+                </ion-item>
+            </div>
             <ion-segment scrollable>
                 <ion-segment-button (click)="resetProds()">
                     Todos
@@ -24,9 +34,8 @@
                     {{item.nombre}}
                 </ion-segment-button>
             </ion-segment>
-        </ion-header>
+        </div>
 
-        <ion-content #scrollArea scrollEvents="true" class="ion-padding">
             <ng-container *ngIf="cargandoProds; else cargandoTemp">
                 <ion-item lines="none">
                     <ion-spinner style="margin: auto;" name="dots" color="primary"></ion-spinner>

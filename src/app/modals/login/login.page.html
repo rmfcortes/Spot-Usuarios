@@ -11,12 +11,12 @@
                     <img style="margin-bottom: 1rem;" src="../../../assets/img/backgrounds/o.jpg" alt="">
                     <ion-input (keyup.enter)="$event.target.blur();" type="text" [(ngModel)]="correo" class="input-usuario" placeholder="Correo electrónico"></ion-input>
                     <ion-input (keyup.enter)="$event.target.blur();" type="password" [(ngModel)]="pass" class="input-usuario" placeholder="Contraseña"></ion-input>
-                    <ion-label color="primary" style="float: right; margin-bottom: 1.2rem; font-size: smaller;" (click)="resetPass()">¿Olvidaste tu contraseña?</ion-label>
+                    <ion-label color="primary" style="float: right; margin-bottom: 1.2rem; font-size: xx-small;" (click)="resetPass()">¿Olvidaste tu contraseña?</ion-label>
                     <ion-button [disabled]="!correo || !pass" (click)="ingresarConCorreo()" color="primary" shape="round" expand="block">
                         Iniciar sesión
                     </ion-button>
                     <ion-item lines="none" style="margin-top: 2.2rem; --background: transparent;">
-                        <ion-label color="medium" style="font-size: smaller;">¿No tienes cuenta?</ion-label>
+                        <ion-label color="medium" style="font-size: smaller;" class="ion-text-wrap">¿No tienes cuenta?</ion-label>
                         <ion-button fill="clear" (click)="mostrarFormularioCuenta()">
                             Regístrate
                         </ion-button>

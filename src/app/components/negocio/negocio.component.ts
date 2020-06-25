@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { AnimationsService } from 'src/app/services/animations.service';
+import { Direccion } from '../../interfaces/direcciones';
 
 @Component({
   selector: 'app-negocio',
@@ -9,6 +10,7 @@ import { AnimationsService } from 'src/app/services/animations.service';
 export class NegocioComponent implements OnInit {
 
   @Input() negocios
+  @Input() direccion: Direccion
   @Output() verNeg = new EventEmitter<any>()
 
   constructor(

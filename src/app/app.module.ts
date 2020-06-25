@@ -7,6 +7,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
+import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { AppVersion } from '@ionic-native/app-version/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { OneSignal } from '@ionic-native/onesignal/ngx';
@@ -27,6 +28,7 @@ import { Facebook } from '@ionic-native/facebook/ngx';
 import { IonicStorageModule } from '@ionic/storage';
 
 import { ChatPageModule } from './modals/chat/chat.module';
+import { enterPageAnimation } from './animations/nav';
 
 @NgModule({
   declarations: [AppComponent],
@@ -34,7 +36,9 @@ import { ChatPageModule } from './modals/chat/chat.module';
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
-    IonicModule.forRoot(),
+    IonicModule.forRoot({
+      navAnimation: enterPageAnimation
+    }),
     IonicStorageModule.forRoot(),
     AppRoutingModule,
     HttpClientModule,
@@ -47,6 +51,7 @@ import { ChatPageModule } from './modals/chat/chat.module';
     StatusBar,
     SplashScreen,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    Geolocation,
     AppVersion,
     OneSignal,
     Facebook,

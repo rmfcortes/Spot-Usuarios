@@ -2,7 +2,7 @@
     <ion-toolbar *ngIf="infoReady" color="primary">
         <ion-buttons slot="start">
             <ion-button (click)="regresar()">
-                <ion-icon color="light" slot="icon-only" name="arrow-back"></ion-icon>
+                <ion-icon color="light" slot="icon-only" name="chevron-back"></ion-icon>
             </ion-button>
         </ion-buttons>
         <ion-title>{{negocio.datos.nombreNegocio}}</ion-title>
@@ -17,7 +17,7 @@
                     <ion-icon class="icono-lista" name="location"></ion-icon> <br>
                 </ion-col>
                 <ion-col size="10" class="ion-align-self-center">
-                    {{negocio.detalles.direccion}}
+                    {{negocio.datos.direccion.direccion}}
                 </ion-col>
             </ion-row>
         </ion-grid>
@@ -59,8 +59,8 @@
                 </ion-col>
             </ion-row>
         </ion-grid>
-        <agm-map [latitude]="negocio.detalles.lat" [longitude]="negocio.detalles.lng" [zoom]="17">
-            <agm-marker [latitude]="negocio.detalles.lat" [longitude]="negocio.detalles.lng"></agm-marker>
+        <agm-map [latitude]="negocio.datos.direccion.lat" [longitude]="negocio.datos.direccion.lng" [zoom]="17">
+            <agm-marker [latitude]="negocio.datos.direccion.lat" [longitude]="negocio.datos.direccion.lng"></agm-marker>
         </agm-map>
     </div>
 </ion-content>

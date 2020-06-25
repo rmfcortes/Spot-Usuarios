@@ -1,8 +1,8 @@
-<ion-content>
+<ion-content style="--background: transparent !important">
     <ng-container *ngIf="infoReady; else elseTemplate">
         <!-- Contacto -->
         <ion-item lines="none">
-            <ion-icon color="primary" slot="start" name="arrow-back" (click)="regresar()"></ion-icon>
+            <ion-icon color="primary" slot="start" name="chevron-back" (click)="regresar()"></ion-icon>
             <ion-button (click)="verPedido()" expand="block" fill="clear" slot="end">
                 Ver detalles
             </ion-button>
@@ -14,7 +14,7 @@
                     <img [src]="pedido.negocio.logo" />
                 </ion-thumbnail>
                 <ion-label>
-                    <h3 class="comfortaa">{{pedido.negocio.nombreNegocio}}</h3>
+                    <h2 class="comfortaa">{{pedido.negocio.nombreNegocio}}</h2>
                 </ion-label>
                 <ion-icon slot="end" name="call"></ion-icon>
             </ion-item>
@@ -97,14 +97,11 @@
         <ion-card *ngIf="pedido.entrega === 'inmediato'">
             <h2>Rastreo</h2>
             <div class="marco">
-                <agm-map style="height: 45vh" [latitude]="20.627006" [longitude]="-103.416554" [disableDefaultUI]="true" [streetViewControl]="false" [zoomControl]="false" [fitBounds]="true">
-                    <agm-marker [agmFitBounds]="true" [iconUrl]='{"url": icon,"scaledSize": {"height": 75, "width": 50}}' [latitude]="pedido.cliente.direccion.lat" [longitude]="pedido.cliente.direccion.lng" [animation]="'DROP'"></agm-marker>
-                    <agm-marker [agmFitBounds]="true" [iconUrl]='{"url": tienda,"scaledSize": {"height": 50, "width": 50}}' [latitude]="pedido.negocio.direccion.lat" [longitude]="pedido.negocio.direccion.lng" [animation]="'DROP'"></agm-marker>
-                    <agm-marker [agmFitBounds]="true" *ngIf="pedido.repartidor && pedido.repartidor.lat" [iconUrl]='{"url": repartidor,"scaledSize": {"height": 50, "width": 50}}' [latitude]="pedido.repartidor.lat" [longitude]="pedido.repartidor.lng" [animation]="'DROP'"></agm-marker>
-                </agm-map>
+                <div id="map_canvas">
+                </div>
             </div>
         </ion-card>
-
+        
     </ng-container>
 
 

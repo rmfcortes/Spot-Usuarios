@@ -4,6 +4,15 @@ import { Platform, ModalController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 
 import { CallNumber } from '@ionic-native/call-number/ngx';
+import {
+  GoogleMaps,
+  GoogleMap,
+  GoogleMapOptions,
+  Marker,
+  Environment,
+  MarkerIcon,
+  ILatLng
+} from '@ionic-native/google-maps';
 
 import { DisparadoresService } from 'src/app/services/disparadores.service';
 import { PedidoService } from 'src/app/services/pedido.service';
@@ -13,6 +22,8 @@ import { PedidoActivoPage } from 'src/app/modals/pedido-activo/pedido-activo.pag
 import { CalificarPage } from 'src/app/modals/calificar/calificar.page';
 import { PermisosPage } from 'src/app/modals/permisos/permisos.page';
 import { ChatPage } from 'src/app/modals/chat/chat.page';
+
+import { environment } from '../../../environments/environment';
 
 import { Ubicacion } from 'src/app/interfaces/region.interface';
 import { Pedido, Repartidor } from 'src/app/interfaces/pedido';
@@ -28,29 +39,33 @@ import { leaveAnimation } from 'src/app/animations/leave';
 })
 export class AvancesPage implements OnInit {
 
-  icon = '../../../assets/img/iconos/pin.png';
-  tienda = '../../../assets/img/iconos/tienda.png';
-  repartidor = '../../../assets/img/iconos/repartidor.png';
+  map: GoogleMap
+  markers: ILatLng[] = []
+  repartidorMarker: Marker
+  repartidorIcon: MarkerIcon
 
-  pedido: Pedido;
-  msgSub: Subscription;
-  pedidoSub: Subscription;
-  entregadoSub: Subscription;
-  ubicacionSub: Subscription;
-  repartidorSub: Subscription;
-  tipoEntregaSub: Subscription;
+  clienteLatLng: ILatLng
+  negocioLatLng: ILatLng
 
-  telReady = true;
-  tel: string;
+  pedido: Pedido
+  msgSub: Subscription
+  pedidoSub: Subscription
+  entregadoSub: Subscription
+  ubicacionSub: Subscription
+  repartidorSub: Subscription
+  tipoEntregaSub: Subscription
 
-  newMsg = false;
-  hasPermission = true;
+  telReady = true
+  tel: string
 
-  entregaAprox = null;
+  newMsg = false
+  hasPermission = true
 
-  infoReady = false;
+  entregaAprox = null
 
-  back: Subscription;
+  infoReady = false
+
+  back: Subscription
 
 
   constructor(
@@ -77,14 +92,100 @@ export class AvancesPage implements OnInit {
   }
 
   ionViewDidEnter() {
-    this.getTelefono();
-    this.getToken();
+    this.getTelefono()
+    this.getToken()
+  }
+
+  loadMap() {
+    if(this.map) this.map.clear()
+
+    let mapOptions: GoogleMapOptions = {
+      camera: {
+        target: {
+          lat: 20.627006,
+          lng: -103.416554
+        },
+         zoom: 17,
+       },
+       gestures: {
+         zoom: true,
+         rotate: true
+       },
+    }
+
+    const cliente: MarkerIcon = {
+      url: './assets/img/iconos/pin.png',
+      size: {
+        width: 30,
+        height: 40
+      }
+    }
+
+    const negocio: MarkerIcon = {
+      url: './assets/img/iconos/tienda.png',
+      size: {
+        width: 40,
+        height: 40
+      }
+    }
+
+    this.map = GoogleMaps.create('map_canvas', mapOptions)
+    const styles = {
+      default: null,
+      hide: [
+        {
+          featureType: 'poi.business',
+          stylers: [{visibility: 'off'}]
+        },
+        {
+          featureType: 'transit',
+          elementType: 'labels.icon',
+          stylers: [{visibility: 'off'}]
+        }
+      ]
+    };
+    this.map.setOptions({styles: styles['hide']})
+
+    this.map.addMarkerSync({
+      icon: cliente,
+      animation: 'DROP',
+      position: {
+        lat: this.pedido.cliente.direccion.lat,
+        lng: this.pedido.cliente.direccion.lng
+      }
+    })
+
+    this.map.addMarkerSync({
+      icon: negocio,
+      animation: 'DROP',
+      position: {
+        lat: this.pedido.negocio.direccion.lat,
+        lng: this.pedido.negocio.direccion.lng
+      }
+    })
+
+    this.clienteLatLng = {
+      lat: this.pedido.cliente.direccion.lat,
+      lng: this.pedido.cliente.direccion.lng
+    }
+    this.negocioLatLng = {
+      lat: this.pedido.negocio.direccion.lat,
+      lng: this.pedido.negocio.direccion.lng
+    }
+
+    this.markers = [this.clienteLatLng, this.negocioLatLng]
+
+    this.map.moveCamera({
+      target: this.markers,
+      padding: 100
+    })
+
   }
 
   getPedido(id) {
     this.pedidoService.getPedido(id).then((pedido: Pedido) => {
       this.pedido = pedido
-      console.log(this.pedido)
+      this.loadMap()
       if (!this.pedido.aceptado) {
         this.pedidoSub = this.pedidoService.trackAcept(id).subscribe((resp: number) => {
           if (resp) {
@@ -93,7 +194,7 @@ export class AvancesPage implements OnInit {
             this.isInmediato(id)
             this.trackAvances()
           } else  this.infoReady = true
-        });
+        })
       } else {
         this.trackAvances()
         this.isInmediato(id)
@@ -109,10 +210,10 @@ export class AvancesPage implements OnInit {
     if (!this.pedido.repartidor && this.pedido.entrega && this.pedido.entrega === 'inmediato') {
       this.repartidorSub = this.pedidoService.trackRepartidor(id).subscribe((resp: Repartidor) => {
         if (resp) {
-          this.repartidorSub.unsubscribe();
-          this.pedido.repartidor = resp;
+          this.repartidorSub.unsubscribe()
+          this.pedido.repartidor = resp
           this.infoReady = true
-          this.trackRepartidor();
+          this.trackRepartidor()
         } else {
           this.infoReady = true
         }
@@ -120,7 +221,7 @@ export class AvancesPage implements OnInit {
     }
     if (this.pedido.repartidor && this.pedido.entrega && this.pedido.entrega === 'inmediato') {
       this.infoReady = true
-      this.trackRepartidor();
+      this.trackRepartidor()
     }
     if (this.pedido.entrega === 'indefinido') {
       this.trackTipoEntrega()
@@ -128,13 +229,13 @@ export class AvancesPage implements OnInit {
   }
 
   async getTelefono() {
-    this.tel = await this.pedidoService.getTelefono();
+    this.tel = await this.pedidoService.getTelefono()
     if (!this.tel) {
       setTimeout(() => {
-        this.telReady = false;
-      }, 2000);
+        this.telReady = false
+      }, 2000)
     } else {
-      this.telReady = true;
+      this.telReady = true
     }
   }
 
@@ -162,21 +263,44 @@ export class AvancesPage implements OnInit {
   trackAvances() {
     this.pedido.avances = []
     this.pedidoService.trackAvances(this.pedido.id).query.ref.on('child_added', snapshot => {
-      this.ngZone.run(() => {
-        this.pedido.avances.push(snapshot.val())
-      });
-    });
+      this.ngZone.run(() => this.pedido.avances.push(snapshot.val()))
+    })
   }
 
   trackRepartidor() {
-    this.trackEntregado();
-    this.listenNewMsg();
+    if  (!this.repartidorIcon) {
+      this.repartidorIcon = {
+        url: './assets/img/iconos/repartidor.png',
+        size: {
+          width: 40,
+          height: 60
+        }
+      }
+    }
+    this.trackEntregado()
+    this.listenNewMsg()
     this.repartidorSub = this.pedidoService.trackUbicacion(this.pedido.repartidor.id).subscribe((ubicacion: Ubicacion) => {
       if (ubicacion) {
-        this.pedido.repartidor.lat = ubicacion.lat;
-        this.pedido.repartidor.lng = ubicacion.lng;
+        const position: ILatLng = {
+          lat: ubicacion.lat,
+          lng: ubicacion.lng
+        }
+        if (!this.repartidorMarker) {
+          this.repartidorMarker = this.map.addMarkerSync({
+            icon: this.repartidorIcon,
+            animation: 'DROP',
+            position
+          })
+        } else {
+          this.repartidorMarker.setPosition(position)
+        }
+        const markers: ILatLng[] = [position, this.clienteLatLng, this.negocioLatLng]
+        this.map.moveCamera({
+          target: markers,
+          padding: 100
+        })
       }
-    });
+    })
   }
 
   trackEntregado() {
@@ -190,18 +314,18 @@ export class AvancesPage implements OnInit {
         this.pedido.entregado = true
         this.verCalificar()
       }
-    });
+    })
   }
 
   listenNewMsg() {
     this.msgSub = this.chatService.listenMsgPedido(this.pedido.id).subscribe((unRead: UnreadMsg) => {
       if (unRead && unRead.cantidad > 0) {
-        this.newMsg = true;
-        this.alertService.presentToast('Nuevo mensaje de ' + this.pedido.repartidor.nombre);
+        this.newMsg = true
+        this.alertService.presentToast('Nuevo mensaje de ' + this.pedido.repartidor.nombre)
       } else {
-        this.newMsg = false;
+        this.newMsg = false
       }
-    });
+    })
   }
 
     // Acciones
@@ -209,10 +333,12 @@ export class AvancesPage implements OnInit {
   async verPedido() {
     const modal = await this.modalCtrl.create({
       component: PedidoActivoPage,
+      enterAnimation,
+      leaveAnimation,
       componentProps: {pedido: this.pedido}
-    });
+    })
 
-    return await modal.present();
+    return await modal.present()
   }
 
   async verCalificar() {
@@ -229,27 +355,23 @@ export class AvancesPage implements OnInit {
   }
 
   guardaTel(event?) {
-    if (event) {
-      event.target.blur();
-    }
-    if (!this.tel) {
-      return;
-    }
-    this.tel = this.tel.replace(/ /g, "");
+    if (event) event.target.blur()
+    if (!this.tel) return
+    this.tel = this.tel.replace(/ /g, "")
     if (this.tel.length === 10) {
-      this.pedidoService.guardarTelefono(this.tel);
-      this.alertService.presentToast('Teléfono guardado. ¡Muchas gracias!');
-      this.telReady = true;
+      this.pedidoService.guardarTelefono(this.tel)
+      this.alertService.presentToast('Teléfono guardado. ¡Muchas gracias!')
+      this.telReady = true
     } else {
-      this.alertService.presentAlert('Número incorrecto', 'El teléfono debe ser de 10 dígitos, por favor intenta de nuevo');
-      return;
+      this.alertService.presentAlert('Número incorrecto', 'El teléfono debe ser de 10 dígitos, por favor intenta de nuevo')
+      return
     }
   }
 
   llamar(numero) {
     this.callNumber.callNumber(numero, true)
       .then(res => console.log('Launched dialer!', res))
-      .catch(err => console.error(err));
+      .catch(err => console.error(err))
   }
 
   async muestraChat() {
@@ -266,28 +388,26 @@ export class AvancesPage implements OnInit {
       }
     });
 
-    modal.onDidDismiss().then(() => {
-      this.listenNewMsg();
-    });
+    modal.onDidDismiss().then(() => this.listenNewMsg())
 
-    return await modal.present();
+    return await modal.present()
   }
 
   async muestraPermisos() {
     const modal = await this.modalCtrl.create({
       component: PermisosPage,
-    });
+    })
 
-    return await modal.present();
+    return await modal.present()
   }
 
   guardarCalificacion() {
-    return;
+    return
   }
 
-// Salida
-
-  regresar() {
+    // Salida
+  async regresar() {
+    this.map.remove()
     if (this.back) this.back.unsubscribe()
     if (this.msgSub) this.msgSub.unsubscribe()
     if (this.pedidoSub) this.pedidoSub.unsubscribe()

@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 
 import { RegionService } from '../services/region.service';
 import { UidService } from '../services/uid.service';
+import { DireccionService } from '../services/direccion.service';
 
 
 @Injectable({
@@ -13,21 +14,28 @@ export class RegionGuard implements CanActivate {
 
   constructor(
     private router: Router,
+    private direccionService: DireccionService,
     private regionService: RegionService,
-    private uidService: UidService,
   ) {}
 
   canActivate(
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-      const region = this.uidService.getRegion()
-      if (region) return true 
-      else {
-        return this.regionService.getRegionStorage().then(resp => {
-          if (resp) return true
-          return this.router.navigate(['/region'])
-        })
-      }
+      return this.regionService.getRegion()
+      .then(resp => {
+        if (!resp) {
+          throw false
+        }
+        return this.direccionService.getDireccion()
+      })
+      .then(dir => {
+        if (dir) return true
+        throw false
+      })
+      .catch(() => {
+        this.router.navigate(['/region'])
+        return false
+      })
   }
 
 }

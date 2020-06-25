@@ -1,3 +1,33 @@
+.portada_box {
+    width: 100vw;
+    height: 33vw;
+    border-bottom-left-radius:25%;
+    border-bottom-right-radius:25%;
+    overflow: hidden;
+}
+
+.header {
+    background: white;
+    width: 100%;
+    height: 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+}
+
+.logo_box {
+    width: 80%;
+    height: 18vw;
+    border-radius: 500px;
+    background: white;
+    position: absolute;
+    margin-top: -13vw;
+    margin-left: 10%;
+    z-index: 15;
+    text-align: center;
+}
+
+
 $spinner-size: 45px;
 $spinner-color: #e0a331;
 .topleft {

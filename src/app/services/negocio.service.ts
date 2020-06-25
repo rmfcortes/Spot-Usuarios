@@ -156,15 +156,5 @@ export class NegocioService {
     })
   }
 
-  // Para Home page, calcular costo de envíos
-  getUltimaDireccion(): Promise<Direccion> {
-    return new Promise((resolve, reject) => {
-      const uid = this.uidService.getUid()
-      const dirSub = this.db.object(`usuarios/${uid}/direcciones/ultima`).valueChanges().subscribe((dir: Direccion) => {
-        dirSub.unsubscribe()
-        resolve(dir)
-      })
-    })
-  }
 
 }

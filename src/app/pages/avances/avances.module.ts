@@ -5,7 +5,6 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 
 import { CallNumber } from '@ionic-native/call-number/ngx';
-import { AgmCoreModule } from '@agm/core';
 import { LOCALE_ID } from '@angular/core';
 import { registerLocaleData } from '@angular/common';
 
@@ -17,7 +16,6 @@ import { AvancesPageRoutingModule } from './avances-routing.module';
 import { AvancesPage } from './avances.page';
 import { PedidoActivoPageModule } from 'src/app/modals/pedido-activo/pedido-activo.module';
 
-import { environment } from 'src/environments/environment';
 import { CalificarPageModule } from 'src/app/modals/calificar/calificar.module';
 import { ChatPageModule } from 'src/app/modals/chat/chat.module';
 import { PermisosPageModule } from 'src/app/modals/permisos/permisos.module';
@@ -32,9 +30,6 @@ import { PermisosPageModule } from 'src/app/modals/permisos/permisos.module';
     CalificarPageModule,
     PermisosPageModule,
     ChatPageModule,
-    AgmCoreModule.forRoot({
-      apiKey: environment.mapsApiKey
-    }),
   ],
   providers: [
     CallNumber,

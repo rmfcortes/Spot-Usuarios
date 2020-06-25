@@ -3,7 +3,6 @@ import { ModalController } from '@ionic/angular';
 import { Router } from '@angular/router';
 
 import { DireccionesPage } from 'src/app/modals/direcciones/direcciones.page';
-import { ZonasPage } from 'src/app/modals/zonas/zonas.page';
 
 import { RegionService } from 'src/app/services/region.service';
 
@@ -26,20 +25,6 @@ export class RegionPage implements OnInit {
   ngOnInit() {
   }
 
-  async mostrarZonas() {
-    const modal = await this.modalCtrl.create({
-      component: ZonasPage,
-      enterAnimation,
-    });
-    modal.onWillDismiss().then(resp => {
-      if (resp.data) {
-        this.regionService.setRegion(resp.data)
-        this.router.navigate(['/home'])
-      }
-    });
-    return await modal.present();
-  }
-
   async mostrarDirecciones() {
     const modal = await this.modalCtrl.create({
       component: DireccionesPage,
@@ -51,8 +36,8 @@ export class RegionPage implements OnInit {
         this.regionService.setRegion(resp.data)
         this.router.navigate(['/home'])
       }
-    });
-    return await modal.present();
+    })
+    return await modal.present()
   }
 
 }

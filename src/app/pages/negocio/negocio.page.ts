@@ -1,6 +1,7 @@
-import { Component, ViewChild, AfterContentInit } from '@angular/core';
+import { Component, ViewChild, NgZone } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { AlertController, ModalController, IonInfiniteScroll, NavController, Platform } from '@ionic/angular';
+import { Location } from '@angular/common';
+import { AlertController, ModalController, IonInfiniteScroll, Platform } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 
 import { InfoSucursalPage } from 'src/app/modals/info-sucursal/info-sucursal.page';
@@ -13,11 +14,12 @@ import { CartService } from 'src/app/services/cart.service';
 import { UidService } from 'src/app/services/uid.service';
 
 import { Negocio, DatosParaCuenta, InfoPasillos, ProductoPasillo } from 'src/app/interfaces/negocio';
+import { Direccion } from '../../interfaces/direcciones';
 import { Producto } from 'src/app/interfaces/producto';
 
 import { enterAnimation } from 'src/app/animations/enter';
 import { leaveAnimation } from 'src/app/animations/leave';
-import { AnimationsService } from 'src/app/services/animations.service';
+import { DisparadoresService } from 'src/app/services/disparadores.service';
 
 
 @Component({
@@ -29,46 +31,48 @@ export class NegocioPage {
 
   @ViewChild(IonInfiniteScroll, {static: false}) infiniteScroll: IonInfiniteScroll;
 
-  uid: string;
-  categoria: string;
+  uid: string
+  direccion: Direccion
+  categoria: string
 
-  negocio: Negocio;
-  portada: string;
-  vista: string;
-  productos: ProductoPasillo[] = [];
+  negocio: Negocio
+  portada: string
+  vista: string
+  productos: ProductoPasillo[] = []
   pasillos: InfoPasillos = {
     vista: '',
     portada: '',
     pasillos: []
-  };
+  }
 
-  infiniteCall: number;
-  productosCargados: number;
-  yPasillo = 0;
+  infiniteCall: number
+  productosCargados: number
+  yPasillo = 0
 
-  batch = 15;
-  lastKey = '';
-  noMore = false;
+  batch = 15
+  lastKey = ''
+  noMore = false
 
-  cuenta = 0;
+  cuenta = 0
 
-  pasilloFiltro = '';
-  cambiandoPasillo = false;
+  pasilloFiltro = ''
+  cambiandoPasillo = false
 
-  cargandoProds = true;
-  hasOfertas = false;
-  infoReady = false;
-  error = false;
+  cargandoProds = true
+  hasOfertas = false
+  infoReady = false
+  error = false
 
   back: Subscription
 
   constructor(
+    private ngZone: NgZone,
     private platform: Platform,
-    private navCtrl: NavController,
+    private navLocation: Location,
     private activatedRoute: ActivatedRoute,
     private modalController: ModalController,
     private alertController: AlertController,
-    private animationService: AnimationsService,
+    private commonService: DisparadoresService,
     private negocioService: NegocioService,
     private cartService: CartService,
     private uidService: UidService,
@@ -78,7 +82,7 @@ export class NegocioPage {
 
   ionViewWillEnter() {
     this.uid = this.uidService.getUid()
-    this.categoria = this.activatedRoute.snapshot.paramMap.get('cat');
+    this.categoria = this.activatedRoute.snapshot.paramMap.get('cat')
     this.getNegocio()
     this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
       this.regresar()
@@ -87,11 +91,12 @@ export class NegocioPage {
 
   async getNegocio() {
     const id = this.activatedRoute.snapshot.paramMap.get('id');
-    const abierto = this.activatedRoute.snapshot.paramMap.get('status');
+    const abierto = this.activatedRoute.snapshot.paramMap.get('status')
     let status
     if (abierto === 'true')status = 'abiertos'
     else status = 'cerrados'
     this.negocio = await this.negocioService.getNegocioPreview(id, this.categoria, status)
+    this.costoEnvio()
     if (!this.negocio) {
       this.infoReady = true
       this.error = true
@@ -103,30 +108,28 @@ export class NegocioPage {
     this.getPasillos()
   }
 
+  async costoEnvio() {
+    this.direccion = this.uidService.getDireccion()
+    if (this.negocio.repartidores_propios) {
+      if (!this.negocio.envio_costo_fijo && !this.negocio.envio_gratis_pedMin) {
+        const distancia: number = await this.commonService.calculaDistancia(this.direccion.lat, this.direccion.lng, this.negocio.direccion.lat, this.negocio.direccion.lng)
+        this.negocio.envio =  Math.ceil(distancia * 6 + 10)
+      }
+    } else {
+      if (this.negocio.direccion && this.negocio.tipo === 'productos') {
+        const distancia: number = await this.commonService.calculaDistancia(this.direccion.lat, this.direccion.lng, this.negocio.direccion.lat, this.negocio.direccion.lng)
+        this.negocio.envio = Math.ceil(distancia * 6 + 25)
+      }
+    }
+  }
+
   async getPasillos() {
     const detalles: InfoPasillos = await this.negocioService.getPasillos(this.categoria, this.negocio.id)
     this.portada = detalles.portada
     this.vista = detalles.vista || 'lista'
     this.pasillos.pasillos = detalles.pasillos
     this.pasillos.pasillos = this.pasillos.pasillos.sort((a, b) => a.prioridad - b.prioridad)
-    setTimeout(() => {
-      this.animPortada()
-    }, 350)
     this.getOfertas()
-  }
-
-  animPortada() {
-    const portada = document.getElementById('portada')
-    if (!portada) {
-      this.animPortada()
-      return
-    }
-    const heigth = portada.clientHeight
-    const segment = document.getElementById('segment')
-    segment.style.marginTop = heigth.toString() + 'px'
-    segment.style.visibility = 'visible'
-    const contenido = document.getElementById('contenido')
-    this.animationService.hidePortada(contenido, portada, heigth, segment)
   }
 
   // Get Productos
@@ -135,242 +138,247 @@ export class NegocioPage {
     this.cargandoProds = true;
     this.negocioService.getOfertas(this.categoria, this.negocio.id).then(async (ofertas: Producto[]) => {
       if (ofertas && ofertas.length > 0) {
-        this.hasOfertas = true;
-        this.agregaProductos(ofertas, 'Ofertas');
+        this.hasOfertas = true
+        this.agregaProductos(ofertas, 'Ofertas')
       } else {
-        this.hasOfertas = false;
-        this.cargandoProds = false;
+        this.hasOfertas = false
+        this.cargandoProds = false
       }
       if (!this.pasilloFiltro) {
-        this.getInfoProdsLista();
+        this.getInfoProdsLista()
       }
-    });
+    })
   }
 
   async getInfoProdsLista() {
-    this.infiniteCall = 1;
-    this.productosCargados = 0;
-    this.cargandoProds = true;
-    this.getProds();
+    this.infiniteCall = 1
+    this.productosCargados = 0
+    this.cargandoProds = true
+    this.getProds()
   }
 
   async getProds(event?) {
     return new Promise(async (resolve, reject) => {
       const productos = await this.negocioService
-      .getProductosLista(this.categoria, this.negocio.id, this.pasillos.pasillos[this.yPasillo].nombre, this.batch + 1, this.lastKey);
-      this.cambiandoPasillo = false;
+      .getProductosLista(this.categoria, this.negocio.id, this.pasillos.pasillos[this.yPasillo].nombre, this.batch + 1, this.lastKey)
+      this.cambiandoPasillo = false
       if (productos && productos.length > 0) {
-        this.lastKey = productos[productos.length - 1].id;
-        this.evaluaProdsLista(productos, event);
+        this.lastKey = productos[productos.length - 1].id
+        this.evaluaProdsLista(productos, event)
       } else if ( this.yPasillo + 1 < this.pasillos.pasillos.length ) {
-        this.yPasillo++;
-        this.lastKey = null;
+        this.yPasillo++
+        this.lastKey = null
         if (this.productosCargados < this.batch * this.infiniteCall) {
-          this.getProds();
+          this.getProds()
         }
       } else {
-        this.noMore = true;
-        this.infoReady = true;
-        this.cargandoProds = false;
+        this.noMore = true
+        this.infoReady = true
+        this.cargandoProds = false
         if (this.productos.length === 0) {
 
         }
-        if (event) { event.target.complete(); }
-        resolve();
+        if (event) event.target.complete()
+        resolve()
       }
-    });
+    })
   }
 
   async evaluaProdsLista(productos, event?) {
     if (productos.length === this.batch + 1) {
-      productos.pop();
-      return await this.agregaProductos(productos, this.pasillos.pasillos[this.yPasillo].nombre, event);
+      productos.pop()
+      return await this.agregaProductos(productos, this.pasillos.pasillos[this.yPasillo].nombre, event)
     } else if (productos.length === this.batch && this.yPasillo + 1 < this.pasillos.pasillos.length) {
-      return await this.nextPasillo(productos, event);
+      return await this.nextPasillo(productos, event)
     } else if (this.yPasillo + 1 >= this.pasillos.pasillos.length) {
       this.noMore = true;
-      if (event) { event.target.complete(); }
-      return await this.agregaProductos(productos, this.pasillos.pasillos[this.yPasillo].nombre, event);
+      if (event) event.target.complete()
+      return await this.agregaProductos(productos, this.pasillos.pasillos[this.yPasillo].nombre, event)
     }
     if (productos.length < this.batch && this.yPasillo + 1 < this.pasillos.pasillos.length) {
-      await this.nextPasillo(productos, event);
+      await this.nextPasillo(productos, event)
       if (this.productosCargados < this.batch * this.infiniteCall) {
-        return this.getProds();
+        return this.getProds()
       }
     } else {
-      this.agregaProductos(productos, this.pasillos.pasillos[this.yPasillo].nombre, event);
-      this.noMore = true;
+      this.agregaProductos(productos, this.pasillos.pasillos[this.yPasillo].nombre, event)
+      this.noMore = true
     }
   }
 
   async nextPasillo(productos, event?) {
     return new Promise(async (resolve, reject) => {
-      await this.agregaProductos(productos, this.pasillos.pasillos[this.yPasillo].nombre, event);
-      this.yPasillo++;
-      this.lastKey = null;
-      resolve();
+      await this.agregaProductos(productos, this.pasillos.pasillos[this.yPasillo].nombre, event)
+      this.yPasillo++
+      this.lastKey = null
+      resolve()
     });
   }
 
   async agregaProductos(prod: Producto[], pasillo, event?) {
     return new Promise(async (resolve, reject) => {
-      this.productosCargados += prod.length;
+      this.productosCargados += prod.length
       if ( this.productos.length > 0 && this.productos[this.productos.length - 1].nombre === pasillo) {
-        this.productos[this.productos.length - 1].productos = this.productos[this.productos.length - 1].productos.concat(prod);
+        this.productos[this.productos.length - 1].productos = this.productos[this.productos.length - 1].productos.concat(prod)
       } else {
         const prodArray: ProductoPasillo = {
           nombre: pasillo,
           productos: prod
-        };
-        this.productos.push(prodArray);
+        }
+        this.productos.push(prodArray)
       }
-      if (event) { event.target.complete(); }
-      resolve();
-      this.infoReady = true;
-      this.cargandoProds = false;
-    });
+      if (event) event.target.complete()
+      resolve()
+      this.infoReady = true
+      this.cargandoProds = false
+    })
   }
 
   loadDataLista(event) {
     if (this.cambiandoPasillo) {
-      event.target.complete();
-      return;
+      event.target.complete()
+      return
     }
-    this.infiniteCall++;
+    this.infiniteCall++
     if (this.noMore) {
-      event.target.disabled = true;
-      event.target.complete();
-      return;
+      event.target.disabled = true
+      event.target.complete()
+      return
     }
-    this.getProds(event);
+    this.getProds(event)
 
     // App logic to determine if all data is loaded
     // and disable the infinite scroll
-    if (this.noMore) {
-      event.target.disabled = true;
-    }
+    if (this.noMore) event.target.disabled = true
   }
 
   // Acciones
   async muestraProducto(producto: Producto) {
+    producto.cantidad = 1
+    producto.total = producto.precio
+    if (!this.uid) return this.presentAlertNotLogin()
     const modal = await this.modalController.create({
       component: ProductoPage,
       enterAnimation,
       leaveAnimation,
       componentProps: {producto, idNegocio: this.negocio.id}
-    });
+    })
     modal.onWillDismiss().then(async (resp) => {
       if (resp.data) {
-        producto = await this.cartService.updateCart(this.negocio.id, producto);
-        this.cuenta = await this.negocioService.getCart(this.uid, this.negocio.id);
+        producto = await this.cartService.updateCart(this.negocio.id, producto)
+        this.cuenta = await this.negocioService.getCart(this.uid, this.negocio.id)
       }
-    });
-    return await modal.present();
+    })
+    return await modal.present()
   }
   
   async verCuenta() {
     const datos: DatosParaCuenta = {
       logo: this.negocio.foto,
       nombreNegocio: this.negocio.nombre,
+      direccion: this.negocio.direccion,
       idNegocio: this.negocio.id,
-      categoria: this.categoria
-    };
+      categoria: this.categoria,
+      envio: this.negocio.envio,
+      repartidores_propios: this.negocio.repartidores_propios,
+      envio_gratis_pedMin: this.negocio.envio_gratis_pedMin,
+      envio_costo_fijo: this.negocio.envio_costo_fijo
+    }
     const modal = await this.modalController.create({
       component: CuentaPage,
       enterAnimation,
       leaveAnimation,
       componentProps: {cuenta: this.cuenta, datos, productos: this.productos}
-    });
-    modal.onWillDismiss().then(async (resp) => {
-      this.cuenta = await this.negocioService.getCart(this.uid, this.negocio.id);
-    });
-    return await modal.present();
+    })
+    modal.onWillDismiss().then(async () => this.cuenta = await this.negocioService.getCart(this.uid, this.negocio.id))
+    return await modal.present()
   }
 
   async getProdsFiltrados(event?) {
-    this.cargandoProds = true;
+    this.cargandoProds = true
     const productos = await this.negocioService
-      .getProductosLista(this.categoria, this.negocio.id, this.pasilloFiltro, this.batch + 1, this.lastKey);
-    this.cambiandoPasillo = false;
-    this.lastKey = productos[productos.length - 1].id;
-    this.cargaFiltrados(productos, event);
+      .getProductosLista(this.categoria, this.negocio.id, this.pasilloFiltro, this.batch + 1, this.lastKey)
+    this.cambiandoPasillo = false
+    this.lastKey = productos[productos.length - 1].id
+    this.cargaFiltrados(productos, event)
   }
 
   cargaFiltrados(productos, event) {
     if (productos.length === this.batch + 1) {
-      this.lastKey = productos[productos.length - 1].id;
-      productos.pop();
+      this.lastKey = productos[productos.length - 1].id
+      productos.pop()
     } else {
-      this.noMore = true;
+      this.noMore = true
     }
     if (this.productos.length === 0) {
       this.productos =  [{
         nombre: this.pasilloFiltro,
         productos: [...productos]
-      }];
+      }]
     } else {
       this.productos =  [{
         nombre: this.pasilloFiltro,
         productos: this.productos[0].productos.concat(productos)
-      }];
+      }]
     }
     if (event) {
-      event.target.complete();
+      event.target.complete()
     }
-    this.cargandoProds = false;
+    this.cargandoProds = false
   }
 
   resetProds(pasillo?) {
-    this.cambiandoPasillo = true;
-    this.lastKey = '';
-    this.yPasillo = 0;
-    this.productos = [];
-    this.productosCargados = 0;
-    this.infiniteCall = 1;
-    this.noMore = false;
-    this.infiniteScroll.disabled = false;
-    this.pasilloFiltro = pasillo;
+    this.cambiandoPasillo = true
+    this.lastKey = ''
+    this.yPasillo = 0
+    this.productos = []
+    this.productosCargados = 0
+    this.infiniteCall = 1
+    this.noMore = false
+    this.infiniteScroll.disabled = false
+    this.pasilloFiltro = pasillo
     if (!pasillo || pasillo === 'Ofertas') {
-      this.getOfertas();
+      this.getOfertas()
     } else {
-      this.getProdsFiltrados();
+      this.getProdsFiltrados()
     }
   }
 
   loadDataListaFiltrada(event) {
     if (this.cambiandoPasillo) {
-      event.target.complete();
-      return;
+      event.target.complete()
+      return
     }
     if (this.noMore) {
-      event.target.disabled = true;
-      event.target.complete();
-      return;
+      event.target.disabled = true
+      event.target.complete()
+      return
     }
-    this.getProdsFiltrados(event);
+    this.getProdsFiltrados(event)
 
     // App logic to determine if all data is loaded
     // and disable the infinite scroll
     if (this.noMore) {
-      event.target.disabled = true;
+      event.target.disabled = true
     }
   }
 
   async verInfo() {
     const datos: DatosParaCuenta = {
       logo: this.negocio.foto,
+      direccion: this.negocio.direccion,
       nombreNegocio: this.negocio.nombre,
       idNegocio: this.negocio.id,
       categoria: this.categoria
-    };
+    }
     const modal = await this.modalController.create({
       component: InfoSucursalPage,
       enterAnimation,
       leaveAnimation,
       componentProps : {datos, abierto: this.negocio.abierto}
-    });
+    })
 
-    return await modal.present();
+    return await modal.present()
   }
 
   // Login
@@ -378,15 +386,20 @@ export class NegocioPage {
     const modal = await this.modalController.create({
       component: LoginPage,
       cssClass: 'my-custom-modal-css',
-    });
-    return await modal.present();
+    })
+    modal.onWillDismiss().then(() => {
+      this.uid = this.uidService.getUid()
+    })
+    return await modal.present()
   }
 
   // Salida
 
   regresar() {
-    if (this.back) {this.back.unsubscribe()}
-    this.navCtrl.back();
+    this.ngZone.run(() => {
+      if (this.back) this.back.unsubscribe()
+      this.navLocation.back()
+    })
   }
 
   // Mensajes
@@ -407,20 +420,18 @@ export class NegocioPage {
         {
           text: 'Iniciar sesión',
           cssClass: 'primary',
-          handler: (blah) => {
-            this.presentLogin();
-          }
+          handler: () => this.presentLogin()
         }
       ]
-    });
+    })
 
-    await alert.present();
+    await alert.present()
   }
 
   // Auxiliares
 
   reintentar() {
-    location.reload();
+    location.reload()
   }
 
 }

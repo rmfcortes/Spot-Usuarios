@@ -15,3 +15,8 @@
 .linea {
     border: 1px #fddce1 solid;
 }
+
+.relleno {
+    --background: var(--ion-color-primary);
+    --color: white
+}

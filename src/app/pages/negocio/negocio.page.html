@@ -1,30 +1,52 @@
 <ng-container *ngIf="!error; else errorTemplate">
     <ng-container *ngIf="portada; else infoTemplate">
         <ion-content>
-            <div id="portada" style="overflow: hidden !important; background: white; position: fixed; top: 0; transition: 0.2s; z-index: 100;">
-                <div class="portada_box">
-                    <ion-icon color="light" class="topleft" (click)="regresar()" name="arrow-back"></ion-icon>
+            <div style="background: white !important;">
+                <div class="portada_box shadow">
                     <img style="width: 100%;" [src]="portada" alt="">
                 </div>
                 <div class="logo_box shadow">
-                    <ion-label color="primary" class="comfortaa">{{negocio.nombre}}</ion-label>
-                    <ion-grid>
-                        <ion-row style="font-size: xx-small;">
+                    <ion-grid class="ion-no-padding">
+                        <ion-row>
                             <ion-col size="4">
-                                Envío
+                                <ion-item lines="none" style="text-align: center;">
+                                    <ion-label>
+                                        <h6 class="ion-text-wrap" style="font-size: xx-small;">Envío</h6>
+                                        <h6 *ngIf="negocio.envio_gratis_pedMin && negocio.repartidores_propios" class="primario">Gratis</h6>
+                                        <h3 *ngIf="!negocio.envio_gratis_pedMin">{{negocio.envio | currency:'CAD':'symbol-narrow':'1.0-2'}}</h3>
+                                    </ion-label>
+                                </ion-item>
                             </ion-col>
                             <ion-col size="4">
-                                Pedido mínimo
+                                <ion-item lines="none" style="text-align: center;">
+                                    <ion-label>
+                                        <h6 class="ion-text-wrap" style="font-size: xx-small;">Pedido mínimo</h6>
+                                        <h6 *ngIf="negocio.envio_gratis_pedMin" class="primario">{{negocio.envio_gratis_pedMin | currency:'CAD':'symbol-narrow':'1.0-2'}}</h6>
+                                        <h3 *ngIf="!negocio.envio_gratis_pedMin">--</h3>
+                                    </ion-label>
+                                </ion-item>
                             </ion-col>
                             <ion-col size="4" (click)="verInfo()">
-                                Detalles
+                                <ion-item lines="none" style="text-align: center;">
+                                    <ion-label>
+                                        <h6 class="ion-text-wrap" style="font-size: x-small; text-decoration: underline;">Ver más</h6>
+                                    </ion-label>
+                                </ion-item>
                             </ion-col>
                         </ion-row>
                     </ion-grid>
                 </div>
-                <div style="height: 3rem;"></div>
+                <div style="height: 2rem"></div>
             </div>
-            <div id="segment" style="visibility: hidden; background: white; z-index: 150; position: sticky; transition: 0.2s;">
+            <div class="header">
+                <ion-item lines="none">
+                    <ion-icon slot="start" color="primary" name="chevron-back" style="font-size: medium;" (click)="regresar()"></ion-icon>
+                    <ion-label>
+                        <h2 class="comfortaa primario">{{negocio.nombre}}</h2>
+                    </ion-label>
+                </ion-item>
+            </div>
+            <div style="background: white; z-index: 150; position: sticky; top: 2rem">
                 <ion-segment scrollable>
                     <ion-segment-button (click)="resetProds()">
                         Todos
@@ -45,7 +67,7 @@
             </ng-container>
             <ng-template #cargandoTemp>
                 <!-- Vista de lista -->
-                <div [ngSwitch]="vista" id="contenido">
+                <div [ngSwitch]="vista">
                     <div *ngSwitchCase="'list-img'">
                         <app-list-img [sections]="productos" (showProduct)="muestraProducto($event)"></app-list-img>
                     </div>

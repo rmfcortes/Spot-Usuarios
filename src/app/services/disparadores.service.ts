@@ -18,8 +18,21 @@ export class DisparadoresService {
     const toast = await this.toastController.create({
       message: mensaje,
       duration: 2000
-    });
-    toast.present();
+    })
+    toast.present()
+  }  
+  
+  async presentToastconBoton(mensaje) {
+    const toast = await this.toastController.create({
+      message: mensaje,
+      buttons: [
+        {
+          text: 'Aceptar',
+          role: 'cancel',
+        }
+      ]
+    })
+    toast.present()
   }
 
   async presentAlert(titulo, msn) {

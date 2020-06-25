@@ -173,40 +173,38 @@ export class CategoriaPage implements OnInit, OnDestroy{
   // Filtra por categoria
 
   async getNegociosSub(subCategoria) {
-    this.negociosReady = false;
-    this.subCategoria = subCategoria;
-    this.negocios = [];
-    this.lastValue = null;
-    this.lastKey = '';
-    this.noMore = false;
-    this.status = 'abiertos';
-    this.infiniteScroll.disabled = false;
-    this.getNegocios();
+    this.negociosReady = false
+    this.subCategoria = subCategoria
+    this.negocios = []
+    this.lastValue = null
+    this.lastKey = ''
+    this.noMore = false
+    this.status = 'abiertos'
+    this.infiniteScroll.disabled = false
+    this.getNegocios()
   }
 
   // Infinite Scroll
 
   async loadData(event) {
     if (this.noMore) {
-      event.target.disabled = true;
-      event.target.complete();
-      return;
+      event.target.disabled = true
+      event.target.complete()
+      return
     }
-    this.getNegocios(event);
+    this.getNegocios(event)
     // App logic to determine if all data is loaded
     // and disable the infinite scroll
-    if (this.noMore) {
-      event.target.disabled = true;
-    }
+    if (this.noMore) event.target.disabled = true
   }
 
   ionViewWillLeave() {
-    if (this.back) {this.back.unsubscribe()}
+    if (this.back) this.back.unsubscribe()
   }
 
   ngOnDestroy() {
-    this.categoriaService.listenCambios().query.ref.off('child_changed');
-    if (this.back) { this.back.unsubscribe(); }
+    this.categoriaService.listenCambios().query.ref.off('child_changed')
+    if (this.back) this.back.unsubscribe()
   }
 
 

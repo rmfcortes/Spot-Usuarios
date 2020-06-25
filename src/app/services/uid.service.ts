@@ -1,17 +1,20 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
+import { Direccion } from '../interfaces/direcciones';
+
 @Injectable({
   providedIn: 'root'
 })
 export class UidService {
 
-  uid: string;
-  foto: string;
-  nombre: string;
-  region: string;
+  uid: string
+  foto: string
+  nombre: string
+  region: string
+  direccion: Direccion
 
-  public usuario = new BehaviorSubject(null);
+  public usuario = new BehaviorSubject(null)
   change = new BehaviorSubject<boolean>(false)
 
   constructor() {  }
@@ -47,6 +50,14 @@ export class UidService {
 
   getRegion() {
     return this.region
+  }  
+
+  setDireccion(direccion: Direccion) {
+    this.direccion = direccion
+  }
+
+  getDireccion() {
+    return this.direccion
   }
 
   regionChange(val: boolean) {

@@ -189,19 +189,13 @@ export class HomePage implements OnInit, OnDestroy {
 
   async ngOnInit() {
     await this.getCategorias()
+    this.direccion = this.uidService.getDireccion()
     this.getUid()
     this.getOfertas()
     this.getPopulares()
     this.getMasVendidos()
     this.listenCambios()
     this.listenRegion()
-  }
-
-  getDireccion() {
-    return new Promise(async (resolve, reject) => {
-      this.direccion = await this.negocioService.getUltimaDireccion()
-      resolve()
-    })
   }
 
   listenRegion() {
@@ -230,7 +224,6 @@ export class HomePage implements OnInit, OnDestroy {
           this.pedidosReady = false
           this.visitadosReady = false
           this.uid = uid
-          await this.getDireccion()
           this.getVisitas() // Ordena categorías
           this.getPedidosActivos() // Pedidos en curso
           this.getNegociosVisitados()
@@ -269,15 +262,14 @@ export class HomePage implements OnInit, OnDestroy {
 
   costoEnvio(negocios) {
     return new Promise(async (resolve, reject) => {
-      if (!this.uid || !this.direccion) return resolve()
       for (const n of negocios) {
         if (n.repartidores_propios) {
-          if (!n.envio_costo_fijo) {
+          if (!n.envio_costo_fijo && !n.envio_gratis_pedMin) {
             const distancia: number = await this.alertService.calculaDistancia(this.direccion.lat, this.direccion.lng, n.direccion.lat, n.direccion.lng)
             n.envio =  Math.ceil(distancia * 6 + 10)
           }
         } else {
-          if (n.direccion) {
+          if (n.direccion && n.tipo === 'productos') {
             const distancia: number = await this.alertService.calculaDistancia(this.direccion.lat, this.direccion.lng, n.direccion.lat, n.direccion.lng)
             n.envio = Math.ceil(distancia * 6 + 25)
           }

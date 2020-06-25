@@ -6,18 +6,20 @@
           </ion-thumbnail>
           <ion-label style="margin-left: 0.5rem;">
             <h2>{{item.nombre}}</h2>
-            <p *ngIf="!item.envio_gratis_pedMin">Envío: {{item.envio | currency:'CAD':'symbol-narrow':'1.0-2'}} </p>
-            <p *ngIf="item.envio_gratis_pedMin" class="primario">Envío gratis</p>
+            <p *ngIf="!item.envio_gratis_pedMin && direccion">Envío: {{item.envio | currency:'CAD':'symbol-narrow':'1.0-2'}} </p>
+            <p *ngIf="item.envio_gratis_pedMin && item.repartidores_propios" class="primario">Envío gratis</p>
             <app-stars *ngIf="item.promedio" [calificacion]="item.promedio" [readOnly]="true" [size]="'x-small'"></app-stars>
           </ion-label>
       </ng-container>
       <ng-template #visitadosOpen>
           <ion-thumbnail>
-            <ion-img [src]="item.url" style="width: 100%" (ionImgWillLoad)="ionImgWillLoad($event)"></ion-img>
+            <div style="opacity: 0.5;">
+              <ion-img [src]="item.foto" style="width: 100%;" (ionImgWillLoad)="ionImgWillLoad($event)"></ion-img>
+            </div>
           </ion-thumbnail>
           <ion-label style="margin-left: 0.5rem;" color="medium">
             <h2>{{item.nombre}}</h2>
-            <p *ngIf="!item.envio_gratis_pedMin">Envío: {{item.envio | currency:'CAD':'symbol-narrow':'1.0-2'}} </p>
+            <p *ngIf="!item.envio_gratis_pedMin && direccion">Envío: {{item.envio | currency:'CAD':'symbol-narrow':'1.0-2'}} </p>
             <p *ngIf="item.envio_gratis_pedMin" class="primario">Envío gratis</p>
             <app-stars *ngIf="item.promedio" [calificacion]="item.promedio" [readOnly]="true" [size]="'x-small'"></app-stars>
           </ion-label>
