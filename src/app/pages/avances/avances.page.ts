@@ -9,7 +9,6 @@ import {
   GoogleMap,
   GoogleMapOptions,
   Marker,
-  Environment,
   MarkerIcon,
   ILatLng
 } from '@ionic-native/google-maps';
@@ -22,8 +21,6 @@ import { PedidoActivoPage } from 'src/app/modals/pedido-activo/pedido-activo.pag
 import { CalificarPage } from 'src/app/modals/calificar/calificar.page';
 import { PermisosPage } from 'src/app/modals/permisos/permisos.page';
 import { ChatPage } from 'src/app/modals/chat/chat.page';
-
-import { environment } from '../../../environments/environment';
 
 import { Ubicacion } from 'src/app/interfaces/region.interface';
 import { Pedido, Repartidor } from 'src/app/interfaces/pedido';
@@ -38,6 +35,11 @@ import { leaveAnimation } from 'src/app/animations/leave';
   styleUrls: ['./avances.page.scss'],
 })
 export class AvancesPage implements OnInit {
+
+
+  icon = '../../../assets/img/iconos/pin.png';
+  tienda = '../../../assets/img/iconos/tienda.png';
+  repartidor = '../../../assets/img/iconos/repartidor.png';
 
   map: GoogleMap
   markers: ILatLng[] = []
@@ -185,7 +187,7 @@ export class AvancesPage implements OnInit {
   getPedido(id) {
     this.pedidoService.getPedido(id).then((pedido: Pedido) => {
       this.pedido = pedido
-      this.loadMap()
+      // this.loadMap()
       if (!this.pedido.aceptado) {
         this.pedidoSub = this.pedidoService.trackAcept(id).subscribe((resp: number) => {
           if (resp) {
@@ -241,12 +243,9 @@ export class AvancesPage implements OnInit {
 
   getToken() {
     this.pedidoService.getToken().then(resp => {
-      if (resp) {
-        this.hasPermission = true;
-      } else {
-        this.hasPermission = false;
-      }
-    });
+      if (resp) this.hasPermission = true
+      else this.hasPermission = false
+    })
   }
 
   // Listener
@@ -254,10 +253,10 @@ export class AvancesPage implements OnInit {
   trackTipoEntrega() {
     this.tipoEntregaSub = this.pedidoService.trackTipoEntrega(this.pedido.id).subscribe((tipo: string) => {
       if (tipo === 'inmediato' || tipo === 'planeado') {
-        this.pedido.entrega = tipo;
+        this.pedido.entrega = tipo
         this.isInmediato(this.pedido.id)
       }
-    });
+    })
   }
 
   trackAvances() {
@@ -350,7 +349,7 @@ export class AvancesPage implements OnInit {
       componentProps: { pedido: this.pedido }
     })
 
-    modal.onWillDismiss().then(() =>this.regresar())
+    modal.onWillDismiss().then(() => this.regresar())
     return await modal.present()
   }
 
@@ -375,7 +374,7 @@ export class AvancesPage implements OnInit {
   }
 
   async muestraChat() {
-    if (this.msgSub) { this.msgSub.unsubscribe(); }
+    if (this.msgSub) this.msgSub.unsubscribe()
     const modal = await this.modalCtrl.create({
       component: ChatPage,
       enterAnimation,
@@ -397,17 +396,20 @@ export class AvancesPage implements OnInit {
     const modal = await this.modalCtrl.create({
       component: PermisosPage,
     })
-
+    modal.onWillDismiss().then(resp => {
+      if (resp) {
+        this.hasPermission = true
+        this.alertService.presentToast('Notificaciones activadas')
+      } else {
+        this.hasPermission = false
+      }
+    })
     return await modal.present()
-  }
-
-  guardarCalificacion() {
-    return
   }
 
     // Salida
   async regresar() {
-    this.map.remove()
+    if (this.map) this.map.remove()
     if (this.back) this.back.unsubscribe()
     if (this.msgSub) this.msgSub.unsubscribe()
     if (this.pedidoSub) this.pedidoSub.unsubscribe()

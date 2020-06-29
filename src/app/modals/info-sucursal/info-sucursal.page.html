@@ -9,7 +9,7 @@
     </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content style="--background: white !important">
     <div *ngIf="infoReady">
         <ion-grid class="linea">
             <ion-row>
@@ -59,8 +59,10 @@
                 </ion-col>
             </ion-row>
         </ion-grid>
-        <agm-map [latitude]="negocio.datos.direccion.lat" [longitude]="negocio.datos.direccion.lng" [zoom]="17">
-            <agm-marker [latitude]="negocio.datos.direccion.lat" [longitude]="negocio.datos.direccion.lng"></agm-marker>
-        </agm-map>
+        <div [style.display]="mapReady ? 'initial' : 'none'">
+            <agm-map [latitude]="negocio.datos.direccion.lat" [longitude]="negocio.datos.direccion.lng" [zoom]="17" (mapReady)="mapLoaded($event)">
+                <agm-marker [latitude]="negocio.datos.direccion.lat" [longitude]="negocio.datos.direccion.lng" [iconUrl]='{"url": icon,"scaledSize": {"height": 60, "width": 60}}'></agm-marker>
+            </agm-map>
+        </div>
     </div>
 </ion-content>

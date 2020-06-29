@@ -4,41 +4,37 @@
             <ion-icon slot="icon-only" name="close"></ion-icon>
         </ion-button>
     </ion-item>
-    <ion-card class="card-shadow">
-        <ion-item lines="none">
-            <ion-thumbnail class="foto">
-                <img [src]="pedido.negocio.logo" />
-            </ion-thumbnail>
-        </ion-item>
-        <ion-item style="text-align: center;" lines="none">
+    <div class="logo shadow">
+        <img [src]="pedido.negocio.logo" />
+    </div>
+    <div class="tarjeta card-shadow">
+        <ion-item style="text-align: center; margin-top: 5vw;" lines="none">
             <ion-label>{{pedido.negocio.nombreNegocio}}</ion-label>
         </ion-item>
-        <ion-item lines="none">
-            <app-stars style="margin: auto;" [calificacion]="negocio.puntos" (calficar)="negocio.puntos = $event"></app-stars>
-        </ion-item>
-        <ion-item lines="none" style="margin-bottom: 1.5rem">
-            <ion-label color="medium" position="floating">Comentarios</ion-label>
+        <div style="width: 100%; text-align: center;">
+            <app-stars style="margin: auto;" [calificacion]="negocio.puntos" (calficar)="negocio.puntos = $event" [size]="'x-large'"></app-stars>
+        </div>
+        <ion-item lines="none" style="padding-bottom: 1.5rem">
+            <ion-label color="medium" position="floating" style="font-size: small;">Comentarios para la tienda</ion-label>
             <ion-textarea style="border-bottom: solid 1px var(--ion-color-primary);" (keyup.enter)="$event.target.blur();" [(ngModel)]="negocio.comentarios" name="descripcion"></ion-textarea>
         </ion-item>
-    </ion-card>
-    <ion-card class="card-shadow">
-        <ion-item lines="none">
-            <ion-thumbnail class="foto">
-                <img [src]="pedido.repartidor.foto" />
-            </ion-thumbnail>
-        </ion-item>
-        <ion-item style="text-align: center;" lines="none">
+    </div>
+    <div class="logo shadow">
+        <img [src]="pedido.repartidor.foto" />
+    </div>
+    <div class="tarjeta card-shadow">
+        <ion-item style="text-align: center; margin-top: 5vw;" lines="none">
             <ion-label>{{pedido.repartidor.nombre}}</ion-label>
         </ion-item>
-        <ion-item lines="none">
-            <app-stars style="margin: auto;" [calificacion]="repartidor.puntos" (calficar)="repartidor.puntos = $event"></app-stars>
-        </ion-item>
-        <ion-item lines="none" style="margin-bottom: 1.5rem">
-            <ion-label color="medium" position="floating">Comentarios</ion-label>
+        <div style="width: 100%; text-align: center;">
+            <app-stars style="margin: auto;" [calificacion]="repartidor.puntos" (calficar)="repartidor.puntos = $event" [size]="'x-large'"></app-stars>
+        </div>
+        <ion-item lines="none" style="padding-bottom: 1.5rem">
+            <ion-label color="medium" position="floating" style="font-size: small;">Comentarios para el repartidor</ion-label>
             <ion-textarea style="border-bottom: solid 1px var(--ion-color-primary);" (keyup.enter)="$event.target.blur();" [(ngModel)]="repartidor.comentarios" name="comentarios"></ion-textarea>
         </ion-item>
-    </ion-card>
-    <ion-button (click)="calificar()" class="boton-margen" shape="round">
+    </div>
+    <ion-button (click)="calificar()" class="boton-margen" style="margin-top: 1rem;" shape="round">
         Enviar
     </ion-button>
 </ion-content>

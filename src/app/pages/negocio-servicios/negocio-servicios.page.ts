@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import { ModalController, IonInfiniteScroll, NavController, Platform } from '@ionic/angular';
@@ -25,7 +25,7 @@ import { Producto } from 'src/app/interfaces/producto';
   templateUrl: './negocio-servicios.page.html',
   styleUrls: ['./negocio-servicios.page.scss'],
 })
-export class NegocioServiciosPage {
+export class NegocioServiciosPage{
 
   @ViewChild(IonInfiniteScroll, {static: false}) infiniteScroll: IonInfiniteScroll
 
@@ -63,10 +63,12 @@ export class NegocioServiciosPage {
 
   backButtonSubscription: Subscription
 
+  origen_categoria = false
+
   constructor(
+    private router: Router,
     private platform: Platform,
     private callNumber: CallNumber,
-    private navCtrl: NavController,
     private socialSharing: SocialSharing,
     private activatedRoute: ActivatedRoute,
     private modalController: ModalController,
@@ -75,6 +77,7 @@ export class NegocioServiciosPage {
   ) { }
 
   ionViewWillEnter() {
+    this.origen_categoria = history.state.origen_categoria
     this.categoria = this.activatedRoute.snapshot.paramMap.get('cat')
     this.getNegocio()
     this.backButtonSubscription = this.platform.backButton.subscribeWithPriority(9999, () => {
@@ -336,7 +339,8 @@ export class NegocioServiciosPage {
 
   regresar() {
     if (this.backButtonSubscription) this.backButtonSubscription.unsubscribe()
-    this.navCtrl.back()
+    if (this.origen_categoria) this.router.navigate(['/categoria', this.categoria])
+    else this.router.navigate(['/home'])
   }
 
     // Auxiliares

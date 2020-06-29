@@ -3,9 +3,11 @@ import { ModalController, Platform } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 
 import { NegocioService } from 'src/app/services/negocio.service';
+import { UidService } from 'src/app/services/uid.service';
 
 import { DatosParaCuenta, NegocioInfo, DetallesNegocio } from 'src/app/interfaces/negocio';
 import { Dia } from 'src/app/interfaces/horario.interface';
+import { GoogleMap } from '@ionic-native/google-maps';
 
 
 @Component({
@@ -18,6 +20,10 @@ export class InfoSucursalPage implements OnInit {
   @Input() datos: DatosParaCuenta
   @Input() abierto: boolean
 
+  icon = '../../../assets/img/iconos/tienda.png';
+  map: GoogleMap
+  mapReady = false
+
   negocio: NegocioInfo
   despliegueHorario = false
   infoReady = false
@@ -26,10 +32,12 @@ export class InfoSucursalPage implements OnInit {
 
   back: Subscription
 
+
   constructor(
     private platform: Platform,
     private modalController: ModalController,
     private negocioService: NegocioService,
+    private uidService: UidService,
   ) { }
 
   ngOnInit() {
@@ -37,6 +45,30 @@ export class InfoSucursalPage implements OnInit {
     this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
       this.regresar()
     })
+  }
+
+  mapLoaded(event) {
+    this.mapReady = true
+    this.map = event
+    this.styleMap()
+  }
+
+  styleMap()  {
+    const styles = {
+      default: null,
+      hide: [
+        {
+          featureType: 'poi.business',
+          stylers: [{visibility: 'off'}]
+        },
+        {
+          featureType: 'transit',
+          elementType: 'labels.icon',
+          stylers: [{visibility: 'off'}]
+        }
+      ]
+    };
+    this.map.setOptions({styles: styles['hide']})
   }
 
   async getInfo() {
@@ -49,6 +81,14 @@ export class InfoSucursalPage implements OnInit {
       datos: this.datos,
       detalles: result,
       status
+    }
+    if (!this.datos.direccion) {
+      this.datos.direccion = {
+        direccion: result.direccion,
+        lat: result.lat,
+        lng: result.lng,
+        region: this.uidService.getRegion()
+      }
     }
     this.infoReady = true
   }

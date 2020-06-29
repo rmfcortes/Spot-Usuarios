@@ -9,9 +9,9 @@ import { Subscription } from 'rxjs';
 })
 export class CategoriasPage implements OnInit {
 
-  @Input() categorias;
+  @Input() categorias
 
-  back: Subscription;
+  back: Subscription
 
   constructor(
     private platform: Platform,
@@ -25,13 +25,13 @@ export class CategoriasPage implements OnInit {
   }
 
   irCategoria(categoria) {
-    if (this.back) {this.back.unsubscribe()}
-    this.modalCtrl.dismiss(categoria);
+    if (this.back) this.back.unsubscribe()
+    this.modalCtrl.dismiss(categoria)
   }
 
   regresar() {
-    if (this.back) {this.back.unsubscribe()}
-    this.modalCtrl.dismiss();
+    if (this.back) this.back.unsubscribe()
+    this.modalCtrl.dismiss()
   }
 
 }

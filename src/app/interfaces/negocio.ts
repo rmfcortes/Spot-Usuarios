@@ -22,6 +22,9 @@ export interface DetallesNegocio {
     descripcion: string;
     telefono: number;
     horario: Horario[];
+    direccion?: string;
+    lat: number;
+    lng: number;
 }
 
 export interface ProductoPasillo {

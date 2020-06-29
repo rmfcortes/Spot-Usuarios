@@ -43,12 +43,12 @@ export class HistorialPage implements OnInit {
 
   ionViewWillEnter() {
     this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-      this.router.navigate(['/home']);
-    });
+      this.router.navigate(['/home'])
+    })
   }
 
   ionViewWillLeave() {
-    if (this.back) {this.back.unsubscribe()}
+    if (this.back) this.back.unsubscribe()
   }
 
   getPedidos(event?) {
@@ -60,29 +60,25 @@ export class HistorialPage implements OnInit {
   cargaHistorial(historial, event) {
     if (historial.length === this.batch + 1) {
       this.lastKey = historial[0].id;
-      historial.shift();
+      historial.shift()
     } else {
-      this.noMore = true;
+      this.noMore = true
     }
-    this.historial = this.historial.concat(historial.reverse());
-    if (event) {
-      event.target.complete();
-    }
-    this.historialReady = true;
+    this.historial = this.historial.concat(historial.reverse())
+    if (event) event.target.complete()
+    this.historialReady = true
   }
 
   async loadData(event) {
     if (this.noMore) {
-      event.target.disabled = true;
-      event.target.complete();
-      return;
+      event.target.disabled = true
+      event.target.complete()
+      return
     }
-    this.getPedidos(event);
+    this.getPedidos(event)
     // App logic to determine if all data is loaded
     // and disable the infinite scroll
-    if (this.noMore) {
-      event.target.disabled = true;
-    }
+    if (this.noMore) event.target.disabled = true
   }
 
   async verPedido(pedido: Pedido) {
@@ -91,9 +87,9 @@ export class HistorialPage implements OnInit {
       enterAnimation,
       leaveAnimation,
       componentProps: {pedido}
-    });
+    })
 
-    return await modal.present();
+    return await modal.present()
   }
 
 }

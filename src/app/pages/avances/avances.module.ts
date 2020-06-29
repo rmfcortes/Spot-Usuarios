@@ -19,12 +19,17 @@ import { PedidoActivoPageModule } from 'src/app/modals/pedido-activo/pedido-acti
 import { CalificarPageModule } from 'src/app/modals/calificar/calificar.module';
 import { ChatPageModule } from 'src/app/modals/chat/chat.module';
 import { PermisosPageModule } from 'src/app/modals/permisos/permisos.module';
+import { AgmCoreModule } from '@agm/core';
+import { environment } from 'src/environments/environment.prod';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
+    AgmCoreModule.forRoot({
+      apiKey: environment.mapsApiKey,
+    }),
     AvancesPageRoutingModule,
     PedidoActivoPageModule,
     CalificarPageModule,

@@ -5,3 +5,20 @@
     overflow: hidden;
     box-shadow: 0 4px 3px 0 rgba(0, 0, 0, 0.15), 0 6px 5px 0 rgba(0, 0, 0, 0.10);
 }
+
+.tarjeta {
+    background: white;
+    border-radius: 20px;
+    width: 90%;
+    margin-left: 5%;
+}
+
+.logo {
+    width: 10vw;
+    height: 10vw;
+    margin-left: auto;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: -10vw;
+    z-index: 100;
+}

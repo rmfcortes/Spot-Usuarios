@@ -1,6 +1,5 @@
-import { Component, ViewChild, NgZone } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { Location } from '@angular/common';
+import { Component, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AlertController, ModalController, IonInfiniteScroll, Platform } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 
@@ -9,6 +8,7 @@ import { ProductoPage } from 'src/app/modals/producto/producto.page';
 import { CuentaPage } from 'src/app/modals/cuenta/cuenta.page';
 import { LoginPage } from 'src/app/modals/login/login.page';
 
+import { DisparadoresService } from 'src/app/services/disparadores.service';
 import { NegocioService } from 'src/app/services/negocio.service';
 import { CartService } from 'src/app/services/cart.service';
 import { UidService } from 'src/app/services/uid.service';
@@ -19,7 +19,6 @@ import { Producto } from 'src/app/interfaces/producto';
 
 import { enterAnimation } from 'src/app/animations/enter';
 import { leaveAnimation } from 'src/app/animations/leave';
-import { DisparadoresService } from 'src/app/services/disparadores.service';
 
 
 @Component({
@@ -65,10 +64,11 @@ export class NegocioPage {
 
   back: Subscription
 
+  origen_categoria = false
+
   constructor(
-    private ngZone: NgZone,
+    private router: Router,
     private platform: Platform,
-    private navLocation: Location,
     private activatedRoute: ActivatedRoute,
     private modalController: ModalController,
     private alertController: AlertController,
@@ -82,6 +82,7 @@ export class NegocioPage {
 
   ionViewWillEnter() {
     this.uid = this.uidService.getUid()
+    this.origen_categoria = history.state.origen_categoria
     this.categoria = this.activatedRoute.snapshot.paramMap.get('cat')
     this.getNegocio()
     this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
@@ -396,10 +397,9 @@ export class NegocioPage {
   // Salida
 
   regresar() {
-    this.ngZone.run(() => {
-      if (this.back) this.back.unsubscribe()
-      this.navLocation.back()
-    })
+    if (this.back) this.back.unsubscribe()
+    if (this.origen_categoria) this.router.navigate(['/categoria', this.categoria])
+    else this.router.navigate(['/home'])
   }
 
   // Mensajes

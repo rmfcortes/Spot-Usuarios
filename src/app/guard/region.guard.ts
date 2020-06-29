@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 
-import { RegionService } from '../services/region.service';
-import { UidService } from '../services/uid.service';
 import { DireccionService } from '../services/direccion.service';
+import { RegionService } from '../services/region.service';
+import { AuthService } from '../services/auth.service';
 
 
 @Injectable({
@@ -16,6 +16,7 @@ export class RegionGuard implements CanActivate {
     private router: Router,
     private direccionService: DireccionService,
     private regionService: RegionService,
+    private authService: AuthService,
   ) {}
 
   canActivate(
@@ -28,8 +29,11 @@ export class RegionGuard implements CanActivate {
         }
         return this.direccionService.getDireccion()
       })
-      .then(dir => {
-        if (dir) return true
+      .then(async (dir) => {
+        if (dir) {
+          await this.authService.checkUser()
+          return true
+        }
         throw false
       })
       .catch(() => {

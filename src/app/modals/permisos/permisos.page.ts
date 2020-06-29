@@ -11,7 +11,7 @@ import { NotificationsService } from 'src/app/services/notifications.service';
 })
 export class PermisosPage implements OnInit {
 
-  back: Subscription;
+  back: Subscription
 
   constructor(
     private platform: Platform,
@@ -21,18 +21,18 @@ export class PermisosPage implements OnInit {
 
   ngOnInit() {
     this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-      this.salir();
-    });
+      this.salir()
+    })
   }
 
   async activaPermisos()  {
-    await this.notificationService.setupPush();
-    this.modalCtrl.dismiss(true);
+    await this.notificationService.setupPush()
+    this.modalCtrl.dismiss(true)
   }
 
   salir() {
-    if (this.back) {this.back.unsubscribe()}
-    this.modalCtrl.dismiss();
+    if (this.back) this.back.unsubscribe()
+    this.modalCtrl.dismiss()
   }
 
 }

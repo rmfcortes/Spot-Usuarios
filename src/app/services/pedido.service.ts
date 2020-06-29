@@ -20,13 +20,13 @@ export class PedidoService {
   ) { }
 
   getPedidosActivos() {
-    const uid = this.uidService.getUid();
-    return this.db.list(`usuarios/${uid}/pedidos/activos`).valueChanges();
+    const uid = this.uidService.getUid()
+    return this.db.list(`usuarios/${uid}/pedidos/activos`).valueChanges()
   }
 
   listenEntregados() {
-    const uid = this.uidService.getUid();
-    return this.db.object(`usuarios/${uid}/pedidos/activos`);
+    const uid = this.uidService.getUid()
+    return this.db.object(`usuarios/${uid}/pedidos/activos`)
   }
 
   async createPedido(pedido: Pedido) {
@@ -59,70 +59,70 @@ export class PedidoService {
   }
 
   trackTipoEntrega(idPedido: string) {
-    const uid = this.uidService.getUid();
-    return this.db.object(`usuarios/${uid}/pedidos/activos/${idPedido}/entrega`).valueChanges();
+    const uid = this.uidService.getUid()
+    return this.db.object(`usuarios/${uid}/pedidos/activos/${idPedido}/entrega`).valueChanges()
   }
 
   trackAcept(idPedido: string) {
-    const uid = this.uidService.getUid();
-    return this.db.object(`usuarios/${uid}/pedidos/activos/${idPedido}/aceptado`).valueChanges();
+    const uid = this.uidService.getUid()
+    return this.db.object(`usuarios/${uid}/pedidos/activos/${idPedido}/aceptado`).valueChanges()
   }
 
   trackAvances(idPedido: string) {
-    const uid = this.uidService.getUid();
-    return this.db.object(`usuarios/${uid}/pedidos/activos/${idPedido}/avances`);
+    const uid = this.uidService.getUid()
+    return this.db.object(`usuarios/${uid}/pedidos/activos/${idPedido}/avances`)
   }
 
   trackRepartidor(idPedido: string) {
-    const uid = this.uidService.getUid();
-    return this.db.object(`usuarios/${uid}/pedidos/activos/${idPedido}/repartidor`).valueChanges();
+    const uid = this.uidService.getUid()
+    return this.db.object(`usuarios/${uid}/pedidos/activos/${idPedido}/repartidor`).valueChanges()
   }
 
   trackEntregado(idPedido: string) {
-    const uid = this.uidService.getUid();
-    return this.db.object(`usuarios/${uid}/pedidos/historial/${idPedido}/entregado`).valueChanges();
+    const uid = this.uidService.getUid()
+    return this.db.object(`usuarios/${uid}/pedidos/historial/${idPedido}/entregado`).valueChanges()
   }
 
   trackUbicacion(idRepartidor: string) {
-    return this.db.object(`ubicaciones/${idRepartidor}`).valueChanges();
+    return this.db.object(`ubicaciones/${idRepartidor}`).valueChanges()
   }
 
   getTelefono(): Promise<string>  {
     return new Promise((resolve, reject) => {
-     const uid = this.uidService.getUid();
+     const uid = this.uidService.getUid()
      const telSub = this.db.object(`usuarios/${uid}/datos/telefono`).valueChanges().subscribe((telefono: string) => {
-       telSub.unsubscribe();
-       resolve(telefono);
-     });
-    });
+       telSub.unsubscribe()
+       resolve(telefono)
+     })
+    })
   }
 
   async guardarTelefono(tel: string) {
-    const uid = this.uidService.getUid();
-    await this.db.object(`usuarios/${uid}/datos/telefono`).set(tel);
+    const uid = this.uidService.getUid()
+    await this.db.object(`usuarios/${uid}/datos/telefono`).set(tel)
     const user = await this.authFirebase.auth.currentUser
     user.phoneNumber = '+52' + tel
     this.authFirebase.auth.updateCurrentUser(user)
  }
 
   listenCalificar() {
-    const uid = this.uidService.getUid();
-    const calRef = this.db.object(`entregados/${uid}`);
+    const uid = this.uidService.getUid()
+    const calRef = this.db.object(`entregados/${uid}`)
     calRef.query.ref.on('child_added', snapshot => {
       this.ngZone.run(() => {
-        const idPedido = snapshot.val();
-        });
-      });
+        const idPedido = snapshot.val()
+        })
+      })
   }
 
   getToken(): Promise<string>  {
     return new Promise((resolve, reject) => {
-     const uid = this.uidService.getUid();
+     const uid = this.uidService.getUid()
      const tokSub = this.db.object(`usuarios/${uid}/token`).valueChanges().subscribe((token: string) => {
-       tokSub.unsubscribe();
-       resolve(token);
-     });
-    });
+       tokSub.unsubscribe()
+       resolve(token)
+     })
+    })
   }
 
 }

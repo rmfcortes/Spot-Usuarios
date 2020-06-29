@@ -28,6 +28,8 @@ export interface Avance {
 }
 
 export interface Calificacion {
+    creado: number;
+    region: string;
     negocio: DetallesCalificacionNegocio;
     repartidor: DetallesCalificacionRepartidor;
 }

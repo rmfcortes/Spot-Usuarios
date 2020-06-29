@@ -4,7 +4,7 @@ import { Subscription } from 'rxjs';
 
 import { CalificarService } from 'src/app/services/calificar.service';
 
-import { Pedido, DetallesCalificacionRepartidor, DetallesCalificacionNegocio } from 'src/app/interfaces/pedido';
+import { Pedido, DetallesCalificacionRepartidor, DetallesCalificacionNegocio, Calificacion } from 'src/app/interfaces/pedido';
 
 @Component({
   selector: 'app-calificar',
@@ -48,13 +48,13 @@ export class CalificarPage implements OnInit {
     this.repartidor.externo = this.pedido.repartidor.externo
     this.repartidor.idRepartidor = this.pedido.repartidor.id
     this.negocio.idNegocio = this.pedido.negocio.idNegocio
-    this.calificarService.calificar(this.pedido.id, this.negocio, this.repartidor)
-    const calificacion = {
+    const calificacion: Calificacion = {
       negocio: this.negocio,
       repartidor: this.repartidor,
       creado: this.pedido.createdAt,
       region: this.pedido.region
     }
+    this.calificarService.calificar(this.pedido.id, calificacion)
     this.pedido.calificacion = calificacion
     this.modalCtrl.dismiss()
   }
@@ -65,4 +65,6 @@ export class CalificarPage implements OnInit {
     this.modalCtrl.dismiss()
   }
 
+  
+  
 }

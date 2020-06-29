@@ -25,35 +25,35 @@ export class NotificationsService {
 
   async setupPush() {
     return new Promise(async (resolve, reject) => {
-      await this.oneSignal.startInit(environment.oneSignalID, environment.senderID);
+      await this.oneSignal.startInit(environment.oneSignalID, environment.senderID)
       this.oneSignal.getIds().then(data => {
-        this.uid = this.uidService.getUid();
-        this.db.object(`usuarios/${this.uid}/token`).set(data.userId);
-      });
-      await this.oneSignal.inFocusDisplaying(this.oneSignal.OSInFocusDisplayOption.Notification);
+        this.uid = this.uidService.getUid()
+        this.db.object(`usuarios/${this.uid}/token`).set(data.userId)
+      })
+      await this.oneSignal.inFocusDisplaying(this.oneSignal.OSInFocusDisplayOption.Notification)
 
       this.oneSignal.handleNotificationReceived().subscribe(data => {
         this.ngZone.run(() => {
           if (data.payload.additionalData.mensaje) {
-            this.presentToast('Nuevo mensaje recibido');
+            this.presentToast('Nuevo mensaje recibido')
           }
           if (data.payload.additionalData.pedido) {
-            this.presentToast('Nuevo pedido');
+            this.presentToast('Nuevo pedido')
           }
-        });
-      });
+        })
+      })
 
-      await this.oneSignal.endInit();
-      resolve();
-    });
+      await this.oneSignal.endInit()
+      resolve()
+    })
   }
 
   async presentToast(mensaje) {
     const toast = await this.toastController.create({
       message: mensaje,
       duration: 1500
-    });
-    toast.present();
+    })
+    toast.present()
   }
 
 }

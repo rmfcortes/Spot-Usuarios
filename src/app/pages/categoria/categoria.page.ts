@@ -147,9 +147,9 @@ export class CategoriaPage implements OnInit, OnDestroy{
     if (uid) this.categoriaService.setVisitaNegocio(uid, infoNeg.idNegocio)
     this.categoriaService.setVisita(infoNeg)
     if (negocio.tipo === 'productos') {
-      this.router.navigate([`negocio/${this.categoria}/${negocio.id}/${infoNeg.abierto}`])
+      this.router.navigate([`/negocio/${this.categoria}/${negocio.id}/${infoNeg.abierto}`], {state: {origen_categoria: true}})
     } else {
-      this.router.navigate([`negocio-servicios/${this.categoria}/${negocio.id}/${infoNeg.abierto}`])
+      this.router.navigate([`/negocio-servicios/${this.categoria}/${negocio.id}/${infoNeg.abierto}`], {state: {origen_categoria: true}})
     }
   }
 
@@ -167,7 +167,7 @@ export class CategoriaPage implements OnInit, OnDestroy{
     const infoNeg: InfoGral = await this.ofertaService.getStatus(oferta.idNegocio)
     if (uid) this.categoriaService.setVisitaNegocio(uid, oferta.idNegocio)
     this.categoriaService.setVisita(infoNeg)
-    this.router.navigate(['/negocio', infoNeg.categoria, oferta.idNegocio, infoNeg.abierto])
+    this.router.navigate(['/negocio', infoNeg.categoria, oferta.idNegocio, infoNeg.abierto], {state: {origen_categoria: true}})
   }
 
   // Filtra por categoria

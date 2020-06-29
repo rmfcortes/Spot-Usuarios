@@ -13,6 +13,8 @@ import { StorageService } from './storage.service';
 })
 export class AuthService {
 
+  entradas = 1
+
   constructor(
     private fb: Facebook,
     public authFirebase: AngularFireAuth,
@@ -23,6 +25,23 @@ export class AuthService {
 
   // Check isLog
 
+  checkUser(): Promise<boolean> {
+    return new Promise(async (resolve, reject) => {
+      let user
+      user = this.uidService.getUid()
+      if (user) return resolve(user)
+      if (this.entradas <= 1) {
+        user = await this.getUser()
+        if (user) return resolve(user)
+        this.entradas++
+        return resolve(false)
+      } else {
+        this.entradas++
+        return resolve(false)
+      }
+    })
+  }
+
   async getUser() {
     return new Promise (async (resolve, reject) => {
       const uid = await this.storageService.getString('uid')
@@ -32,6 +51,7 @@ export class AuthService {
         this.uidService.setUid(uid)
         this.uidService.setFoto(foto)
         this.uidService.setNombre(nombre)
+        resolve(true)
       } else {
         try {
           await this.revisaFireAuth()
@@ -56,7 +76,7 @@ export class AuthService {
           await this.setUser(usuario.uid, usuario.nombre, usuario.foto)
           resolve(true)
         } else {
-          reject()
+          resolve(false)
         }
       })
     })
