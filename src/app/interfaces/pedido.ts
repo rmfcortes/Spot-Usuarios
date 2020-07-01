@@ -38,6 +38,8 @@ export interface DetallesCalificacionNegocio {
     comentarios: string;
     idNegocio: string;
     puntos: number;
+    idPedido?: string;
+    fecha?: number;
 }
 
 export interface DetallesCalificacionRepartidor {
@@ -45,6 +47,8 @@ export interface DetallesCalificacionRepartidor {
     idRepartidor: string;
     puntos: number;
     externo: boolean;
+    idPedido?: string;
+    fecha?: number;
 }
 
 export interface Repartidor {

@@ -136,7 +136,7 @@ export class NegocioPage {
   // Get Productos
 
   getOfertas() {
-    this.cargandoProds = true;
+    this.cargandoProds = true
     this.negocioService.getOfertas(this.categoria, this.negocio.id).then(async (ofertas: Producto[]) => {
       if (ofertas && ofertas.length > 0) {
         this.hasOfertas = true

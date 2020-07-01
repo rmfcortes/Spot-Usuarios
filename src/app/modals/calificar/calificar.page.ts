@@ -54,6 +54,10 @@ export class CalificarPage implements OnInit {
       creado: this.pedido.createdAt,
       region: this.pedido.region
     }
+    this.negocio.idPedido = this.pedido.id
+    this.repartidor.idPedido = this.pedido.id
+    this.negocio.fecha = this.pedido.createdAt
+    this.repartidor.fecha = this.pedido.createdAt
     this.calificarService.calificar(this.pedido.id, calificacion)
     this.pedido.calificacion = calificacion
     this.modalCtrl.dismiss()
