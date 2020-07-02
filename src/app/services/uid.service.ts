@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
+import { CostoEnvio } from '../interfaces/envio.interface';
 import { Direccion } from '../interfaces/direcciones';
 
 @Injectable({
@@ -13,6 +14,7 @@ export class UidService {
   nombre: string
   region: string
   direccion: Direccion
+  costoEnvio: CostoEnvio
 
   public usuario = new BehaviorSubject(null)
   change = new BehaviorSubject<boolean>(false)
@@ -62,6 +64,14 @@ export class UidService {
 
   regionChange(val: boolean) {
     this.change.next(val)
+  }
+
+  getCostoEnvio() {
+    return this.costoEnvio
+  }
+
+  setCostoEnvio(costo: CostoEnvio) {
+    this.costoEnvio = costo
   }
 
 }

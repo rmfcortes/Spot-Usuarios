@@ -13,7 +13,7 @@
                                     <ion-label>
                                         <h6 class="ion-text-wrap" style="font-size: xx-small;">Envío</h6>
                                         <h6 *ngIf="negocio.envio_gratis_pedMin && negocio.repartidores_propios" class="primario">Gratis</h6>
-                                        <h3 *ngIf="!negocio.envio_gratis_pedMin">{{negocio.envio | currency:'CAD':'symbol-narrow':'1.0-2'}}</h3>
+                                        <h3 *ngIf="!negocio.envio_gratis_pedMin || !negocio.repartidores_propios">{{negocio.envio | currency:'CAD':'symbol-narrow':'1.0-2'}}</h3>
                                     </ion-label>
                                 </ion-item>
                             </ion-col>
@@ -21,8 +21,8 @@
                                 <ion-item lines="none" style="text-align: center;">
                                     <ion-label>
                                         <h6 class="ion-text-wrap" style="font-size: xx-small;">Pedido mínimo</h6>
-                                        <h6 *ngIf="negocio.envio_gratis_pedMin" class="primario">{{negocio.envio_gratis_pedMin | currency:'CAD':'symbol-narrow':'1.0-2'}}</h6>
-                                        <h3 *ngIf="!negocio.envio_gratis_pedMin">--</h3>
+                                        <h6 *ngIf="negocio.envio_gratis_pedMin && negocio.repartidores_propios" class="primario">{{negocio.envio_gratis_pedMin | currency:'CAD':'symbol-narrow':'1.0-2'}}</h6>
+                                        <h3 *ngIf="!negocio.envio_gratis_pedMin || !negocio.repartidores_propios">--</h3>
                                     </ion-label>
                                 </ion-item>
                             </ion-col>

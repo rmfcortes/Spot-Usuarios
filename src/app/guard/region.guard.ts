@@ -32,6 +32,7 @@ export class RegionGuard implements CanActivate {
       .then(async (dir) => {
         if (dir) {
           await this.authService.checkUser()
+          await this.direccionService.checkEnvio()
           return true
         }
         throw false

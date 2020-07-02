@@ -7,6 +7,7 @@ import { StorageService } from './storage.service';
 import { UidService } from './uid.service';
 
 import { Ubicacion } from '../interfaces/region.interface';
+import { CostoEnvio } from '../interfaces/envio.interface';
 import { Direccion } from '../interfaces/direcciones';
 
 @Injectable({
@@ -119,6 +120,29 @@ export class DireccionService {
       // this.geolocation.getCurrentPosition().then(resp => {
       //   console.log(resp);
       // })
+    })
+  }
+
+  // Costo de envío
+
+  checkEnvio() {
+    return new Promise(async (resolve, reject) => {
+      let costo: CostoEnvio
+      costo = this.uidService.getCostoEnvio()
+      if (costo) return resolve(true)
+      costo = await this.getCostEnvio()
+      resolve(true)
+    })
+  }
+
+  getCostEnvio(): Promise<CostoEnvio> {
+    return new Promise((resolve, reject) => {
+      const region = this.uidService.getRegion()
+      const costoSub = this.db.object(`ciudades/${region}/envio`).valueChanges().subscribe((costo: CostoEnvio) => {
+        costoSub.unsubscribe()
+        this.uidService.setCostoEnvio(costo)
+        resolve(costo)
+      })
     })
   }
   

@@ -4,9 +4,9 @@ import { auth } from 'firebase/app';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { Facebook } from '@ionic-native/facebook/ngx';
 
-import { UidService } from './uid.service';
 import { DisparadoresService } from './disparadores.service';
 import { StorageService } from './storage.service';
+import { UidService } from './uid.service';
 
 @Injectable({
   providedIn: 'root'

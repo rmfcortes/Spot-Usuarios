@@ -18,6 +18,8 @@ import { UidService } from 'src/app/services/uid.service';
 import { Oferta, InfoGral, NegocioBusqueda } from 'src/app/interfaces/negocio';
 import { Categoria } from 'src/app/interfaces/categoria.interface';
 import { UnreadMsg } from 'src/app/interfaces/chat.interface';
+import { CostoEnvio } from '../../interfaces/envio.interface';
+import { Direccion } from '../../interfaces/direcciones';
 import { MasVendido } from 'src/app/interfaces/producto';
 import { Pedido } from 'src/app/interfaces/pedido';
 
@@ -25,7 +27,6 @@ import { enterAnimationCategoria } from 'src/app/animations/enterCat';
 import { leaveAnimationCategoria } from 'src/app/animations/leaveCat';
 import { AnimationsService } from 'src/app/services/animations.service';
 
-import { Direccion } from '../../interfaces/direcciones';
 
 
 @Component({
@@ -171,6 +172,8 @@ export class HomePage implements OnInit, OnDestroy {
 
   direccion: Direccion
 
+  costo_envio: CostoEnvio
+
   constructor(
     private router: Router,
     private ngZone: NgZone,
@@ -261,17 +264,18 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   costoEnvio(negocios) {
+    if (!this.costo_envio) this.costo_envio = this.uidService.getCostoEnvio()
     return new Promise(async (resolve, reject) => {
       for (const n of negocios) {
         if (n.repartidores_propios) {
           if (!n.envio_costo_fijo && !n.envio_gratis_pedMin) {
             const distancia: number = await this.alertService.calculaDistancia(this.direccion.lat, this.direccion.lng, n.direccion.lat, n.direccion.lng)
-            n.envio =  Math.ceil(distancia * 6 + 10)
+            n.envio =  Math.ceil(distancia * this.costo_envio.costo_km + this.costo_envio.banderazo_cliente)
           }
         } else {
           if (n.direccion && n.tipo === 'productos') {
             const distancia: number = await this.alertService.calculaDistancia(this.direccion.lat, this.direccion.lng, n.direccion.lat, n.direccion.lng)
-            n.envio = Math.ceil(distancia * 6 + 25)
+            n.envio = Math.ceil(distancia * this.costo_envio.costo_km + this.costo_envio.banderazo_cliente + this.costo_envio.banderazo_negocio)
           }
         }
       }

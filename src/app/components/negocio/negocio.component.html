@@ -6,9 +6,11 @@
           </ion-thumbnail>
           <ion-label style="margin-left: 0.5rem;">
             <h2>{{item.nombre}}</h2>
-            <p *ngIf="!item.envio_gratis_pedMin && direccion">Envío: {{item.envio | currency:'CAD':'symbol-narrow':'1.0-2'}} </p>
-            <p *ngIf="item.envio_gratis_pedMin && item.repartidores_propios" class="primario">Envío gratis</p>
             <app-stars *ngIf="item.promedio" [calificacion]="item.promedio" [readOnly]="true" [size]="'x-small'"></app-stars>
+            <div *ngIf="item.tipo === 'productos'" class="medium">
+              <p *ngIf="!item.envio_gratis_pedMin && direccion || !item.repartidores_propios">Envío: {{item.envio | currency:'CAD':'symbol-narrow':'1.0-2'}} </p>
+              <p *ngIf="item.envio_gratis_pedMin && item.repartidores_propios" class="primario">Envío gratis</p>
+            </div>
           </ion-label>
       </ng-container>
       <ng-template #visitadosOpen>

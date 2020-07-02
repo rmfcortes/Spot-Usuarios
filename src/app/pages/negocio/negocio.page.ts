@@ -14,6 +14,7 @@ import { CartService } from 'src/app/services/cart.service';
 import { UidService } from 'src/app/services/uid.service';
 
 import { Negocio, DatosParaCuenta, InfoPasillos, ProductoPasillo } from 'src/app/interfaces/negocio';
+import { CostoEnvio } from '../../interfaces/envio.interface';
 import { Direccion } from '../../interfaces/direcciones';
 import { Producto } from 'src/app/interfaces/producto';
 
@@ -66,6 +67,8 @@ export class NegocioPage {
 
   origen_categoria = false
 
+  costo_envio: CostoEnvio
+
   constructor(
     private router: Router,
     private platform: Platform,
@@ -111,15 +114,16 @@ export class NegocioPage {
 
   async costoEnvio() {
     this.direccion = this.uidService.getDireccion()
+    if (!this.costo_envio) this.costo_envio = this.uidService.getCostoEnvio()
     if (this.negocio.repartidores_propios) {
       if (!this.negocio.envio_costo_fijo && !this.negocio.envio_gratis_pedMin) {
         const distancia: number = await this.commonService.calculaDistancia(this.direccion.lat, this.direccion.lng, this.negocio.direccion.lat, this.negocio.direccion.lng)
-        this.negocio.envio =  Math.ceil(distancia * 6 + 10)
+        this.negocio.envio =  Math.ceil(distancia * this.costo_envio.costo_km + this.costo_envio.banderazo_cliente)
       }
     } else {
       if (this.negocio.direccion && this.negocio.tipo === 'productos') {
         const distancia: number = await this.commonService.calculaDistancia(this.direccion.lat, this.direccion.lng, this.negocio.direccion.lat, this.negocio.direccion.lng)
-        this.negocio.envio = Math.ceil(distancia * 6 + 25)
+        this.negocio.envio = Math.ceil(distancia * this.costo_envio.costo_km + this.costo_envio.banderazo_cliente + this.costo_envio.banderazo_negocio)
       }
     }
   }

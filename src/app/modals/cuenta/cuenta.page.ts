@@ -25,6 +25,7 @@ import { enterAnimationDerecha } from 'src/app/animations/enterDerecha';
 import { leaveAnimationDerecha } from 'src/app/animations/leaveDerecha';
 import { enterAnimation } from 'src/app/animations/enter';
 import { leaveAnimation } from 'src/app/animations/leave';
+import { CostoEnvio } from 'src/app/interfaces/envio.interface';
 
 @Component({
   selector: 'app-cuenta',
@@ -49,7 +50,6 @@ export class CuentaPage implements OnInit {
   infoReady = false
 
   comision: number
-  envio: number
 
   botones_propina = [
     {
@@ -76,6 +76,8 @@ export class CuentaPage implements OnInit {
 
   propina_sel = 2
   propina = 0
+
+  costo_envio: CostoEnvio
 
   constructor(
     private router: Router,
@@ -121,15 +123,16 @@ export class CuentaPage implements OnInit {
   }
 
   costoEnvio(): Promise<number> {
+    if (!this.costo_envio) this.costo_envio = this.uidService.getCostoEnvio()
     return new Promise(async (resolve, reject) => {
       if (!this.datos.repartidores_propios) {
         const distancia: number = await this.alertSerivce.calculaDistancia(this.direccion.lat, this.direccion.lng, this.datosNegocio.direccion.lat, this.datosNegocio.direccion.lng)
-        return resolve(Math.ceil(distancia * 6 + 25))
+        return resolve(Math.ceil(distancia * this.costo_envio.costo_km + this.costo_envio.banderazo_negocio + this.costo_envio.banderazo_cliente))
       }
       if (this.datos.envio_gratis_pedMin && this.cuenta > this.datos.envio_gratis_pedMin) return resolve(0)
       if (!this.datos.envio_costo_fijo) {
         const distancia: number = await this.alertSerivce.calculaDistancia(this.direccion.lat, this.direccion.lng, this.datosNegocio.direccion.lat, this.datosNegocio.direccion.lng)
-        return resolve(Math.ceil(distancia * 6 + 10))
+        return resolve(Math.ceil(distancia * this.costo_envio.costo_km + this.costo_envio.banderazo_cliente))
       } else {
         return resolve(this.datos.envio)
       }
@@ -284,6 +287,8 @@ export class CuentaPage implements OnInit {
         cliente,
         comision: this.comision,
         createdAt: Date.now(),
+        envio: this.datosNegocio.envio,
+        propina: this.propina,
         negocio: this.datosNegocio,
         productos: this.cart,
         total: this.cuenta + this.datosNegocio.envio + this.comision,

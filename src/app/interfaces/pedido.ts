@@ -9,6 +9,8 @@ export interface Pedido {
     comision: number;
     id?: string;
     entrega: string;
+    envio: number;
+    propina: number;
     formaPago: FormaPago;
     negocio: DatosNegocioParaPedido;
     productos: Producto[];

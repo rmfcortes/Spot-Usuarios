@@ -5,11 +5,14 @@ import { Subscription } from 'rxjs';
 
 import { OfertasPage } from 'src/app/modals/ofertas/ofertas.page';
 
+import { DisparadoresService } from 'src/app/services/disparadores.service';
 import { CategoriasService } from 'src/app/services/categorias.service';
 import { OfertasService } from 'src/app/services/ofertas.service';
 import { UidService } from 'src/app/services/uid.service';
 
 import { Negocio, Oferta, InfoGral } from 'src/app/interfaces/negocio';
+import { CostoEnvio } from 'src/app/interfaces/envio.interface';
+import { Direccion } from 'src/app/interfaces/direcciones';
 
 @Component({
   selector: 'app-categoria',
@@ -18,23 +21,23 @@ import { Negocio, Oferta, InfoGral } from 'src/app/interfaces/negocio';
 })
 export class CategoriaPage implements OnInit, OnDestroy{
 
-  @ViewChild(IonInfiniteScroll, {static: false}) infiniteScroll: IonInfiniteScroll;
+  @ViewChild(IonInfiniteScroll, {static: false}) infiniteScroll: IonInfiniteScroll
 
-  categoria: string;
-  subCategorias: string[];
-  ofertas: Oferta[] = [];
-  negocios: Negocio[] = [];
-  status = 'abiertos';
+  categoria: string
+  subCategorias: string[]
+  ofertas: Oferta[] = []
+  negocios: Negocio[] = []
+  status = 'abiertos'
 
-  lastKey = '';
-  lastValue = null;
-  batch = 15;
-  noMore = false;
+  lastKey = ''
+  lastValue = null
+  batch = 15
+  noMore = false
 
-  batchOfertas = 10;
-  hayMas = false;
+  batchOfertas = 10
+  hayMas = false
 
-  subCategoria = 'todos';
+  subCategoria = 'todos'
 
   slideOpts = {
     centeredSlides: true,
@@ -43,10 +46,13 @@ export class CategoriaPage implements OnInit, OnDestroy{
     speed: 400,
   };
 
-  promosReady = false;
-  negociosReady = false;
+  promosReady = false
+  negociosReady = false
 
-  back: Subscription;
+  back: Subscription
+
+  direccion: Direccion
+  costo_envio: CostoEnvio
 
   constructor(
     private ngZone: NgZone,
@@ -55,6 +61,7 @@ export class CategoriaPage implements OnInit, OnDestroy{
     private activatedRoute: ActivatedRoute,
     private modalController: ModalController,
     private categoriaService: CategoriasService,
+    private alertService: DisparadoresService,
     private ofertaService: OfertasService,
     private uidService: UidService,
   ) { }
@@ -63,6 +70,7 @@ export class CategoriaPage implements OnInit, OnDestroy{
 
   ngOnInit() {
     this.categoria = this.activatedRoute.snapshot.paramMap.get('cat')
+    this.direccion = this.uidService.getDireccion()
     this.getSubCategorias()
     this.getOfertas()
     this.getNegocios()
@@ -100,15 +108,16 @@ export class CategoriaPage implements OnInit, OnDestroy{
   async getNegocios(event?) {
     this.categoriaService
       .getNegocios(this.status, this.categoria, this.subCategoria, this.batch + 1, this.lastKey, this.lastValue)
-      .then(negocios => {
+      .then(async (negocios) => {
         if (negocios.length === this.batch + 1) {
           this.lastKey = negocios[0].id
           this.lastValue = negocios[0].promedio
-          negocios.shift();
+          negocios.shift()
         } else if (this.status === 'abiertos') {
           this.status = 'cerrados'
           this.lastKey = ''
           this.lastValue = ''
+          await this.costoEnvio(negocios)
           this.negocios = this.negocios.concat(negocios.reverse())
           if (event) event.target.complete()
           this.getNegocios(event)
@@ -116,11 +125,32 @@ export class CategoriaPage implements OnInit, OnDestroy{
         } else {
           this.noMore = true
         }
+        await this.costoEnvio(negocios)
         this.negocios = this.negocios.concat(negocios.reverse())
         if (event) event.target.complete()
         this.negociosReady = true
       })
       .catch((err) => console.log(err))
+  }
+
+  costoEnvio(negocios) {
+    if (!this.costo_envio) this.costo_envio = this.uidService.getCostoEnvio()
+    return new Promise(async (resolve, reject) => {
+      for (const n of negocios) {
+        if (n.repartidores_propios) {
+          if (!n.envio_costo_fijo && !n.envio_gratis_pedMin) {
+            const distancia: number = await this.alertService.calculaDistancia(this.direccion.lat, this.direccion.lng, n.direccion.lat, n.direccion.lng)
+            n.envio =  Math.ceil(distancia * this.costo_envio.costo_km + this.costo_envio.banderazo_cliente)
+          }
+        } else {
+          if (n.direccion && n.tipo === 'productos') {
+            const distancia: number = await this.alertService.calculaDistancia(this.direccion.lat, this.direccion.lng, n.direccion.lat, n.direccion.lng)
+            n.envio = Math.ceil(distancia * this.costo_envio.costo_km + this.costo_envio.banderazo_cliente + this.costo_envio.banderazo_negocio)
+          }
+        }
+      }
+      resolve()
+    })
   }
 
   // Listeners
