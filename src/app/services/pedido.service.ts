@@ -32,12 +32,11 @@ export class PedidoService {
   async createPedido(pedido: Pedido) {
     return new Promise(async (resolve, reject) => {
       try {
-        const uid = this.uidService.getUid();
-        const idPedido = this.db.createPushId();
-        pedido.id = idPedido;
-        console.log(pedido);
-        await this.db.object(`usuarios/${uid}/pedidos/activos/${idPedido}`).update(pedido);
-        await this.db.object(`usuarios/${uid}/cart/${pedido.negocio.idNegocio}`).remove();
+        const uid = this.uidService.getUid()
+        const idPedido = this.db.createPushId()
+        pedido.id = idPedido
+        await this.db.object(`usuarios/${uid}/pedidos/activos/${idPedido}`).update(pedido)
+        await this.db.object(`usuarios/${uid}/cart/${pedido.negocio.idNegocio}`).remove()
         resolve()
       } catch (error) {
         reject(error)
@@ -123,6 +122,11 @@ export class PedidoService {
        resolve(token)
      })
     })
+  }
+
+  async removePedidoCancelado(pedido: Pedido) {
+    await this.db.object(`usuarios/${pedido.cliente.uid}/pedidos/historial/${pedido.id}`).set(pedido)
+    await this.db.object(`usuarios/${pedido.cliente.uid}/pedidos/activos/${pedido.id}`).remove()
   }
 
 }

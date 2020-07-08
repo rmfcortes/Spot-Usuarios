@@ -90,10 +90,12 @@
                 <ion-item *ngIf="pedidos.length > 0" (click)="verPedido(pedidos[0])" detail style="--detail-icon-color: var(--ion-color-primary)">
                     <ion-label color="medium">{{pedidos[0].negocio.nombreNegocio}}</ion-label>
                     <ion-badge color="primary" *ngIf="pedidos[0].unRead > 0">{{pedidos[0].unRead}}</ion-badge>
+                    <ion-badge color="danger" *ngIf="pedidos[0].cancelado_by_negocio">Cancelado</ion-badge>
                 </ion-item>
                 <ion-item *ngIf="pedidos.length > 1" (click)="verPedido(pedidos[1])" detail style="--detail-icon-color: var(--ion-color-primary)">
                     <ion-label color="medium">{{pedidos[1].negocio.nombreNegocio}}</ion-label>
                     <ion-badge color="primary" *ngIf="pedidos[1].unRead > 0">{{pedidos[1].unRead}}</ion-badge>
+                    <ion-badge color="danger" *ngIf="pedidos[1].cancelado_by_negocio">Cancelado</ion-badge>
                 </ion-item>
                 <ion-item *ngIf="pedidos.length > 2" (click)="verPedidos = true">
                     <ion-label color="medium" slot="end">Ver más
@@ -105,6 +107,7 @@
                 <ion-item *ngFor="let item of pedidos" detail (click)="verPedido(item)" style="--detail-icon-color: var(--ion-color-primary)">
                     <ion-label color="medium">{{item.negocio.nombreNegocio}}</ion-label>
                     <ion-badge color="primary" *ngIf="item.unRead > 0">{{item.unRead}}</ion-badge>
+                    <ion-badge color="danger" *ngIf="item.cancelado_by_negocio">Cancelado</ion-badge>
                 </ion-item>
                 <ion-item (click)="verPedidos = false" lines="none">
                     <ion-label color="medium" slot="end">Ocultar

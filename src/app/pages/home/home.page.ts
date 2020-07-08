@@ -323,6 +323,7 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   getPedidosActivos() {
+    if (this.pedSub) this.pedSub.unsubscribe()
     this.pedSub = this.pedidoService.getPedidosActivos().subscribe((pedidos: Pedido[]) => {
       if (pedidos && pedidos.length > 0) {
         this.pedidos = pedidos
@@ -370,6 +371,7 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   listenNewMsg() {
+    if (this.msgSub) this.msgSub.unsubscribe()
     this.msgSub = this.chatService.listenMsg().subscribe((unReadmsg: UnreadMsg[]) => {
       this.pedidos.forEach(p => {
         const i = unReadmsg.findIndex(u => u.idPedido === p.id)
@@ -382,9 +384,14 @@ export class HomePage implements OnInit, OnDestroy {
   listenEntregados() {
     this.pedidoService.listenEntregados().query.ref.on('child_removed', snapshot => {
       this.ngZone.run(() => {
-        const pedidoEliminado = snapshot.val()
+        const pedidoEliminado: Pedido = snapshot.val()
         const index = this.pedidos.findIndex(p => p.id === pedidoEliminado.id)
         this.pedidos.splice(index, 1)
+        if (pedidoEliminado.entregado) this.alertService.presentToast(`Tu pedido de ${pedidoEliminado.negocio.nombreNegocio} ha sido entregado.`)
+        if (this.pedidos.length === 0) {
+          this.pedidoService.listenEntregados().query.ref.off('child_removed')
+          if (this.msgSub) this.msgSub.unsubscribe()
+        }
       })
     })
   }

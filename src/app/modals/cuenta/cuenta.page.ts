@@ -291,15 +291,14 @@ export class CuentaPage implements OnInit {
         propina: this.propina,
         negocio: this.datosNegocio,
         productos: this.cart,
-        total: this.cuenta + this.datosNegocio.envio + this.comision,
+        total: this.cuenta + this.datosNegocio.envio + this.comision + this.propina,
         entrega: this.datosNegocio.entrega || 'indefinido',
         avances: [],
         formaPago: this.formaPago,
         region: this.uidService.getRegion()
       }
-      if (this.formaPago.tipo !== 'efectivo') {
-        await this.pagoService.cobrar(pedido)
-      }
+      if (this.formaPago.tipo !== 'efectivo') pedido.idOrder =  await this.pagoService.cobrar(pedido)
+      console.log(pedido);
       await this.pedidoService.createPedido(pedido)
       this.alertSerivce.dismissLoading()
       this.router.navigate(['/avances', pedido.id])

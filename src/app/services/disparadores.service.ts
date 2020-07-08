@@ -49,9 +49,9 @@ export class DisparadoresService {
           }
         }
       ]
-    });
+    })
 
-    await alert.present();
+    await alert.present()
   }
 
   async presentAlertAction(titulo, msn) {

@@ -1,13 +1,28 @@
 <ion-content style="--background: transparent !important">
     <ng-container *ngIf="infoReady; else elseTemplate">
-        <!-- Contacto -->
+
+        <!-- Header -->
         <ion-item lines="none">
-            <ion-icon color="primary" slot="start" name="chevron-back" (click)="verPedido()"></ion-icon>
-            <ion-button (click)="verCalificar()" expand="block" fill="clear" slot="end">
+            <ion-icon color="primary" slot="start" name="chevron-back" (click)="regresar()"></ion-icon>
+            <ion-button (click)="verPedido()" expand="block" fill="clear" slot="end">
                 Ver detalles
             </ion-button>
         </ion-item>
-        <ion-card>
+
+
+        <!-- Cancelacion -->
+        <ion-card *ngIf="pedido.cancelado_by_negocio">
+            <h2 class="comfortaa">Pedido cancelado</h2>
+            <ion-item lines="none">
+                <ion-label color="medium" class="ion-text-wrap">
+                    Tú dinero ya ha sido reembolsado. Aún así, lamentamos que el negocio cancelara tu pedido por la siguiente razón: <strong>{{pedido.razon_cancelacion}}</strong>
+                </ion-label>
+            </ion-item>
+        </ion-card>
+
+
+        <!-- Contacto -->
+        <ion-card *ngIf="!pedido.cancelado_by_negocio">
             <h2 class="comfortaa">Contacto</h2>
             <ion-item>
                 <ion-thumbnail slot="start">
@@ -41,9 +56,8 @@
         </ion-card>
 
         <!-- Status -->
-        <ion-card>
+        <ion-card *ngIf="!pedido.cancelado_by_negocio">
             <h2 class="comfortaa">Status</h2>
-
             <h3 *ngIf="pedido.aceptado && pedido.entrega === 'inmediato'" style="margin-left: 1rem;">Entrega: {{pedido.aceptado | date:'h:mm a'}}</h3>
             <h3 *ngIf="pedido.aceptado && pedido.entrega === 'planeado'" style="margin-left: 1rem;">Entrega: {{pedido.aceptado | date:'EEEE d/MMMM/y'}}</h3>
             <ion-grid class="ion-no-padding">
@@ -94,7 +108,7 @@
 
 
         <!-- Mapa -->
-        <ion-card *ngIf="pedido.entrega === 'inmediato'">
+        <ion-card *ngIf="pedido.entrega === 'inmediato' && !pedido.cancelado_by_negocio">
             <h2>Rastreo</h2>
             <div class="marco">
                 <agm-map style="height: 45vh" [latitude]="20.627006" [longitude]="-103.416554" [disableDefaultUI]="true" [streetViewControl]="false" [zoomControl]="false" [fitBounds]="true">

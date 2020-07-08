@@ -409,6 +409,7 @@ export class AvancesPage implements OnInit {
 
     // Salida
   async regresar() {
+    if (this.pedido.cancelado_by_negocio) this.pedidoService.removePedidoCancelado(this.pedido)
     if (this.map) this.map.remove()
     if (this.back) this.back.unsubscribe()
     if (this.msgSub) this.msgSub.unsubscribe()

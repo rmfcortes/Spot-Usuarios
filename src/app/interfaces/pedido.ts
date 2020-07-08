@@ -22,6 +22,9 @@ export interface Pedido {
     entregado?: boolean;
     categoria?: string;
     calificacion?: Calificacion;
+    cancelado_by_negocio?: number;
+    razon_cancelacion?: string;
+    idOrder?: string;
 }
 
 export interface Avance {

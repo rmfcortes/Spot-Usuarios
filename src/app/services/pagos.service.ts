@@ -3,7 +3,7 @@ import { Platform } from '@ionic/angular';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { AngularFireDatabase } from '@angular/fire/database';
-import { HTTP } from '@ionic-native/http/ngx';
+import { HTTP, HTTPResponse } from '@ionic-native/http/ngx';
 
 import { UidService } from './uid.service';
 
@@ -100,7 +100,7 @@ export class PagosService {
     });
   }
 
-  cobrar(pedido: Pedido): Promise<boolean> {
+  cobrar(pedido: Pedido): Promise<string> {
     return new Promise((resolve, reject) => {
       const body = {
         origen: 'cobro',
@@ -108,8 +108,7 @@ export class PagosService {
       }
       if (this.platform.is ('cordova')) {
         this.http.post('https://us-central1-revistaojo-9a8d3.cloudfunctions.net/request', body, {Authorization: 'secret-key-test'})
-        .then(res => resolve(true)
-        )
+        .then((resp: HTTPResponse) => resolve(resp.data))
         .catch(err => reject(err.error.text))
       } else {
         const httpOptions = {
@@ -117,23 +116,19 @@ export class PagosService {
             'Content-Type':  'application/json',
             'Authorization': 'secret-key'
           })
-         };
+         }
          this.httpAngular.post('https://us-central1-revistaojo-9a8d3.cloudfunctions.net/request', body, httpOptions)
          .subscribe(
-          res => {
-            console.log(res);
-            resolve(true)
+          (resp: string) => {
+            console.log(resp)
+            resolve(resp)
           },
           err => {
-            console.log(err);
-            if (err.status === 200) {
-              resolve(true)
-            } else {
-              reject(err.error)
-            }
+            if (err.status === 200) resolve(err.error.text)
+            else reject(err.error)
           })
       }
-    });
+    })
   }
 
 }
