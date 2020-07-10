@@ -40,11 +40,12 @@ export class CategoriaPage implements OnInit, OnDestroy{
   subCategoria = 'todos'
 
   slideOpts = {
-    centeredSlides: true,
+    centeredSlides: false,
     initialSlide: 0,
     slidesPerView: 1.2,
     speed: 400,
-  };
+    freeMode: true
+  }
 
   promosReady = false
   negociosReady = false

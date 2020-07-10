@@ -14,15 +14,15 @@ import { Oferta, InfoGral } from 'src/app/interfaces/negocio';
 })
 export class OfertasPage implements OnInit {
 
-  @Input() categoria;
-  @Input() batch;
+  @Input() categoria
+  @Input() batch
 
-  lastKey = '';
-  ofertas: Oferta[] = [];
+  lastKey = ''
+  ofertas: Oferta[] = []
 
-  noMore = false;
+  noMore = false
 
-  back: Subscription;
+  back: Subscription
 
   constructor(
     private router: Router,
@@ -32,59 +32,50 @@ export class OfertasPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.getOfertas();
+    this.getOfertas()
     this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-      this.regresar();
-    });
+      this.regresar()
+    })
   }
 
   // Carga de ofertas
 
   getOfertas(event?) {
     this.ofertaService.getOfertasModal(this.categoria, this.batch + 1, this.lastKey)
-      .then((ofertas: Oferta[]) => {
-        this.cargaOfertas(ofertas, event);
-      });
+      .then((ofertas: Oferta[]) => this.cargaOfertas(ofertas, event))
   }
 
   cargaOfertas(ofertas, event) {
     if (ofertas.length === this.batch + 1) {
-      this.lastKey = ofertas[0].id;
-      ofertas.shift();
-    } else {
-      this.noMore = true;
-    }
-    this.ofertas = this.ofertas.concat(ofertas.reverse());
-    if (event) {
-      event.target.complete();
-    }
+      this.lastKey = ofertas[0].id
+      ofertas.shift()
+    } else this.noMore = true
+    this.ofertas = this.ofertas.concat(ofertas.reverse())
+    if (event) event.target.complete()
   }
 
   async loadData(event) {
     if (this.noMore) {
-      event.target.disabled = true;
-      event.target.complete();
-      return;
+      event.target.disabled = true
+      event.target.complete()
+      return
     }
-    this.getOfertas(event);
-    // App logic to determine if all data is loaded
-    // and disable the infinite scroll
-    if (this.noMore) {
-      event.target.disabled = true;
-    }
+    this.getOfertas(event)
+
+    if (this.noMore) event.target.disabled = true
   }
 
   // Acciones
 
   async verOferta(oferta: Oferta) {
-    const infoNeg: InfoGral = await this.ofertaService.getStatus(oferta.idNegocio);
-    this.router.navigate(['/negocio', infoNeg.categoria, oferta.idNegocio, infoNeg.abierto]);
-    this.modalCtrl.dismiss();
+    const infoNeg: InfoGral = await this.ofertaService.getStatus(oferta.idNegocio)
+    this.router.navigate(['/negocio', infoNeg.categoria, oferta.idNegocio, infoNeg.abierto])
+    this.modalCtrl.dismiss()
   }
 
   regresar() {
-    if (this.back) {this.back.unsubscribe()}
-    this.modalCtrl.dismiss();
+    if (this.back) this.back.unsubscribe()
+    this.modalCtrl.dismiss()
   }
 
 }

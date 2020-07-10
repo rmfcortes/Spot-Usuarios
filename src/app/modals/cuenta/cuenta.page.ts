@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, NgZone } from '@angular/core';
 import { ModalController, ActionSheetController, Platform } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import { DireccionesPage } from '../direcciones/direcciones.page';
 import { FormasPagoPage } from '../formas-pago/formas-pago.page';
 import { ProductoPage } from '../producto/producto.page';
+import { TarjetaPage } from '../tarjeta/tarjeta.page';
 
 import { DisparadoresService } from 'src/app/services/disparadores.service';
 import { AnimationsService } from 'src/app/services/animations.service';
@@ -19,13 +20,13 @@ import { Producto, ListaComplementosElegidos, Complemento } from 'src/app/interf
 import { Pedido, DatosNegocioParaPedido, Cliente } from 'src/app/interfaces/pedido';
 import { DatosParaCuenta, ProductoPasillo } from 'src/app/interfaces/negocio';
 import { FormaPago } from 'src/app/interfaces/forma-pago.interface';
+import { CostoEnvio } from 'src/app/interfaces/envio.interface';
 import { Direccion } from 'src/app/interfaces/direcciones';
 
 import { enterAnimationDerecha } from 'src/app/animations/enterDerecha';
 import { leaveAnimationDerecha } from 'src/app/animations/leaveDerecha';
 import { enterAnimation } from 'src/app/animations/enter';
 import { leaveAnimation } from 'src/app/animations/leave';
-import { CostoEnvio } from 'src/app/interfaces/envio.interface';
 
 @Component({
   selector: 'app-cuenta',
@@ -43,13 +44,15 @@ export class CuentaPage implements OnInit {
 
   direccion: Direccion
   formaPago: FormaPago
+  ultimoPago: FormaPago
+  tarjetas: FormaPago[] = []
 
   direcciones = []
 
   back: Subscription
   infoReady = false
 
-  comision: number
+  comision = 0
 
   botones_propina = [
     {
@@ -79,6 +82,20 @@ export class CuentaPage implements OnInit {
 
   costo_envio: CostoEnvio
 
+  err: string
+
+  pago_en_efectivo: FormaPago = {
+    forma: 'efectivo',
+    id: 'efectivo',
+    tipo: 'efectivo',
+  }  
+
+  pago_vacio: FormaPago = {
+    forma: '',
+    id: '',
+    tipo: '',
+  }
+
   constructor(
     private router: Router,
     private platform: Platform,
@@ -97,6 +114,8 @@ export class CuentaPage implements OnInit {
     this.getDireccion()
     this.getCart()
     this.calculaPropina(this.propina_sel)
+    const conekta = this.uidService.getConekta()
+    if (!conekta) this.loadConekta()
     this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
       this.closeCart()
     })
@@ -144,18 +163,47 @@ export class CuentaPage implements OnInit {
     this.propina = this.cuenta * this.botones_propina[i].valor
   }
 
-  getFormaPago() {
+  async getFormaPago() {
+    if (this.datosNegocio.formas_pago.tarjeta) await this.getTarjetas()
     this.cartService.getUltimaFormaPago().then(forma => {
-      if (forma.tipo === 'efectivo') {
-        this.comision = 0
-        if (this.datosNegocio.formas_pago.efectivo) this.formaPago = forma
-        else this.formaPago = null
+      if (forma) {
+        if (forma.tipo === 'efectivo') {
+          this.comision = 0
+          if (this.datosNegocio.formas_pago.efectivo) this.formaPago = forma
+          else this.formaPago = this.pago_vacio
+        } else {
+          if (this.datosNegocio.formas_pago.tarjeta) {
+            this.formaPago = forma
+            this.ultimoPago = forma
+            this.tarjetas = this.tarjetas.filter(t => t.id !== forma.id)
+            this.comision = ((this.cuenta * 0.04) + 3) * 1.16
+          } else {
+            this.comision = 0
+            this.formaPago = this.pago_en_efectivo
+          }
+        }
       } else {
-        this.comision = ((this.cuenta * 0.04) + 3) * 1.16
-        if (this.datosNegocio.formas_pago.tarjeta) this.formaPago = forma
-        else this.formaPago = null
+        if (this.datosNegocio.formas_pago.efectivo) {
+          this.formaPago = this.pago_en_efectivo
+          this.comision = 0
+        }
+        else this.formaPago = this.pago_vacio
       }
       this.infoReady = true
+    })
+  }
+
+  getTarjetas(): Promise<boolean> {
+    return new Promise((resolve, reject) => {      
+      this.pagoService.getTarjetas()
+      .then(tarjetas => {
+        this.tarjetas = tarjetas
+        resolve()
+      })
+      .catch(err => {
+        this.err = err
+        resolve()
+      })
     })
   }
 
@@ -215,6 +263,27 @@ export class CuentaPage implements OnInit {
     })
   }
 
+  async nuevaTarjeta() {
+    const modal = await this.modalCtrl.create({
+      component: TarjetaPage,
+      enterAnimation: enterAnimationDerecha,
+      leaveAnimation: leaveAnimationDerecha,
+    })
+
+    modal.onWillDismiss().then(resp => {
+      if (resp.data) {
+        console.log(resp.data);
+        if (this.tarjetas.length >= 2) {
+          if (this.ultimoPago) this.tarjetas.unshift(this.ultimoPago)
+          this.ultimoPago = resp.data
+        } else this.tarjetas.push(resp.data)
+        this.formaPago = resp.data
+      }
+    })
+
+    return await modal.present()
+  }
+
   async formasPago() {
     const modal = await this.modalCtrl.create({
       component: FormasPagoPage,
@@ -224,16 +293,26 @@ export class CuentaPage implements OnInit {
     })
     modal.onWillDismiss().then(resp => {
       if (resp.data) {
-        if (resp.data.tipo === 'efectivo') {
-          this.comision = 0
-        } else {
-          this.comision = ((this.cuenta * 0.04) + 3) * 1.16
-        }
         this.formaPago = resp.data
+        this.ultimoPago = resp.data
       }
     })
 
     return await modal.present()
+  }
+
+  async selFormaPago(event) {
+    if (event === 'efectivo') this.formaPago = this.pago_en_efectivo
+    else {
+      const i: number = this.tarjetas.findIndex(t => t.id === event)
+      let pago: FormaPago
+      if (i >= 0) pago = this.tarjetas[i]
+      else pago = this.ultimoPago
+      this.formaPago = pago
+    }
+    this.pagoService.guardarFormaPago(this.formaPago)
+    if (this.formaPago.tipo === 'efectivo') this.comision = 0
+    else this.comision = ((this.cuenta * 0.04) + 3) * 1.16
   }
 
   // Salida
@@ -348,6 +427,14 @@ export class CuentaPage implements OnInit {
 
   comisionInfo() {
     this.alertSerivce.presentToastconBoton('Cargo realizado por pago con tarjeta')
+  }
+
+  loadConekta() {
+    const script = document.createElement('script')
+    script.src = 'https://cdn.conekta.io/js/latest/conekta.js'
+    script.async = true
+    document.body.appendChild(script)
+    this.uidService.setConekta()
   }
 
   // Track by

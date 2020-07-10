@@ -12,6 +12,15 @@ ion-content {
     border: solid 1px #ff9238;
     border-radius: 15px;
     margin-bottom: 1rem;
+    --background: #fff7f1;
+    --placeholder-color: #ff9238;
+    --color: #ff9238;
+}
+
+.input-registra {
+    --background: #fff7f1;
+    --placeholder-color: #ff9238;
+    --color: #ff9238;
 }
 
 .back-icon {
@@ -19,7 +28,7 @@ ion-content {
     margin-left: 1rem;
     color: #ff9238;
     font-size: 18pt;
-    float: left;
+    position: absolute;
 }
 
 .botones {

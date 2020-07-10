@@ -20,15 +20,15 @@ import { leaveAnimation } from 'src/app/animations/leave';
 })
 export class HistorialPage implements OnInit {
 
-  batch = 5;
-  lastKey = '';
-  noMore = false;
+  batch = 5
+  lastKey = ''
+  noMore = false
 
-  historial: Pedido[] = [];
+  historial: Pedido[] = []
 
-  historialReady = false;
+  historialReady = false
 
-  back: Subscription;
+  back: Subscription
 
   constructor(
     private router: Router,
@@ -38,7 +38,7 @@ export class HistorialPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.getPedidos();
+    this.getPedidos()
   }
 
   ionViewWillEnter() {
@@ -52,9 +52,7 @@ export class HistorialPage implements OnInit {
   }
 
   getPedidos(event?) {
-    this.historialService.getHistorial(this.batch + 1, this.lastKey).then(historial => {
-      this.cargaHistorial(historial, event);
-    });
+    this.historialService.getHistorial(this.batch + 1, this.lastKey).then(historial => this.cargaHistorial(historial, event))
   }
 
   cargaHistorial(historial, event) {

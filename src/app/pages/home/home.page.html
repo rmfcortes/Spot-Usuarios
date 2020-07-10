@@ -48,7 +48,7 @@
 
 
     <!-- Categorias -->
-    <ng-container *ngIf="catsReady; else catsTemplate">
+    <!-- <ng-container *ngIf="catsReady; else catsTemplate">
         <ion-card>
             <ion-grid *ngIf="categorias.length > 0" class="ion-no-padding">
                 <ion-row>
@@ -80,44 +80,40 @@
                 </ion-row>
             </ion-grid>
         </ion-list>
-    </ng-template>
+    </ng-template> -->
 
     <!-- Pedidos -->
     <ion-card *ngIf="pedidosReady && catsReady && pedidos.length > 0">
-        <h2 style="margin-left: 1rem; color: var(--ion-color-primary)" *ngIf="pedidos.length > 0">Pedidos</h2>
-        <ion-card>
-            <ng-container *ngIf="!verPedidos; else pedidosTemplate">
-                <ion-item *ngIf="pedidos.length > 0" (click)="verPedido(pedidos[0])" detail style="--detail-icon-color: var(--ion-color-primary)">
-                    <ion-label color="medium">{{pedidos[0].negocio.nombreNegocio}}</ion-label>
-                    <ion-badge color="primary" *ngIf="pedidos[0].unRead > 0">{{pedidos[0].unRead}}</ion-badge>
-                    <ion-badge color="danger" *ngIf="pedidos[0].cancelado_by_negocio">Cancelado</ion-badge>
-                </ion-item>
-                <ion-item *ngIf="pedidos.length > 1" (click)="verPedido(pedidos[1])" detail style="--detail-icon-color: var(--ion-color-primary)">
-                    <ion-label color="medium">{{pedidos[1].negocio.nombreNegocio}}</ion-label>
-                    <ion-badge color="primary" *ngIf="pedidos[1].unRead > 0">{{pedidos[1].unRead}}</ion-badge>
-                    <ion-badge color="danger" *ngIf="pedidos[1].cancelado_by_negocio">Cancelado</ion-badge>
-                </ion-item>
-                <ion-item *ngIf="pedidos.length > 2" (click)="verPedidos = true">
-                    <ion-label color="medium" slot="end">Ver más
-                        <ion-icon style="margin-left: 0.5rem;" name="chevron-down"></ion-icon>
-                    </ion-label>
-                </ion-item>
-            </ng-container>
-            <ng-template #pedidosTemplate>
-                <ion-item *ngFor="let item of pedidos" detail (click)="verPedido(item)" style="--detail-icon-color: var(--ion-color-primary)">
-                    <ion-label color="medium">{{item.negocio.nombreNegocio}}</ion-label>
-                    <ion-badge color="primary" *ngIf="item.unRead > 0">{{item.unRead}}</ion-badge>
-                    <ion-badge color="danger" *ngIf="item.cancelado_by_negocio">Cancelado</ion-badge>
-                </ion-item>
-                <ion-item (click)="verPedidos = false" lines="none">
-                    <ion-label color="medium" slot="end">Ocultar
-                        <ion-icon style="margin-left: 0.5rem;" name="chevron-up"></ion-icon>
-                    </ion-label>
-                </ion-item>
-            </ng-template>
-
-        </ion-card>
-
+        <h2 style="margin-left: 1rem; color: var(--ion-color-primary)" *ngIf="pedidos.length > 0">Pedidos en curso</h2>
+        <ng-container *ngIf="!verPedidos; else pedidosTemplate">
+            <ion-item *ngIf="pedidos.length > 0" (click)="verPedido(pedidos[0])" detail style="--detail-icon-color: var(--ion-color-primary)" lines="none">
+                <ion-label color="medium">{{pedidos[0].negocio.nombreNegocio}}</ion-label>
+                <ion-badge color="primary" *ngIf="pedidos[0].unRead > 0">{{pedidos[0].unRead}}</ion-badge>
+                <ion-badge color="danger" *ngIf="pedidos[0].cancelado_by_negocio">Cancelado</ion-badge>
+            </ion-item>
+            <ion-item *ngIf="pedidos.length > 1" (click)="verPedido(pedidos[1])" detail style="--detail-icon-color: var(--ion-color-primary)" lines="none">
+                <ion-label color="medium">{{pedidos[1].negocio.nombreNegocio}}</ion-label>
+                <ion-badge color="primary" *ngIf="pedidos[1].unRead > 0">{{pedidos[1].unRead}}</ion-badge>
+                <ion-badge color="danger" *ngIf="pedidos[1].cancelado_by_negocio">Cancelado</ion-badge>
+            </ion-item>
+            <ion-item *ngIf="pedidos.length > 2" (click)="verPedidos = true">
+                <ion-label color="medium" slot="end">Ver más
+                    <ion-icon style="margin-left: 0.5rem;" name="chevron-down"></ion-icon>
+                </ion-label>
+            </ion-item>
+        </ng-container>
+        <ng-template #pedidosTemplate>
+            <ion-item *ngFor="let item of pedidos" detail (click)="verPedido(item)" style="--detail-icon-color: var(--ion-color-primary)" lines="none">
+                <ion-label color="medium">{{item.negocio.nombreNegocio}}</ion-label>
+                <ion-badge color="primary" *ngIf="item.unRead > 0">{{item.unRead}}</ion-badge>
+                <ion-badge color="danger" *ngIf="item.cancelado_by_negocio">Cancelado</ion-badge>
+            </ion-item>
+            <ion-item (click)="verPedidos = false" lines="none">
+                <ion-label color="medium" slot="end">Ocultar
+                    <ion-icon style="margin-left: 0.5rem;" name="chevron-up"></ion-icon>
+                </ion-label>
+            </ion-item>
+        </ng-template>
     </ion-card>
 
     <!-- Ofertas -->
@@ -153,10 +149,63 @@
     </ng-template>
 
 
+    <!-- + vendidos -->
+
+    <!-- <div *ngIf="pedidosReady && catsReady && promosReady && catsReady && visitadosReady && popularesReady && vendidosReady">
+        <ion-card>
+            <h2 style="margin-left: 1rem; color: var(--ion-color-primary)" *ngIf="masVendidos.length > 0">Lo más vendido</h2>
+            <ion-item *ngFor="let prod of masVendidos; let y = index" style="--padding-start: 0; cursor: pointer; margin-top: 1rem;" lines="none" detail (click)="verProducto(prod)">
+                <ion-grid class="ion-no-padding">
+                    <ion-row>
+                        <ion-col size="4">
+                            <ion-img [src]="prod.url" style="height: 100%; width: 100%; max-height: 7rem; object-fit: cover;" (ionImgWillLoad)="ionImgWillLoad($event)"></ion-img>
+                        </ion-col>
+                        <ion-col size="8">
+                            <ion-item lines="none">
+                                <ion-label class="ion-text-wrap">
+                                    <h2>{{(prod.nombre.length > 25) ? (prod.nombre | slice:0:25) + '...' : prod.nombre}}</h2>
+                                    <h2 class="medium">{{prod.nombreNegocio}}</h2>
+                                    <h2 *ngIf="prod.precio" style="color: var(--ion-color-primary)">{{prod.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}</h2>
+                                </ion-label>
+                            </ion-item>
+                        </ion-col>
+                    </ion-row>
+                </ion-grid>
+            </ion-item>
+        </ion-card>
+        <div style="height: 1rem;"></div>
+    </div> -->
+    <div *ngIf="pedidosReady && catsReady && promosReady && catsReady && visitadosReady && popularesReady && vendidosReady">
+        <ion-card>
+            <h2 style="margin-left: 1rem; color: var(--ion-color-primary)" *ngIf="masVendidos.length > 0">Lo más vendido</h2>
+            <ion-slides [options]="slideVendidos" *ngIf="masVendidos.length > 0">
+                <ion-slide *ngFor="let item of masVendidos" (click)="irAOferta(item)">
+                    <ion-grid fixed>
+                        <ion-row>
+                            <ion-col size="12">
+                                <preload-image [ratio]="{w: 1, h: 0.75}" [src]="item.url" class="radius"></preload-image>
+                            </ion-col>
+                            <ion-col size="12">
+                                <ion-item lines="none">
+                                    <ion-label class="ion-text-wrap">
+                                        <h2>{{(item.nombre.length > 25) ? (item.nombre | slice:0:25) + '...' : item.nombre}}</h2>
+                                        <h2 class="medium">{{item.nombreNegocio}}</h2>
+                                        <h2 *ngIf="item.precio" style="color: var(--ion-color-primary)">{{item.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}</h2>
+                                    </ion-label>
+                                </ion-item>
+                            </ion-col>
+                        </ion-row>
+                    </ion-grid>
+                </ion-slide>
+            </ion-slides>
+        </ion-card>
+    </div>
+
+
     <!-- + visitados por ti -->
     <ng-container *ngIf="pedidosReady && catsReady && promosReady && catsReady && visitadosReady; else visTemplate">
         <ion-card *ngIf="negociosVisitados.length > 0">
-            <h2 style="margin-left: 1rem; color: var(--ion-color-primary)">+ Visitados por ti</h2>
+            <h2 style="margin-left: 1rem; color: var(--ion-color-primary)">Tus favoritos</h2>
             <app-negocio [negocios]="negociosVisitados" (verNeg)="verProductoConInfo($event)"></app-negocio>
             <div style="height: 1rem;"></div>
         </ion-card>
@@ -178,35 +227,6 @@
         <ion-card style="margin-top: 0.75rem;">
             <h2 style="margin-left: 1rem; color: var(--ion-color-primary)" *ngIf="negociosPopulares.length > 0">Los más populares</h2>
             <app-negocio [negocios]="negociosPopulares" (verNeg)="verProductoConInfo($event)"></app-negocio>
-            <div style="height: 1rem;"></div>
-        </ion-card>
-    </div>
-
-    <!-- + vendidos -->
-
-    <div *ngIf="pedidosReady && catsReady && promosReady && catsReady && visitadosReady && popularesReady && vendidosReady">
-        <ion-card>
-            <h2 style="margin-left: 1rem; color: var(--ion-color-primary)" *ngIf="masVendidos.length > 0">Lo más vendido</h2>
-            <ion-card *ngFor="let prod of masVendidos; let y = index" style="--padding: 0; margin-top: 1rem;">
-                <ion-item style="--padding-start: 0; cursor: pointer;" lines="none" detail (click)="verProducto(prod)">
-                    <ion-grid class="ion-no-padding">
-                        <ion-row>
-                            <ion-col size="4">
-                                <ion-img [src]="prod.url" style="height: 100%; width: 100%; max-height: 7rem; object-fit: cover;" (ionImgWillLoad)="ionImgWillLoad($event)"></ion-img>
-                            </ion-col>
-                            <ion-col size="8">
-                                <ion-item lines="none">
-                                    <ion-label class="ion-text-wrap">
-                                        <h2>{{(prod.nombre.length > 25) ? (prod.nombre | slice:0:25) + '...' : prod.nombre}}</h2>
-                                        <h2 class="medium">{{prod.nombreNegocio}}</h2>
-                                        <h2 *ngIf="prod.precio" style="color: var(--ion-color-primary)">{{prod.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}</h2>
-                                    </ion-label>
-                                </ion-item>
-                            </ion-col>
-                        </ion-row>
-                    </ion-grid>
-                </ion-item>
-            </ion-card>
             <div style="height: 1rem;"></div>
         </ion-card>
     </div>

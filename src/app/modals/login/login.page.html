@@ -1,4 +1,4 @@
-<ion-content>
+<ion-content class="fondo">
     <ion-slides [options]="slideOpts">
         <ion-slide>
             <div style="width: 100%; height: 100%">
@@ -9,7 +9,7 @@
                         Iniciar con Facebook
                     </ion-button>
                     <img style="margin-bottom: 1rem;" src="../../../assets/img/backgrounds/o.jpg" alt="">
-                    <ion-input (keyup.enter)="$event.target.blur();" type="text" [(ngModel)]="correo" class="input-usuario" placeholder="Correo electrónico"></ion-input>
+                    <ion-input (keyup.enter)="$event.target.blur();" type="text" [(ngModel)]="correo" class="input-usuario" placeholder="correo@gmail.com"></ion-input>
                     <ion-input (keyup.enter)="$event.target.blur();" type="password" [(ngModel)]="pass" class="input-usuario" placeholder="Contraseña"></ion-input>
                     <ion-label color="primary" style="float: right; margin-bottom: 1.2rem; font-size: xx-small;" (click)="resetPass()">¿Olvidaste tu contraseña?</ion-label>
                     <ion-button [disabled]="!correo || !pass" (click)="ingresarConCorreo()" color="primary" shape="round" expand="block">
@@ -27,31 +27,27 @@
         <ion-slide>
             <div style="width: 100%; height: 100%">
                 <div class="back-icon">
-                    <ion-icon name="arrow-back" (click)="regresar()"></ion-icon>
+                    <ion-icon name="chevron-back" (click)="regresar()"></ion-icon>
                 </div>
-                <div style="margin-top: 2.5rem;" class="botones">
+                <ion-card style="margin-top: 4.5rem; padding-bottom: 1rem; padding-top: 1rem;">
                     <form #formaCuenta="ngForm" (submit)="generarCuenta()">
-                        <ion-item>
-                            <ion-label color="medium" position="floating">Nombre</ion-label>
-                            <ion-input (keyup.enter)="$event.target.blur();" [(ngModel)]="usuario.nombre" type="text" name="nombre" required></ion-input>
+                        <ion-item lines="none">
+                            <ion-input (keyup.enter)="$event.target.blur();" class="input-registra" [(ngModel)]="usuario.nombre" placeholder="Nombre" type="text" name="nombre" required></ion-input>
                         </ion-item>
-                        <ion-item>
-                            <ion-label color="medium" position="floating">Correo</ion-label>
-                            <ion-input (keyup.enter)="$event.target.blur();" [(ngModel)]="usuario.correo" type="email" name="email" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$"></ion-input>
+                        <ion-item lines="none">
+                            <ion-input (keyup.enter)="$event.target.blur();" class="input-registra" [(ngModel)]="usuario.correo" placeholder="Correo electrónico" type="email" name="email" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$"></ion-input>
                         </ion-item>
-                        <ion-item>
-                            <ion-label color="medium" position="floating">Contraseña (mínimo 6 caracteres)</ion-label>
-                            <ion-input (keyup.enter)="$event.target.blur();" type="password" required [(ngModel)]="usuario.pass" name="pass" minlength="6"></ion-input>
+                        <ion-item lines="none">
+                            <ion-input (keyup.enter)="$event.target.blur();" type="password" class="input-registra" required placeholder="Contraseña (mínimo 6 caracteres)" [(ngModel)]="usuario.pass" name="pass" minlength="6"></ion-input>
                         </ion-item>
-                        <ion-item>
-                            <ion-label color="medium" position="floating">Confirma contraseña</ion-label>
-                            <ion-input (keyup.enter)="$event.target.blur();" type="password" required [(ngModel)]="usuario.passConfirm" name="passConfirm" minlength="6"></ion-input>
+                        <ion-item lines="none">
+                            <ion-input (keyup.enter)="$event.target.blur();" type="password" class="input-registra" required  placeholder="Confirmar contraseña" [(ngModel)]="usuario.passConfirm" name="passConfirm" minlength="6"></ion-input>
                         </ion-item>
-                        <ion-button style="margin-top: 2rem" [disabled]="!formaCuenta.valid" expand="block" shape="round" type="submit">
+                        <ion-button style="margin-top: 2rem" [disabled]="!formaCuenta.valid" expand="block" shape="round" type="submit" class="botones">
                             Crear cuenta
                         </ion-button>
                     </form>
-                </div>
+                </ion-card>
             </div>
         </ion-slide>
 

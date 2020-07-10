@@ -15,6 +15,7 @@ export class UidService {
   region: string
   direccion: Direccion
   costoEnvio: CostoEnvio
+  conektaLoaded = false
 
   public usuario = new BehaviorSubject(null)
   change = new BehaviorSubject<boolean>(false)
@@ -72,6 +73,14 @@ export class UidService {
 
   setCostoEnvio(costo: CostoEnvio) {
     this.costoEnvio = costo
+  }
+
+  setConekta() {
+    this.conektaLoaded = true
+  }
+
+  getConekta() {
+    return this.conektaLoaded
   }
 
 }

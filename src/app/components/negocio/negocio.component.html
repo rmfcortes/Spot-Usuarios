@@ -1,31 +1,29 @@
-<ion-card *ngFor="let item of negocios; trackBy:trackNegocios">
-  <ion-item detail lines="none" (click)="verNegocio(item)">
-      <ng-container *ngIf="item.abierto; else visitadosOpen">
-          <ion-thumbnail>
-            <ion-img [src]="item.foto" style="width: 100%" (ionImgWillLoad)="ionImgWillLoad($event)"></ion-img>
-          </ion-thumbnail>
-          <ion-label style="margin-left: 0.5rem;">
-            <h2>{{item.nombre}}</h2>
-            <app-stars *ngIf="item.promedio" [calificacion]="item.promedio" [readOnly]="true" [size]="'x-small'"></app-stars>
-            <div *ngIf="item.tipo === 'productos'" class="medium">
-              <p *ngIf="!item.envio_gratis_pedMin && direccion || !item.repartidores_propios">Envío: {{item.envio | currency:'CAD':'symbol-narrow':'1.0-2'}} </p>
-              <p *ngIf="item.envio_gratis_pedMin && item.repartidores_propios" class="primario">Envío gratis</p>
-            </div>
-          </ion-label>
-      </ng-container>
-      <ng-template #visitadosOpen>
-          <ion-thumbnail>
-            <div style="opacity: 0.5;">
-              <ion-img [src]="item.foto" style="width: 100%;" (ionImgWillLoad)="ionImgWillLoad($event)"></ion-img>
-            </div>
-          </ion-thumbnail>
-          <ion-label style="margin-left: 0.5rem;" color="medium">
-            <h2>{{item.nombre}}</h2>
-            <p *ngIf="!item.envio_gratis_pedMin && direccion">Envío: {{item.envio | currency:'CAD':'symbol-narrow':'1.0-2'}} </p>
-            <p *ngIf="item.envio_gratis_pedMin" class="primario">Envío gratis</p>
-            <app-stars *ngIf="item.promedio" [calificacion]="item.promedio" [readOnly]="true" [size]="'x-small'"></app-stars>
-          </ion-label>
-          <ion-badge color="primary" mode="ios">Cerrado</ion-badge>
-      </ng-template>
-  </ion-item>
-</ion-card>
+<ion-item detail lines="none" (click)="verNegocio(item)" *ngFor="let item of negocios; trackBy:trackNegocios">
+    <ng-container *ngIf="item.abierto; else visitadosOpen">
+        <ion-thumbnail>
+          <ion-img [src]="item.foto" style="width: 100%" (ionImgWillLoad)="ionImgWillLoad($event)"></ion-img>
+        </ion-thumbnail>
+        <ion-label style="margin-left: 0.5rem;">
+          <h2>{{item.nombre}}</h2>
+          <app-stars *ngIf="item.promedio" [calificacion]="item.promedio" [readOnly]="true" [size]="'x-small'"></app-stars>
+          <div *ngIf="item.tipo === 'productos'" class="medium">
+            <p *ngIf="!item.envio_gratis_pedMin && direccion || !item.repartidores_propios">Envío: {{item.envio | currency:'CAD':'symbol-narrow':'1.0-2'}} </p>
+            <p *ngIf="item.envio_gratis_pedMin && item.repartidores_propios" class="primario">Envío gratis</p>
+          </div>
+        </ion-label>
+    </ng-container>
+    <ng-template #visitadosOpen>
+        <ion-thumbnail>
+          <div style="opacity: 0.5;">
+            <ion-img [src]="item.foto" style="width: 100%;" (ionImgWillLoad)="ionImgWillLoad($event)"></ion-img>
+          </div>
+        </ion-thumbnail>
+        <ion-label style="margin-left: 0.5rem;" color="medium">
+          <h2>{{item.nombre}}</h2>
+          <p *ngIf="!item.envio_gratis_pedMin && direccion">Envío: {{item.envio | currency:'CAD':'symbol-narrow':'1.0-2'}} </p>
+          <p *ngIf="item.envio_gratis_pedMin" class="primario">Envío gratis</p>
+          <app-stars *ngIf="item.promedio" [calificacion]="item.promedio" [readOnly]="true" [size]="'x-small'"></app-stars>
+        </ion-label>
+        <ion-badge color="primary" mode="ios">Cerrado</ion-badge>
+    </ng-template>
+</ion-item>

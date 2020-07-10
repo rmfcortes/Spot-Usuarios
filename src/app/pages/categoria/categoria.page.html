@@ -1,15 +1,15 @@
 <ion-header>
-    <ion-toolbar class="bg-class">
+    <ion-toolbar>
         <ion-buttons slot="start">
             <ion-button routerLink="/home">
                 <ion-icon slot="start" name="chevron-back"></ion-icon>
             </ion-button>
         </ion-buttons>
-        <ion-title class="comfortaa">{{categoria | titlecase}}</ion-title>
+        <ion-title class="comfortaa" style="font-size: x-large;">{{categoria | titlecase}}</ion-title>
     </ion-toolbar>
-    <ion-toolbar color="light">
-        <ion-segment scrollable>
-            <ion-segment-button *ngFor="let item of subCategorias" (click)="getNegociosSub(item)" class="ion-text-wrap">
+    <ion-toolbar>
+        <ion-segment scrollable style="background: white;" [value]="subCategoria">
+            <ion-segment-button [value]="item" *ngFor="let item of subCategorias" (click)="getNegociosSub(item)" class="ion-text-wrap">
                 <ion-label>{{item | titlecase}}</ion-label>
             </ion-segment-button>
         </ion-segment>

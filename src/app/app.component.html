@@ -9,10 +9,10 @@
                             Inicio
                         </ion-label>
                     </ion-item>
-                    <ion-item [routerLink]="'/region'">
+                    <ion-item (click)="verDirecciones()">
                         <ion-icon color="light" slot="start" name="location"></ion-icon>
                         <ion-label color="light">
-                            Cambiar región
+                            Dirección de entrega
                         </ion-label>
                     </ion-item>
                     <ion-item [routerLink]="'/historial'">

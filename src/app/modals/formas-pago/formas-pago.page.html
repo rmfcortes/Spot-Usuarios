@@ -1,5 +1,5 @@
 <ion-header class="ion-no-border">
-    <ion-toolbar>
+    <ion-toolbar class="fondo-content">
         <ion-buttons slot="start">
             <ion-button (click)="regresar()">
                 <ion-icon slot="start" name="chevron-back"></ion-icon>
@@ -19,7 +19,7 @@
     <ion-card style="margin-top: 1rem;">
         <!-- Aquí irían la lista de tarjetas -->
         <div *ngIf="formas_pago_aceptadas && formas_pago_aceptadas.tarjeta">
-            <ion-item detail *ngFor="let item of tarjetas" (click)="selFormaPago(item.forma, item.tipo, item.id)">
+            <ion-item detail *ngFor="let item of tarjetas" (click)="selFormaPago(item.forma, item.tipo, item.id)" lines="none">
                 <div [ngSwitch]="item.tipo">
                     <div *ngSwitchCase="'visa'">
                         <ion-thumbnail>
@@ -40,9 +40,5 @@
                 <ion-label style="margin-left: 2rem;">**** {{item.forma}}</ion-label>
             </ion-item>
         </div>
-        <ion-item detail (click)="selFormaPago('efectivo', 'efectivo', 'efectivo')">
-            <ion-icon style="margin-left: 0.5rem;" slot="start" name="cash" color="success"></ion-icon>
-            <ion-label style="margin-left: 1.75rem;" class="ion-text-wrap">Efectivo</ion-label>
-        </ion-item>
     </ion-card>
 </ion-content>

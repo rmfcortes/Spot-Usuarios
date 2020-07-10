@@ -38,10 +38,7 @@ export class CalificarPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    console.log(this.pedido)
-    this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-      this.regresar()
-    })
+    this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
   }
 
   calificar() {

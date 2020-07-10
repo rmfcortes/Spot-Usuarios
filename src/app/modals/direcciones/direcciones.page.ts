@@ -134,8 +134,7 @@ export class DireccionesPage implements OnInit {
           }
         } else {
           this.dirReady = false
-          this.alertService.presentAlert('',
-            'Lo sentimos. Ha surgido un error ')
+          this.alertService.presentAlert('', 'Lo sentimos. Ha surgido un error ')
         }
       })
     })
@@ -146,14 +145,17 @@ export class DireccionesPage implements OnInit {
     this.map = google.maps
     this.geocoder.geocode({'placeId': id}, (results, status) => {
       this.ngZone.run(async () => {
+        console.log(status);
         if (status === 'OK') {
           if (results[0]) {
             this.comparaCobertura(results[0])
           }
+        } else if (status === 'ZERO_RESULTS'){
+          this.dirReady = false
+          this.alertService.presentAlert('', 'No hay coincidencias de ubicación para esta dirección')
         } else {
           this.dirReady = false
-          this.alertService.presentAlert('',
-            'Lo sentimos. Ha surgido un error ')
+          this.alertService.presentAlert('', 'Lo sentimos. Ha surgido un error ')
         }
       })
     })

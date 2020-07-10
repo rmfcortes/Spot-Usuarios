@@ -47,14 +47,14 @@
                 </ion-item>
             </div>
             <div style="background: white; z-index: 150; position: sticky; top: 2rem">
-                <ion-segment scrollable>
-                    <ion-segment-button (click)="resetProds()">
+                <ion-segment scrollable [value]="pasilloFiltro ? pasilloFiltro : 'todos'">
+                    <ion-segment-button (click)="resetProds()" [value]="'todos'">
                         Todos
                     </ion-segment-button>
-                    <ion-segment-button (click)="resetProds('Ofertas')" *ngIf="hasOfertas">
+                    <ion-segment-button (click)="resetProds('Ofertas')" *ngIf="hasOfertas" [value]="'ofertas'">
                         Ofertas
                     </ion-segment-button>
-                    <ion-segment-button (click)="resetProds(item.nombre)" *ngFor="let item of pasillos.pasillos">
+                    <ion-segment-button (click)="resetProds(item.nombre)" *ngFor="let item of pasillos.pasillos" [value]="item">
                         {{item.nombre}}
                     </ion-segment-button>
                 </ion-segment>

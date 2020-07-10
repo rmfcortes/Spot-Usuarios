@@ -54,7 +54,7 @@ export class CategoriasService {
 
   getMasVendidos() {
     const region = this.uidService.getRegion()
-    return this.db.list(`vendidos/${region}`).valueChanges()
+    return this.db.list(`vendidos/${region}`, data => data.orderByChild('ventas').limitToLast(15)).valueChanges()
   }
 
   getVisitas(uid: string) {
@@ -71,7 +71,7 @@ export class CategoriasService {
   getVisitasNegocios(uid: string): Promise<visistasNegocio[]> {
     return new Promise((resolve, reject) => {
       const region = this.uidService.getRegion()
-      const visSub = this.db.list(`usuarios/${uid}/visitasNegocio/${region}`, data => data.orderByChild('visitas').limitToLast(5)).valueChanges()
+      const visSub = this.db.list(`usuarios/${uid}/visitasNegocio/${region}`, data => data.orderByChild('visitas').limitToLast(15)).valueChanges()
         .subscribe((visitas: visistasNegocio[]) => {
           visSub.unsubscribe()
           resolve(visitas)

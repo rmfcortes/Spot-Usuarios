@@ -1,5 +1,5 @@
 <ion-header class="ion-no-border">
-    <ion-toolbar>
+    <ion-toolbar class="fondo-content">
         <ion-buttons slot="start">
             <ion-button (click)="regresar()">
                 <ion-icon slot="start" name="chevron-back"></ion-icon>
@@ -35,7 +35,8 @@
                     <ion-spinner name="dots" color="light"></ion-spinner>
                 </ng-container>
                 <ng-template #loadingTemp>
-                    Guardar
+                    <ion-icon name="lock-closed" style="margin-right: 0.5rem;"></ion-icon>
+                    Agregar tarjeta
                 </ng-template>
             </ion-button>
             <ion-item lines="none" style="text-align: center;">

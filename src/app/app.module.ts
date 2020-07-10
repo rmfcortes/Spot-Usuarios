@@ -30,6 +30,9 @@ import { IonicStorageModule } from '@ionic/storage';
 import { ChatPageModule } from './modals/chat/chat.module';
 import { enterPageAnimation } from './animations/nav';
 
+import { DireccionesPageModule } from 'src/app/modals/direcciones/direcciones.module';
+
+
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
@@ -45,6 +48,7 @@ import { enterPageAnimation } from './animations/nav';
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireAuthModule,
     AngularFireDatabaseModule,
+    DireccionesPageModule,
     ChatPageModule,
   ],
   providers: [

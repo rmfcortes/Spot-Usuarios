@@ -41,10 +41,18 @@ export class HomePage implements OnInit, OnDestroy {
   hayMas = false
 
   slideOpts = {
-    centeredSlides: true,
+    centeredSlides: false,
     initialSlide: 0,
     slidesPerView: 1.2,
     speed: 400,
+    freeMode: true
+  }
+
+  slideVendidos = {
+    centeredSlides: false,
+    initialSlide: 0,
+    slidesPerView: 2.2,
+    freeMode: true
   }
 
   sld = {

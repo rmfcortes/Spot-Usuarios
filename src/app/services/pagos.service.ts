@@ -31,19 +31,19 @@ export class PagosService {
         pagoSub.unsubscribe()
         resolve(tarjetas)
       }, err => reject('No pudimos obtener tus tarjetas guardadas' + err))
-    });
+    })
   }
   
   async guardarFormaPago(pago: FormaPago) {
     return new Promise(async (resolve, reject) => {      
       try {      
-        const uid = this.uidService.getUid();
-        await this.db.object(`usuarios/${uid}/forma-pago/ultima`).update(pago);
+        const uid = this.uidService.getUid()
+        await this.db.object(`usuarios/${uid}/forma-pago/ultima`).set(pago)
         resolve()
       } catch (error) {
         reject(error)
       }
-    });
+    })
   }
 
   newCard(cliente): Promise<any> {

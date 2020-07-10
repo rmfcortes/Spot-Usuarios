@@ -4,6 +4,8 @@ import { Subscription } from 'rxjs';
 
 import { CalificarPage } from '../calificar/calificar.page';
 
+import { AnimationsService } from 'src/app/services/animations.service';
+
 import { Pedido } from 'src/app/interfaces/pedido';
 
 import { enterAnimation } from 'src/app/animations/enter';
@@ -17,19 +19,18 @@ import { leaveAnimation } from 'src/app/animations/leave';
 })
 export class PedidoActivoPage implements OnInit {
 
-  @Input() pedido: Pedido;
+  @Input() pedido: Pedido
 
-  back: Subscription;
+  back: Subscription
 
   constructor(
     private platform: Platform,
     private modalCtrl: ModalController,
+    private animationService: AnimationsService,
   ) { }
 
   ngOnInit() {
-    // this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-    //   this.regresar();
-    // });
+    this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
   }
 
   async verCalificar() {
@@ -39,13 +40,17 @@ export class PedidoActivoPage implements OnInit {
      leaveAnimation,
      component: CalificarPage,
      componentProps: { pedido: this.pedido }
-    });
-    return await modal.present();
+    })
+    return await modal.present()
+  }
+
+  ionImgWillLoad(image) {
+    this.animationService.enterAnimation(image.target)
   }
 
   regresar() {
-    if (this.back) {this.back.unsubscribe()}
-    this.modalCtrl.dismiss();
+    if (this.back) this.back.unsubscribe()
+    this.modalCtrl.dismiss()
   }
 
 }
