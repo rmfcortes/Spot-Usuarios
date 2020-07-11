@@ -24,7 +24,7 @@ export class CategoriaPage implements OnInit, OnDestroy{
   @ViewChild(IonInfiniteScroll, {static: false}) infiniteScroll: IonInfiniteScroll
 
   categoria: string
-  subCategorias: string[]
+  subCategorias: string[] = []
   ofertas: Oferta[] = []
   negocios: Negocio[] = []
   status = 'abiertos'
@@ -43,6 +43,14 @@ export class CategoriaPage implements OnInit, OnDestroy{
     centeredSlides: false,
     initialSlide: 0,
     slidesPerView: 1.2,
+    speed: 400,
+    freeMode: true
+  }
+
+  slideCategorias = {
+    centeredSlides: false,
+    initialSlide: 0,
+    slidesPerView: 4.5,
     speed: 400,
     freeMode: true
   }

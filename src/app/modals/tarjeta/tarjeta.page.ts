@@ -109,8 +109,8 @@ export class TarjetaPage implements OnInit {
     if (!Conekta.card.validateNumber(newCard.number)) return this.tarjetaInvalida('Número de tarjeta inválido.');
     if (!Conekta.card.validateExpirationDate(newCard.exp_month, newCard.exp_year)) return this.tarjetaInvalida('Fecha de vencimiento inválida');
     if (!Conekta.card.validateCVC(newCard.cvc)) return this.tarjetaInvalida('Código de seguridad inválido');
-    newCard.tipo = Conekta.card.getBrand(newCard.number);
-    Conekta.card.validateNumber(newCard.number);
+    newCard.tipo = Conekta.card.getBrand(newCard.number)
+    Conekta.card.validateNumber(newCard.number)
     Conekta.Token.create({card: newCard}, (response: any) => {
       if (response.id && response.object === 'token') {
         const data: FormaPago = {

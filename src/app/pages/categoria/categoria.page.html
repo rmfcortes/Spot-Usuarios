@@ -1,5 +1,5 @@
-<ion-header>
-    <ion-toolbar>
+<ion-header class="ion-no-border">
+    <ion-toolbar class="fondo-content">
         <ion-buttons slot="start">
             <ion-button routerLink="/home">
                 <ion-icon slot="start" name="chevron-back"></ion-icon>
@@ -7,8 +7,8 @@
         </ion-buttons>
         <ion-title class="comfortaa" style="font-size: x-large;">{{categoria | titlecase}}</ion-title>
     </ion-toolbar>
-    <ion-toolbar>
-        <ion-segment scrollable style="background: white;" [value]="subCategoria">
+    <ion-toolbar class="fondo-content" *ngIf="subCategorias.length > 1">
+        <ion-segment scrollable [value]="subCategoria">
             <ion-segment-button [value]="item" *ngFor="let item of subCategorias" (click)="getNegociosSub(item)" class="ion-text-wrap">
                 <ion-label>{{item | titlecase}}</ion-label>
             </ion-segment-button>
@@ -20,26 +20,24 @@
 
 <ion-content>
     <ng-container *ngIf="promosReady; else promoTemplate">
-        <ion-card *ngIf="ofertas.length > 0">
-            <ion-grid *ngIf="ofertas.length > 0" class="ion-no-padding">
-                <ion-row>
-                    <ion-col size="8">
-                        <h2 style="margin-left: 1rem; color: var(--ion-color-primary)">Promociones</h2>
-                    </ion-col>
-                    <ion-col size="4" *ngIf="hayMas" (click)="verOfertas()" class="ion-align-self-center">
-                        <ion-label color="primary" style="font-size: smaller; float: right; ; margin-right: 1.2rem;">Ver todas</ion-label>
-                    </ion-col>
-                </ion-row>
-            </ion-grid>
-            <ion-slides [options]="slideOpts" style="margin-bottom: 1rem;">
-                <ion-slide *ngFor="let item of ofertas" (click)="irAOferta(item)" style="padding: 0 0.5rem;">
-                    <preload-image [ratio]="{w: 1, h: 0.45}" [src]="item.foto" class="radius"></preload-image>
-                </ion-slide>
-                <ion-slide *ngIf="hayMas" (click)="verOfertas()" style="padding: 0 0.5rem;">
-                    <ion-img src="../../../assets/img/botones/verTodas.png"></ion-img>
-                </ion-slide>
-            </ion-slides>
-        </ion-card>
+        <ion-grid *ngIf="ofertas.length > 0" class="ion-no-padding">
+            <ion-row>
+                <ion-col size="8">
+                    <h2 style="margin-left: 1rem">Promociones</h2>
+                </ion-col>
+                <ion-col size="4" *ngIf="hayMas" (click)="verOfertas()" class="ion-align-self-center">
+                    <ion-label color="primary" style="font-size: smaller; float: right; ; margin-right: 1.2rem;">Ver todas</ion-label>
+                </ion-col>
+            </ion-row>
+        </ion-grid>
+        <ion-slides [options]="slideOpts" style="margin-bottom: 1rem;">
+            <ion-slide *ngFor="let item of ofertas" (click)="irAOferta(item)" style="padding: 0 0.5rem;">
+                <preload-image [ratio]="{w: 1, h: 0.45}" [src]="item.foto" class="radius"></preload-image>
+            </ion-slide>
+            <ion-slide *ngIf="hayMas" (click)="verOfertas()" style="padding: 0 0.5rem;">
+                <ion-img src="../../../assets/img/botones/verTodas.png"></ion-img>
+            </ion-slide>
+        </ion-slides>
     </ng-container>
     <ng-template #promoTemplate>
         <ion-list>
@@ -56,7 +54,6 @@
     <ng-container *ngIf="promosReady && negociosReady; else negTemplate">
         <ng-container *ngIf="negocios.length > 0; else hayNegTemplate">
             <ion-card>
-                <h2 style="margin-left: 1rem; color: var(--ion-color-primary)">Recomendados para ti</h2>
                 <app-negocio [negocios]="negocios" (verNeg)="verNegocio($event)"></app-negocio>
                 <div style="height: 1rem;"></div>
             </ion-card>

@@ -173,38 +173,6 @@
                             Agregar tarjeta de crédito
                         </ion-button>
                     </ion-item>
-                    <!-- <ion-item (click)="formasPago()" lines="none" detail style="--detail-icon-color: var(--ion-color-primary)">
-                        <ng-container *ngIf="formaPago; else formaPagoTemp">
-                            <ion-label color="medium" class="ion-text-wrap">Forma de pago</ion-label>
-                            <ng-container *ngIf="formaPago.tipo === 'efectivo'; else iconPagoTemp">
-                                <ion-icon slot="start" name="cash" color="success"></ion-icon>
-                                <ion-label slot="end">{{formaPago.forma | titlecase}}</ion-label>
-                            </ng-container>
-                            <ng-template #iconPagoTemp>
-                                <div [ngSwitch]="formaPago.tipo">
-                                    <div *ngSwitchCase="'visa'">
-                                        <ion-thumbnail>
-                                            <img style="padding: 0.5rem;" src="../../../assets/img/iconos/Visa_Inc._logo.svg.png" />
-                                        </ion-thumbnail>
-                                    </div>
-                                    <div *ngSwitchCase="'mastercard'">
-                                        <ion-thumbnail>
-                                            <img style="padding: 0.5rem;" src="../../../assets/img/iconos/mastercard.png" />
-                                        </ion-thumbnail>
-                                    </div>
-                                    <div *ngSwitchCase="'amex'">
-                                        <ion-thumbnail>
-                                            <img style="padding: 0.5rem;" src="../../../assets/img/iconos/amex.jpg" />
-                                        </ion-thumbnail>
-                                    </div>
-                                </div>
-                                <ion-label style="margin-left: 2rem;">**** {{formaPago.forma}}</ion-label>
-                            </ng-template>
-                        </ng-container>
-                        <ng-template #formaPagoTemp>
-                            <ion-label>Agregar forma de pago</ion-label>
-                        </ng-template>
-                    </ion-item> -->
                 </div>
 
                 <div style="height: 1.5rem; background: #e7e7e7e5;"></div>

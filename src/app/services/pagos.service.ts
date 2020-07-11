@@ -58,7 +58,7 @@ export class PagosService {
         .then(res => resolve(res),
          err => reject(err.error.text)
         )
-        .catch(err => reject(err.error.text))
+        .catch(err => reject(err.error))
       } else {
         const httpOptions = {
           headers: new HttpHeaders({
@@ -72,10 +72,11 @@ export class PagosService {
             resolve(res)
           },
           err => {
+            console.log(err);
             if (err.status === 200) {
               resolve()
             } else {
-              reject(err.error.text)
+              reject(err.error)
             }
           })
       }

@@ -3,31 +3,31 @@
         <ion-menu type="overlay" contentId="main-content" swipeGesture="false">
             <ion-content class="bg">
                 <ion-menu-toggle auto-hide="false">
-                    <ion-item [routerLink]="'/home'" style="margin-top: 2rem;">
+                    <ion-item [routerLink]="'/home'" style="margin-top: 2rem;" lines="none">
                         <ion-icon color="light" slot="start" name="home"></ion-icon>
                         <ion-label color="light">
                             Inicio
                         </ion-label>
                     </ion-item>
-                    <ion-item (click)="verDirecciones()">
+                    <ion-item (click)="verDirecciones()" lines="none">
                         <ion-icon color="light" slot="start" name="location"></ion-icon>
                         <ion-label color="light">
                             Dirección de entrega
                         </ion-label>
                     </ion-item>
-                    <ion-item [routerLink]="'/historial'">
+                    <ion-item [routerLink]="'/historial'" lines="none">
                         <ion-icon color="light" slot="start" name="folder"></ion-icon>
                         <ion-label color="light">
                             Historial pedidos
                         </ion-label>
                     </ion-item>
-                    <ion-item (click)="soporte()" *ngIf="uid">
+                    <ion-item (click)="soporte()" *ngIf="uid" lines="none">
                         <ion-icon color="light" slot="start" name="people"></ion-icon>
                         <ion-label color="light">
                             Soporte
                         </ion-label>
                     </ion-item>
-                    <ion-item (click)="salir()">
+                    <ion-item (click)="salir()" lines="none">
                         <ion-icon color="light" slot="start" name="log-out"></ion-icon>
                         <ion-label color="light">
                             Cerrar sesión
