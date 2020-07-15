@@ -187,7 +187,7 @@
     <ng-container *ngIf="pedidosReady && catsReady && promosReady && catsReady && visitadosReady; else visTemplate">
         <ion-card *ngIf="negociosVisitados.length > 0">
             <h2 style="margin-left: 1rem; color: var(--ion-color-primary)">Tus favoritos</h2>
-            <app-negocio [negocios]="negociosVisitados" (verNeg)="verProductoConInfo($event)"></app-negocio>
+            <app-negocio [negocios]="negociosVisitados" [direccion]="direccion" (verNeg)="verProductoConInfo($event)"></app-negocio>
             <div style="height: 1rem;"></div>
         </ion-card>
     </ng-container>
@@ -207,7 +207,7 @@
     <div *ngIf="pedidosReady && catsReady && promosReady && catsReady && visitadosReady && popularesReady">
         <ion-card style="margin-top: 0.75rem;">
             <h2 style="margin-left: 1rem; color: var(--ion-color-primary)" *ngIf="negociosPopulares.length > 0">Los más populares</h2>
-            <app-negocio [negocios]="negociosPopulares" (verNeg)="verProductoConInfo($event)"></app-negocio>
+            <app-negocio [negocios]="negociosPopulares" [direccion]="direccion" (verNeg)="verProductoConInfo($event)"></app-negocio>
             <div style="height: 1rem;"></div>
         </ion-card>
     </div>

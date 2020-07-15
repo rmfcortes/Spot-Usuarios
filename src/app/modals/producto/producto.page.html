@@ -9,6 +9,7 @@
 </ion-header>
 
 <ion-content>
+    <!-- Descripción del producto -->
     <ion-card>
         <ion-item lines="none">
             <ion-thumbnail>
@@ -26,6 +27,8 @@
             <ion-label color="medium" class="ion-text-wrap">{{producto.descripcion}}</ion-label>
         </ion-item>
     </ion-card>
+
+    <!-- Listas de complementos -->
     <ion-card *ngFor="let item of variables; let i = index">
         <ng-container *ngIf="item.limite > 1; else limTemplate">
             <ion-list-header>
@@ -35,8 +38,8 @@
                 </ion-label>
                 <ion-badge color="primary" style="margin-right: 0.75rem;" *ngIf="item.obligatorio">Obligatorio</ion-badge>
             </ion-list-header>
-            <ion-item *ngFor="let prod of item.productos; let y = index">
-                <ion-label>{{prod.nombre | titlecase}}</ion-label>
+            <ion-item *ngFor="let prod of item.productos; let y = index" lines="none">
+                <ion-label class="ion-text-wrap">{{prod.nombre | titlecase}}</ion-label>
                 <ion-note slot="end" *ngIf="prod.precio > 0">+{{prod.precio}}</ion-note>
                 <ion-checkbox slot="end" [(ngModel)]="prod.isChecked" [disabled]="prod.deshabilitado" (ionChange)="checkChange(i, y, prod.isChecked)"></ion-checkbox>
             </ion-item>
@@ -47,8 +50,8 @@
                     <ion-label color="primary">{{item.titulo | titlecase}}</ion-label>
                     <ion-badge color="primary" style="margin-right: 0.75rem;" *ngIf="item.obligatorio">Obligatorio</ion-badge>
                 </ion-list-header>
-                <ion-item *ngFor="let c of item.productos; let y = index">
-                    <ion-label>{{c.nombre | titlecase}}</ion-label>
+                <ion-item *ngFor="let c of item.productos; let y = index" lines="none">
+                    <ion-label class="ion-text-wrap">{{c.nombre | titlecase}}</ion-label>
                     <ion-note slot="end" *ngIf="c.precio > 0">+{{c.precio}}</ion-note>
                     <ion-radio slot="end" color="primary" [value]="y"></ion-radio>
                 </ion-item>
@@ -87,7 +90,7 @@
 <ion-footer>
     <ion-toolbar>
         <ion-button class="boton-cart ion-text-wrap" expand="block" color="primary" (click)="agregarProducto()" [disabled]="!canContinue" shape="round">
-            <strong style="margin-right: 0.5rem;">Agregar al carrito:</strong> {{producto.total | currency:'CAD':'symbol-narrow':'1.0-0'}}
+            <strong style="margin: 0.5rem">Agregar al carrito:</strong> {{producto.total | currency:'CAD':'symbol-narrow':'1.0-0'}}
         </ion-button>
     </ion-toolbar>
 </ion-footer>

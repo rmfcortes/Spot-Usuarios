@@ -285,10 +285,11 @@ export class NegocioPage {
       idNegocio: this.negocio.id,
       categoria: this.categoria,
       envio: this.negocio.envio,
-      repartidores_propios: this.negocio.repartidores_propios,
-      envio_gratis_pedMin: this.negocio.envio_gratis_pedMin,
-      envio_costo_fijo: this.negocio.envio_costo_fijo
+      repartidores_propios: this.negocio.repartidores_propios ? this.negocio.repartidores_propios : false,
+      envio_gratis_pedMin: this.negocio.envio_gratis_pedMin ? this.negocio.envio_gratis_pedMin : null,
+      envio_costo_fijo: this.negocio.envio_costo_fijo ? this.negocio.envio_costo_fijo : false
     }
+    console.log(datos);
     const modal = await this.modalController.create({
       component: CuentaPage,
       enterAnimation,

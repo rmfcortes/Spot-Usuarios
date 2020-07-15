@@ -219,15 +219,14 @@ export class AvancesPage implements OnInit {
         } else {
           this.infoReady = true
         }
-      });
+      })
     }
     if (this.pedido.repartidor && this.pedido.entrega && this.pedido.entrega === 'inmediato') {
       this.infoReady = true
       this.trackRepartidor()
     }
-    if (this.pedido.entrega === 'indefinido') {
-      this.trackTipoEntrega()
-    }
+    if (this.pedido.entrega === 'indefinido') this.trackTipoEntrega()
+    if (this.pedido.entrega === 'planeado') this.infoReady = true
   }
 
   async getTelefono() {

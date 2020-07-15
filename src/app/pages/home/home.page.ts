@@ -51,16 +51,28 @@ export class HomePage implements OnInit, OnDestroy {
   slideCategorias = {
     centeredSlides: false,
     initialSlide: 0,
-    slidesPerView: 4.5,
     speed: 400,
-    freeMode: true
+    freeMode: true,
+    breakpoints: {
+      // when window width is =< 200px
+      200: { slidesPerView: 2.5 },
+      380: { slidesPerView: 3.3 },
+      640: { slidesPerView: 4.5 },
+      900: { slidesPerView: 5.5}
+    }
   }
 
   slideVendidos = {
     centeredSlides: false,
     initialSlide: 0,
-    slidesPerView: 2.2,
     freeMode: true,
+    breakpoints: {
+      // when window width is =< 200px
+      200: { slidesPerView: 1.3 },
+      380: { slidesPerView: 1.3 },
+      640: { slidesPerView: 2.3 },
+      900: { slidesPerView: 3.5}
+    }
   }
 
   pedidos: Pedido[] = []

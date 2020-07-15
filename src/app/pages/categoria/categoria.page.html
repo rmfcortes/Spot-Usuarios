@@ -54,7 +54,7 @@
     <ng-container *ngIf="promosReady && negociosReady; else negTemplate">
         <ng-container *ngIf="negocios.length > 0; else hayNegTemplate">
             <ion-card>
-                <app-negocio [negocios]="negocios" (verNeg)="verNegocio($event)"></app-negocio>
+                <app-negocio [negocios]="negocios" [direccion]="direccion" (verNeg)="verNegocio($event)"></app-negocio>
                 <div style="height: 1rem;"></div>
             </ion-card>
         </ng-container>

@@ -1,6 +1,7 @@
 <ng-container *ngIf="!error; else errorTemplate">
     <ng-container *ngIf="portada; else infoTemplate">
         <ion-content>
+            <!-- Portada y datos de envío -->
             <div style="background: white !important;">
                 <div class="portada_box shadow">
                     <img style="width: 100%;" [src]="portada" alt="">
@@ -38,6 +39,7 @@
                 </div>
                 <div style="height: 2rem"></div>
             </div>
+            <!-- Header, nombre de Negocio -->
             <div class="header">
                 <ion-item lines="none">
                     <ion-icon slot="start" color="primary" name="chevron-back" style="font-size: medium;" (click)="regresar()"></ion-icon>
@@ -46,19 +48,25 @@
                     </ion-label>
                 </ion-item>
             </div>
-            <div style="background: white; z-index: 150; position: sticky; top: 2rem">
-                <ion-segment scrollable [value]="pasilloFiltro ? pasilloFiltro : 'todos'">
-                    <ion-segment-button (click)="resetProds()" [value]="'todos'">
-                        Todos
-                    </ion-segment-button>
-                    <ion-segment-button (click)="resetProds('Ofertas')" *ngIf="hasOfertas" [value]="'ofertas'">
-                        Ofertas
-                    </ion-segment-button>
-                    <ion-segment-button (click)="resetProds(item.nombre)" *ngFor="let item of pasillos.pasillos" [value]="item">
-                        {{item.nombre}}
-                    </ion-segment-button>
-                </ion-segment>
-            </div>
+            <!-- Segment -->
+            <ng-container *ngIf="pasillos.pasillos.length > 1; else segmentTemplate">
+                <div style="background: white; z-index: 150; position: sticky; top: 2rem">
+                    <ion-segment scrollable [value]="pasilloFiltro ? pasilloFiltro : 'todos'">
+                        <ion-segment-button (click)="resetProds()" [value]="'todos'">
+                            Todos
+                        </ion-segment-button>
+                        <ion-segment-button (click)="resetProds('Ofertas')" *ngIf="hasOfertas" [value]="'ofertas'">
+                            Ofertas
+                        </ion-segment-button>
+                        <ion-segment-button (click)="resetProds(item.nombre)" *ngFor="let item of pasillos.pasillos" [value]="item">
+                            {{item.nombre}}
+                        </ion-segment-button>
+                    </ion-segment>
+                </div>
+            </ng-container>
+            <ng-template #segmentTemplate>
+                <div style="height: 1rem; background: white; z-index: 150; position: sticky; top: 2rem"></div>
+            </ng-template>
 
             <ng-container *ngIf="cargandoProds; else cargandoTemp">
                 <ion-item lines="none">
