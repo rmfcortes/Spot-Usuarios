@@ -29,7 +29,7 @@
                     <img [src]="pedido.negocio.logo" />
                 </ion-thumbnail>
                 <ion-label>
-                    <h2 class="comfortaa">{{pedido.negocio.nombreNegocio}}</h2>
+                    <h3 class="comfortaa">{{pedido.negocio.nombreNegocio}}</h3>
                 </ion-label>
                 <ion-icon slot="end" name="call"></ion-icon>
             </ion-item>
@@ -111,7 +111,7 @@
 
 
         <!-- Mapa -->
-        <ion-card *ngIf="pedido.entrega === 'inmediato' && !pedido.cancelado_by_negocio">
+        <ion-card *ngIf="pedido.entrega === 'inmediato' && !pedido.cancelado_by_negocio || pedido.repartidor && !pedido.cancelado_by_negocio">
             <h2>Rastreo</h2>
             <div class="marco">
                 <agm-map style="height: 45vh" [latitude]="20.627006" [longitude]="-103.416554" [disableDefaultUI]="true" [streetViewControl]="false" [zoomControl]="false" [fitBounds]="true">

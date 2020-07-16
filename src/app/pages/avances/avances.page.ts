@@ -193,13 +193,13 @@ export class AvancesPage implements OnInit {
           if (resp) {
             this.pedidoSub.unsubscribe()
             this.pedido.aceptado = resp
-            this.isInmediato(id)
+            this.listenRepartidor(id)
             this.trackAvances()
           } else  this.infoReady = true
         })
       } else {
         this.trackAvances()
-        this.isInmediato(id)
+        this.listenRepartidor(id)
       }
     })
     .catch(() => {
@@ -208,8 +208,8 @@ export class AvancesPage implements OnInit {
     })
   }
 
-  isInmediato(id) {
-    if (!this.pedido.repartidor && this.pedido.entrega && this.pedido.entrega === 'inmediato') {
+  listenRepartidor(id) {
+    if (!this.pedido.repartidor && this.pedido.entrega) {
       this.repartidorSub = this.pedidoService.trackRepartidor(id).subscribe((resp: Repartidor) => {
         if (resp) {
           this.repartidorSub.unsubscribe()
@@ -253,7 +253,7 @@ export class AvancesPage implements OnInit {
     this.tipoEntregaSub = this.pedidoService.trackTipoEntrega(this.pedido.id).subscribe((tipo: string) => {
       if (tipo === 'inmediato' || tipo === 'planeado') {
         this.pedido.entrega = tipo
-        this.isInmediato(this.pedido.id)
+        this.listenRepartidor(this.pedido.id)
       }
     })
   }
