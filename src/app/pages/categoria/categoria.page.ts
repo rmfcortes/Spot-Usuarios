@@ -154,7 +154,7 @@ export class CategoriaPage implements OnInit, OnDestroy{
         } else {
           if (n.direccion && n.tipo === 'productos') {
             const distancia: number = await this.alertService.calculaDistancia(this.direccion.lat, this.direccion.lng, n.direccion.lat, n.direccion.lng)
-            n.envio = Math.ceil(distancia * this.costo_envio.costo_km + this.costo_envio.banderazo_cliente + this.costo_envio.banderazo_negocio)
+            n.envio = Math.ceil(distancia * this.costo_envio.costo_km + this.costo_envio.banderazo_cliente)
           }
         }
       }

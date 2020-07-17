@@ -123,7 +123,7 @@ export class NegocioPage {
     } else {
       if (this.negocio.direccion && this.negocio.tipo === 'productos') {
         const distancia: number = await this.commonService.calculaDistancia(this.direccion.lat, this.direccion.lng, this.negocio.direccion.lat, this.negocio.direccion.lng)
-        this.negocio.envio = Math.ceil(distancia * this.costo_envio.costo_km + this.costo_envio.banderazo_cliente + this.costo_envio.banderazo_negocio)
+        this.negocio.envio = Math.ceil(distancia * this.costo_envio.costo_km + this.costo_envio.banderazo_cliente)
       }
     }
   }

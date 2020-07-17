@@ -212,7 +212,7 @@ export class HomePage implements OnInit, OnDestroy {
         } else {
           if (n.direccion && n.tipo === 'productos') {
             const distancia: number = await this.alertService.calculaDistancia(this.direccion.lat, this.direccion.lng, n.direccion.lat, n.direccion.lng)
-            n.envio = Math.ceil(distancia * this.costo_envio.costo_km + this.costo_envio.banderazo_cliente + this.costo_envio.banderazo_negocio)
+            n.envio = Math.ceil(distancia * this.costo_envio.costo_km + this.costo_envio.banderazo_cliente)
           }
         }
       }
@@ -248,10 +248,12 @@ export class HomePage implements OnInit, OnDestroy {
       if (n.length > 0) {
         n.forEach(async (x) => {
           this.ofertaService.getStatus(x.idNegocio).then((info: InfoGral) => {
-            info.visitas = x.visitas
-            this.negociosVisitados.push(info)
-            this.negociosVisitados.sort((a, b) => b.visitas - a.visitas)
-            this.costoEnvio(this.negociosVisitados)
+            if (info) {
+              info.visitas = x.visitas
+              this.negociosVisitados.push(info)
+              this.negociosVisitados.sort((a, b) => b.visitas - a.visitas)
+              this.costoEnvio(this.negociosVisitados)
+            }
           })
         })
       }

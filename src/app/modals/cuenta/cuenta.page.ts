@@ -146,7 +146,7 @@ export class CuentaPage implements OnInit {
     return new Promise(async (resolve, reject) => {
       if (!this.datos.repartidores_propios) {
         const distancia: number = await this.alertSerivce.calculaDistancia(this.direccion.lat, this.direccion.lng, this.datosNegocio.direccion.lat, this.datosNegocio.direccion.lng)
-        return resolve(Math.ceil(distancia * this.costo_envio.costo_km + this.costo_envio.banderazo_negocio + this.costo_envio.banderazo_cliente))
+        return resolve(Math.ceil(distancia * this.costo_envio.costo_km + this.costo_envio.banderazo_cliente))
       }
       if (this.datos.envio_gratis_pedMin && this.cuenta > this.datos.envio_gratis_pedMin) return resolve(0)
       if (!this.datos.envio_costo_fijo) {
@@ -377,7 +377,6 @@ export class CuentaPage implements OnInit {
         region: this.uidService.getRegion()
       }
       if (this.formaPago.tipo !== 'efectivo') pedido.idOrder =  await this.pagoService.cobrar(pedido)
-      console.log(pedido);
       await this.pedidoService.createPedido(pedido)
       this.alertSerivce.dismissLoading()
       this.router.navigate(['/avances', pedido.id])

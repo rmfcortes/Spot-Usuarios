@@ -209,21 +209,20 @@ export class AvancesPage implements OnInit {
   }
 
   listenRepartidor(id) {
-    if (!this.pedido.repartidor && this.pedido.entrega) {
+    if (!this.pedido.repartidor) {
       this.repartidorSub = this.pedidoService.trackRepartidor(id).subscribe((resp: Repartidor) => {
         if (resp) {
           this.repartidorSub.unsubscribe()
           this.pedido.repartidor = resp
           this.infoReady = true
-          this.trackRepartidor()
+          this.isMapReady()
         } else {
           this.infoReady = true
         }
       })
-    }
-    if (this.pedido.repartidor && this.pedido.entrega && this.pedido.entrega === 'inmediato') {
+    } else {
       this.infoReady = true
-      this.trackRepartidor()
+      this.isMapReady()
     }
     if (this.pedido.entrega === 'indefinido') this.trackTipoEntrega()
     if (this.pedido.entrega === 'planeado') this.infoReady = true
@@ -265,8 +264,17 @@ export class AvancesPage implements OnInit {
     })
   }
 
+  isMapReady() {
+    if (this.map) this.trackRepartidor()
+    else {
+      setTimeout(() => {
+        this.isMapReady()
+      }, 300)
+    }
+  }
+
   trackRepartidor() {
-    if  (!this.repartidorIcon) {
+    if (!this.repartidorIcon) {
       this.repartidorIcon = {
         url: './assets/img/iconos/repartidor.png',
         size: {
@@ -309,7 +317,6 @@ export class AvancesPage implements OnInit {
         if (this.ubicacionSub) this.ubicacionSub.unsubscribe()
         if (this.entregadoSub) this.entregadoSub.unsubscribe()
         if (this.repartidorSub) this.repartidorSub.unsubscribe()
-        this.pedido.entregado = true
         this.verCalificar()
       }
     })
