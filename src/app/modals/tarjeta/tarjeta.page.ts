@@ -1,13 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-
-import { Tarjeta } from 'src/app/interfaces/tarjeta.interface';
 
 import { DisparadoresService } from 'src/app/services/disparadores.service';
 import { AnimationsService } from 'src/app/services/animations.service';
 import { PagosService } from 'src/app/services/pagos.service';
-import { UidService } from 'src/app/services/uid.service';
+
 import { FormaPago } from 'src/app/interfaces/forma-pago.interface';
+import { Tarjeta } from 'src/app/interfaces/tarjeta.interface';
 
 declare var Conekta: any;
 
@@ -43,12 +42,11 @@ export class TarjetaPage implements OnInit {
     private animationService: AnimationsService,
     private commonService: DisparadoresService,
     private pagoService: PagosService,
-    private uidService: UidService,
   ) { }
 
   ngOnInit() {
-    Conekta.setPublicKey('key_D9tzmzTnFqz2xbkTdeqQ9ZA'); //key_D9tzmzTnFqz2xbkTdeqQ9ZA
-    Conekta.setLanguage('es');
+    Conekta.setPublicKey('key_D9tzmzTnFqz2xbkTdeqQ9ZA') //key_D9tzmzTnFqz2xbkTdeqQ9ZA
+    Conekta.setLanguage('es')
   }
 
   async ayuda(titulo: string, mensaje: string, imagen: string) {
@@ -87,7 +85,7 @@ export class TarjetaPage implements OnInit {
   }
 
   moveFocus(nextElement) {
-    nextElement.setFocus();
+    nextElement.setFocus()
   }
 
   spaceKey(text: string) {
@@ -96,8 +94,8 @@ export class TarjetaPage implements OnInit {
   }
 
   agregarTarjeta() {
-    this.loading = true;
-    const vencimiento = this.tarjeta.expiracion.split('/');
+    this.loading = true
+    const vencimiento = this.tarjeta.expiracion.split('/')
     const newCard: Tarjeta = {
       number: this.tarjeta.numero,
       name: this.tarjeta.nombre,
@@ -106,9 +104,9 @@ export class TarjetaPage implements OnInit {
       cvc: this.tarjeta.cvv,
       tipo: ''
     }
-    if (!Conekta.card.validateNumber(newCard.number)) return this.tarjetaInvalida('Número de tarjeta inválido.');
-    if (!Conekta.card.validateExpirationDate(newCard.exp_month, newCard.exp_year)) return this.tarjetaInvalida('Fecha de vencimiento inválida');
-    if (!Conekta.card.validateCVC(newCard.cvc)) return this.tarjetaInvalida('Código de seguridad inválido');
+    if (!Conekta.card.validateNumber(newCard.number)) return this.tarjetaInvalida('Número de tarjeta inválido.')
+    if (!Conekta.card.validateExpirationDate(newCard.exp_month, newCard.exp_year)) return this.tarjetaInvalida('Fecha de vencimiento inválida')
+    if (!Conekta.card.validateCVC(newCard.cvc)) return this.tarjetaInvalida('Código de seguridad inválido')
     newCard.tipo = Conekta.card.getBrand(newCard.number)
     Conekta.card.validateNumber(newCard.number)
     Conekta.Token.create({card: newCard}, (response: any) => {
@@ -124,7 +122,7 @@ export class TarjetaPage implements OnInit {
         }
         this.pagoService.newCard(cliente)
         .then(() => this.pagoService.saveCard(data))
-        .then(() => {
+        .then(async () => {
           this.loading = false
           this.modalCtrl.dismiss(data)
         })
@@ -142,11 +140,11 @@ export class TarjetaPage implements OnInit {
 
   tarjetaInvalida(msn: string) {
     this.loading = false
-    this.commonService.presentAlert('Error', msn);
+    this.commonService.presentAlert('Error', msn)
   }
 
-  regresar() {
-    this.modalCtrl.dismiss();
+  async regresar() {
+    this.modalCtrl.dismiss()
   }
 
 }

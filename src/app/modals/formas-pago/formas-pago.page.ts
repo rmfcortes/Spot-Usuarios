@@ -11,6 +11,7 @@ import { FormaPagoPermitida } from 'src/app/interfaces/pedido';
 
 import { enterAnimationDerecha } from 'src/app/animations/enterDerecha';
 import { leaveAnimationDerecha } from 'src/app/animations/leaveDerecha';
+import { UidService } from 'src/app/services/uid.service';
 
 @Component({
   selector: 'app-formas-pago',
@@ -25,18 +26,30 @@ export class FormasPagoPage implements OnInit {
 
   err: string
 
+  script: HTMLScriptElement
+
   constructor(
     private modalCtrl: ModalController,
     private alertService: DisparadoresService,
     private pagoService: PagosService,
+    private uidService: UidService,
   ) { }
 
   ngOnInit() {
     this.getTarjetas()
-    const script = document.createElement('script')
-    script.src = 'https://cdn.conekta.io/js/latest/conekta.js'
-    script.async = true
-    document.body.appendChild(script)
+  }
+
+  loadConekta() {
+    return new Promise((resolve, reject) => {      
+      this.script = document.createElement('script')
+      this.script.src = 'https://cdn.conekta.io/js/latest/conekta.js'
+      this.script.async = true
+      document.body.appendChild(this.script)
+      this.uidService.setConekta()
+      setTimeout(() => {
+        resolve()
+      }, 1000)
+    })
   }
 
   getTarjetas() {
@@ -46,17 +59,18 @@ export class FormasPagoPage implements OnInit {
   }
 
   async nuevaTarjeta() {
+    const conekta = this.uidService.getConekta()
+    if (!conekta) await this.loadConekta()
     const modal = await this.modalCtrl.create({
       component: TarjetaPage,
       enterAnimation: enterAnimationDerecha,
       leaveAnimation: leaveAnimationDerecha,
-    });
+      componentProps: {script: this.script}
+    })
 
-    modal.onWillDismiss().then(resp => {
-      if (resp.data) this.tarjetas.push(resp.data)
-    });
+    modal.onWillDismiss().then(resp => resp.data ? this.tarjetas.push(resp.data) : null)
 
-    return await modal.present();
+    return await modal.present()
   }
 
   async selFormaPago(forma, tipo, id) {
@@ -66,7 +80,7 @@ export class FormasPagoPage implements OnInit {
       id
     }
     try {
-      await this.pagoService.guardarFormaPago(pago);
+      await this.pagoService.guardarFormaPago(pago)
       this.modalCtrl.dismiss(pago)
     } catch (error) {
       this.alertService.presentAlert(

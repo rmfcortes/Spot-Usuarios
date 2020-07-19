@@ -125,6 +125,7 @@ export class PagosService {
             resolve(resp)
           },
           err => {
+            console.log(err);
             if (err.status === 200) resolve(err.error.text)
             else reject(err.error)
           })

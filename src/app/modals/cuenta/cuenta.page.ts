@@ -6,7 +6,6 @@ import { Subscription } from 'rxjs';
 import { DireccionesPage } from '../direcciones/direcciones.page';
 import { FormasPagoPage } from '../formas-pago/formas-pago.page';
 import { ProductoPage } from '../producto/producto.page';
-import { TarjetaPage } from '../tarjeta/tarjeta.page';
 
 import { DisparadoresService } from 'src/app/services/disparadores.service';
 import { AnimationsService } from 'src/app/services/animations.service';
@@ -44,8 +43,13 @@ export class CuentaPage implements OnInit {
 
   direccion: Direccion
   formaPago: FormaPago
-  ultimoPago: FormaPago
   tarjetas: FormaPago[] = []
+
+  pago_en_efectivo: FormaPago = {
+    forma: 'efectivo',
+    tipo: 'efectivo',
+    id: 'efectivo'
+  }
 
   direcciones = []
 
@@ -84,17 +88,7 @@ export class CuentaPage implements OnInit {
 
   err: string
 
-  pago_en_efectivo: FormaPago = {
-    forma: 'efectivo',
-    id: 'efectivo',
-    tipo: 'efectivo',
-  }  
-
-  pago_vacio: FormaPago = {
-    forma: '',
-    id: '',
-    tipo: '',
-  }
+  script: HTMLScriptElement
 
   constructor(
     private router: Router,
@@ -114,8 +108,6 @@ export class CuentaPage implements OnInit {
     this.getDireccion()
     this.getCart()
     this.calculaPropina(this.propina_sel)
-    const conekta = this.uidService.getConekta()
-    if (!conekta) this.loadConekta()
     this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
       this.closeCart()
     })
@@ -170,11 +162,9 @@ export class CuentaPage implements OnInit {
         if (forma.tipo === 'efectivo') {
           this.comision = 0
           if (this.datosNegocio.formas_pago.efectivo) this.formaPago = forma
-          else this.formaPago = this.pago_vacio
         } else {
           if (this.datosNegocio.formas_pago.tarjeta) {
             this.formaPago = forma
-            this.ultimoPago = forma
             this.tarjetas = this.tarjetas.filter(t => t.id !== forma.id)
             this.comision = ((this.cuenta * 0.04) + 3) * 1.16
           } else {
@@ -182,12 +172,6 @@ export class CuentaPage implements OnInit {
             this.formaPago = this.pago_en_efectivo
           }
         }
-      } else {
-        if (this.datosNegocio.formas_pago.efectivo) {
-          this.formaPago = this.pago_en_efectivo
-          this.comision = 0
-        }
-        else this.formaPago = this.pago_vacio
       }
       this.infoReady = true
     })
@@ -263,27 +247,6 @@ export class CuentaPage implements OnInit {
     })
   }
 
-  async nuevaTarjeta() {
-    const modal = await this.modalCtrl.create({
-      component: TarjetaPage,
-      enterAnimation: enterAnimationDerecha,
-      leaveAnimation: leaveAnimationDerecha,
-    })
-
-    modal.onWillDismiss().then(resp => {
-      if (resp.data) {
-        console.log(resp.data);
-        if (this.tarjetas.length >= 2) {
-          if (this.ultimoPago) this.tarjetas.unshift(this.ultimoPago)
-          this.ultimoPago = resp.data
-        } else this.tarjetas.push(resp.data)
-        this.formaPago = resp.data
-      }
-    })
-
-    return await modal.present()
-  }
-
   async formasPago() {
     const modal = await this.modalCtrl.create({
       component: FormasPagoPage,
@@ -291,33 +254,18 @@ export class CuentaPage implements OnInit {
       leaveAnimation: leaveAnimationDerecha,
       componentProps: {formas_pago_aceptadas: this.datosNegocio.formas_pago}
     })
-    modal.onWillDismiss().then(resp => {
-      if (resp.data) {
-        this.formaPago = resp.data
-        this.ultimoPago = resp.data
-      }
-    })
+    modal.onWillDismiss().then(resp => resp.data ? this.formaPago = resp.data : null)
 
     return await modal.present()
-  }
-
-  async selFormaPago(event) {
-    if (event === 'efectivo') this.formaPago = this.pago_en_efectivo
-    else {
-      const i: number = this.tarjetas.findIndex(t => t.id === event)
-      let pago: FormaPago
-      if (i >= 0) pago = this.tarjetas[i]
-      else pago = this.ultimoPago
-      this.formaPago = pago
-    }
-    this.pagoService.guardarFormaPago(this.formaPago)
-    if (this.formaPago.tipo === 'efectivo') this.comision = 0
-    else this.comision = ((this.cuenta * 0.04) + 3) * 1.16
   }
 
   // Salida
 
   async ordenar() {
+    if (this.comision > 0) this.comision = Math.round((this.comision + Number.EPSILON) * 100) / 100
+    if (this.datosNegocio.envio > 0) this.datosNegocio.envio = Math.round((this.datosNegocio.envio + Number.EPSILON) * 100) / 100
+    if (this.propina) this.propina = Math.round((this.propina + Number.EPSILON) * 100) / 100
+    this.cuenta = Math.round((this.cuenta + Number.EPSILON) * 100) / 100
     if (!this.direccion) {
       this.alertSerivce.presentAlertAction(
         'Agrega dirección',
@@ -376,6 +324,7 @@ export class CuentaPage implements OnInit {
         formaPago: this.formaPago,
         region: this.uidService.getRegion()
       }
+      pedido.total = Math.round((pedido.total + Number.EPSILON) * 100) / 100
       if (this.formaPago.tipo !== 'efectivo') pedido.idOrder =  await this.pagoService.cobrar(pedido)
       await this.pedidoService.createPedido(pedido)
       this.alertSerivce.dismissLoading()
@@ -429,11 +378,15 @@ export class CuentaPage implements OnInit {
   }
 
   loadConekta() {
-    const script = document.createElement('script')
-    script.src = 'https://cdn.conekta.io/js/latest/conekta.js'
-    script.async = true
-    document.body.appendChild(script)
-    this.uidService.setConekta()
+    return new Promise((resolve, reject) => {      
+      this.script = document.createElement('script')
+      this.script.src = 'https://cdn.conekta.io/js/latest/conekta.js'
+      this.script.async = true
+      document.body.appendChild(this.script)
+      setTimeout(() => {
+        resolve()
+      }, 1000)
+    })
   }
 
   // Track by
