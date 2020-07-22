@@ -149,7 +149,7 @@
                 <div style="width: 90%; left: 5%; position: relative; padding-top: 1rem; padding-bottom: 1rem;">
                     <ion-label color="medium">Propina: {{propina | currency : 'CAD' : 'symbol-narrow':'1.0-2'}}</ion-label>
                     <ion-item lines="none" style="text-align: center;">
-                        <ion-button (click)="calculaPropina(i)" *ngFor="let boton of botones_propina; let i = index" [ngClass]="{'relleno' : propina_sel === i}" fill="outline" shape="round">
+                        <ion-button (click)="calculaPropina(i)" *ngFor="let boton of botones_propina; let i = index" [ngClass]="{'gradient-- relleno' : propina_sel === i}" fill="outline" shape="round">
                             {{boton.texto}}</ion-button>
                     </ion-item>
                 </div>
@@ -300,8 +300,10 @@
 
 </ion-content>
 
-<ion-footer no-border>
-    <ion-button class="boton-margen" expand="block" [disabled]="cuenta === 0 || !infoReady" (click)="ordenar()" shape="round">
-        Generar pedido
-    </ion-button>
+<ion-footer class="ion-no-border">
+    <ion-toolbar class="fondo-content">
+        <ion-button class="boton-margen gradient--" expand="block" [disabled]="cuenta === 0 || !infoReady" (click)="ordenar()" shape="round">
+            Generar pedido
+        </ion-button>
+    </ion-toolbar>
 </ion-footer>

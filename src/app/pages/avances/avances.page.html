@@ -55,7 +55,7 @@
             </ion-item>
         </ion-card>
 
-        <!-- Status -->
+        <!-- Avances -->
         <ion-card *ngIf="!pedido.cancelado_by_negocio">
             <h2 class="comfortaa">Status</h2>
             <h3 *ngIf="pedido.aceptado && pedido.entrega === 'inmediato'" style="margin-left: 1rem;">Entrega: {{pedido.aceptado | date:'h:mm a'}}</h3>
@@ -114,7 +114,7 @@
         <ion-card *ngIf="pedido.entrega === 'inmediato' && !pedido.cancelado_by_negocio || pedido.repartidor && !pedido.cancelado_by_negocio">
             <h2 class="comfortaa">Rastreo</h2>
             <div class="marco">
-                <agm-map style="height: 45vh" [latitude]="20.627006" [longitude]="-103.416554" [disableDefaultUI]="true" [streetViewControl]="false" [zoomControl]="false" [fitBounds]="true">
+                <agm-map style="height: 45vh" [latitude]="20.627006" [longitude]="-103.416554" [disableDefaultUI]="true" [streetViewControl]="false" [zoomControl]="false" [fitBounds]="true" (mapReady)="mapReady($event)">
                     <agm-marker [agmFitBounds]="true" [iconUrl]='{"url": icon,"scaledSize": {"height": 75, "width": 50}}' [latitude]="pedido.cliente.direccion.lat" [longitude]="pedido.cliente.direccion.lng" [animation]="'DROP'"></agm-marker>
                     <agm-marker [agmFitBounds]="true" [iconUrl]='{"url": tienda,"scaledSize": {"height": 50, "width": 50}}' [latitude]="pedido.negocio.direccion.lat" [longitude]="pedido.negocio.direccion.lng" [animation]="'DROP'"></agm-marker>
                     <agm-marker [agmFitBounds]="true" *ngIf="pedido.repartidor && pedido.repartidor.lat" [iconUrl]='{"url": repartidor,"scaledSize": {"height": 50, "width": 50}}' [latitude]="pedido.repartidor.lat" [longitude]="pedido.repartidor.lng" [animation]="'DROP'"></agm-marker>

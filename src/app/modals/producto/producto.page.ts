@@ -14,17 +14,20 @@ import { Producto, ListaComplementos, ListaComplementosElegidos, Complemento } f
 })
 export class ProductoPage implements OnInit {
 
-  @ViewChild('brinca', {static: false}) inputCant: ElementRef;
-  @Input() producto: Producto;
-  @Input() idNegocio: string;
+  @ViewChild('brinca', {static: false}) inputCant: ElementRef
+  @Input() producto: Producto
+  @Input() idNegocio: string
+  @Input() modifica: boolean
 
-  variables: ListaComplementos[];
-  obligatoriosPendientes = [];
-  elegidos: ListaComplementosElegidos[] = [];
-  back: Subscription;
+  variables: ListaComplementos[]
+  obligatoriosPendientes = []
+  elegidos: ListaComplementosElegidos[] = []
+  back: Subscription
 
   canContinue = false
   showDesc = true
+
+  recalculando = true
 
   constructor(
     private platform: Platform,
@@ -47,14 +50,31 @@ export class ProductoPage implements OnInit {
       this.producto.total = this.producto.precio
       this.producto.cantidad = 1
     }
+    if (this.modifica) this.recalculaTotal()
+  }
+
+  recalculaTotal() {
+    return new Promise((resolve, reject) => {      
+      this.recalculando = true
+      setTimeout(() => {
+        this.producto.total = this.producto.precio
+        this.producto.complementos.forEach(c => {
+          c.complementos.forEach(cc => {
+            this.producto.total += cc.precio
+          })
+        })
+        this.producto.total = this.producto.total * this.producto.cantidad
+        this.recalculando = false
+        resolve()
+      }, 1500)
+    })
   }
 
   async getVariables() {
-    this.variables = await this.productoService.getVariables(this.idNegocio, this.producto.id);
+    this.variables = await this.productoService.getVariables(this.idNegocio, this.producto.id)
+    console.log(this.variables);
     if (this.variables.length > 0) {
-      this.variables.forEach(v => {
-        this.obligatoriosPendientes.push(v.obligatorio)
-      });
+      this.variables.forEach(v => this.obligatoriosPendientes.push(v.obligatorio))
       this.checkObligatorios()
       if (this.producto.complementos && this.producto.complementos.length > 0) this.setComplementos()
     } else this.canContinue = true
@@ -116,18 +136,14 @@ export class ProductoPage implements OnInit {
         this.obligatoriosPendientes[i] = false
       }
     })
-    if (checados === 0) this.obligatoriosPendientes[i] = true
+    if (checados === 0) this.obligatoriosPendientes[i] = this.variables[i].obligatorio
     if (checados === this.variables[i].limite) {
       this.variables[i].productos.forEach(p => {
         if (p.isChecked) p.deshabilitado = false
         else p.deshabilitado = true
       })
     }
-    else {
-      this.variables[i].productos.forEach(p => {
-        p.deshabilitado = false
-      })
-    }
+    else this.variables[i].productos.forEach(p => p.deshabilitado = false)
     this.checkObligatorios()
     let unidad = this.producto.total / this.producto.cantidad
     if (isChecked)  unidad += this.variables[i].productos[y].precio
@@ -137,6 +153,7 @@ export class ProductoPage implements OnInit {
 
   checkObligatorios() {
     this.canContinue = true
+    console.log(this.obligatoriosPendientes);
     this.obligatoriosPendientes.forEach(o => o ? this.canContinue = false : null)
   }
 

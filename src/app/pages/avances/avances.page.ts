@@ -184,6 +184,10 @@ export class AvancesPage implements OnInit {
 
   }
 
+  mapReady(map) {
+    this.map = map
+  }
+
   getPedido(id) {
     this.pedidoService.getPedido(id).then((pedido: Pedido) => {
       this.pedido = pedido
@@ -287,24 +291,26 @@ export class AvancesPage implements OnInit {
     this.listenNewMsg()
     this.repartidorSub = this.pedidoService.trackUbicacion(this.pedido.repartidor.id).subscribe((ubicacion: Ubicacion) => {
       if (ubicacion) {
-        const position: ILatLng = {
-          lat: ubicacion.lat,
-          lng: ubicacion.lng
-        }
-        if (!this.repartidorMarker) {
-          this.repartidorMarker = this.map.addMarkerSync({
-            icon: this.repartidorIcon,
-            animation: 'DROP',
-            position
-          })
-        } else {
-          this.repartidorMarker.setPosition(position)
-        }
-        const markers: ILatLng[] = [position, this.clienteLatLng, this.negocioLatLng]
-        this.map.moveCamera({
-          target: markers,
-          padding: 100
-        })
+        this.pedido.repartidor.lng = ubicacion.lng
+        this.pedido.repartidor.lat = ubicacion.lat
+        // const position: ILatLng = {
+        //   lat: ubicacion.lat,
+        //   lng: ubicacion.lng
+        // }
+        // if (!this.repartidorMarker) {
+        //   this.repartidorMarker = this.map.addMarkerSync({
+        //     icon: this.repartidorIcon,
+        //     animation: 'DROP',
+        //     position
+        //   })
+        // } else {
+        //   this.repartidorMarker.setPosition(position)
+        // }
+        // const markers: ILatLng[] = [position, this.clienteLatLng, this.negocioLatLng]
+        // this.map.moveCamera({
+        //   target: markers,
+        //   padding: 100
+        // })
       }
     })
   }
@@ -416,7 +422,7 @@ export class AvancesPage implements OnInit {
     // Salida
   async regresar() {
     if (this.pedido.cancelado_by_negocio) this.pedidoService.removePedidoCancelado(this.pedido)
-    if (this.map) this.map.remove()
+    // if (this.map) this.map.remove()
     if (this.back) this.back.unsubscribe()
     if (this.msgSub) this.msgSub.unsubscribe()
     if (this.pedidoSub) this.pedidoSub.unsubscribe()

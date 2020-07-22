@@ -163,11 +163,12 @@ export class DisparadoresService {
     });
   }
 
-  async presentLoading() {
+  async presentLoading(message?) {
     this.loader = await this.loadingCtrl.create({
-     spinner: 'crescent'
-    });
-    return await this.loader.present();
+     spinner: 'crescent',
+     message,
+    })
+    return await this.loader.present()
   }
 
   dismissLoading() {

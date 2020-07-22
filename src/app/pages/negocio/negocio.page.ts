@@ -261,6 +261,7 @@ export class NegocioPage {
   async muestraProducto(producto: Producto) {
     producto.cantidad = 1
     producto.total = producto.precio
+    producto.complementos = []
     if (!this.uid) return this.presentAlertNotLogin()
     const modal = await this.modalController.create({
       component: ProductoPage,
@@ -289,7 +290,6 @@ export class NegocioPage {
       envio_gratis_pedMin: this.negocio.envio_gratis_pedMin ? this.negocio.envio_gratis_pedMin : null,
       envio_costo_fijo: this.negocio.envio_costo_fijo ? this.negocio.envio_costo_fijo : false
     }
-    console.log(datos);
     const modal = await this.modalController.create({
       component: CuentaPage,
       enterAnimation,
@@ -418,9 +418,6 @@ export class NegocioPage {
           text: 'Cancelar',
           role: 'cancel',
           cssClass: 'tertiary',
-          handler: (blah) => {
-            console.log('Confirm Cancel: blah');
-          }
         },
         {
           text: 'Iniciar sesión',

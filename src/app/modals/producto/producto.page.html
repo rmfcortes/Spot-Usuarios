@@ -41,7 +41,7 @@
             <ion-item *ngFor="let prod of item.productos; let y = index" lines="none">
                 <ion-label class="ion-text-wrap">{{prod.nombre | titlecase}}</ion-label>
                 <ion-note slot="end" *ngIf="prod.precio > 0">+{{prod.precio}}</ion-note>
-                <ion-checkbox slot="end" [(ngModel)]="prod.isChecked" [disabled]="prod.deshabilitado" (ionChange)="checkChange(i, y, prod.isChecked)"></ion-checkbox>
+                <ion-checkbox slot="end" [(ngModel)]="prod.isChecked" [disabled]="prod.deshabilitado || recalculando" (ionChange)="checkChange(i, y, prod.isChecked)"></ion-checkbox>
             </ion-item>
         </ng-container>
         <ng-template #limTemplate>
@@ -53,7 +53,7 @@
                 <ion-item *ngFor="let c of item.productos; let y = index" lines="none">
                     <ion-label class="ion-text-wrap">{{c.nombre | titlecase}}</ion-label>
                     <ion-note slot="end" *ngIf="c.precio > 0">+{{c.precio}}</ion-note>
-                    <ion-radio slot="end" color="primary" [value]="y"></ion-radio>
+                    <ion-radio slot="end" color="primary" [value]="y" [disabled]="recalculando"></ion-radio>
                 </ion-item>
             </ion-radio-group>
         </ng-template>
@@ -89,8 +89,15 @@
 
 <ion-footer>
     <ion-toolbar>
-        <ion-button class="boton-cart ion-text-wrap" expand="block" color="primary" (click)="agregarProducto()" [disabled]="!canContinue" shape="round">
-            <strong style="margin: 0.5rem">Agregar al carrito:</strong> {{producto.total | currency:'CAD':'symbol-narrow':'1.0-0'}}
-        </ion-button>
+        <ng-container *ngIf="modifica; else modTemplate">
+            <ion-button class="boton-cart ion-text-wrap" expand="block" color="primary" (click)="agregarProducto()" [disabled]="!canContinue || recalculando" shape="round">
+                <strong style="margin: 0.5rem">Actualizar</strong> {{producto.total | currency:'CAD':'symbol-narrow':'1.0-0'}}
+            </ion-button>
+        </ng-container>
+        <ng-template #modTemplate>            
+            <ion-button class="boton-cart ion-text-wrap" expand="block" color="primary" (click)="agregarProducto()" [disabled]="!canContinue" shape="round">
+                <strong style="margin: 0.5rem">Agregar al carrito:</strong> {{producto.total | currency:'CAD':'symbol-narrow':'1.0-0'}}
+            </ion-button>        
+        </ng-template>
     </ion-toolbar>
 </ion-footer>

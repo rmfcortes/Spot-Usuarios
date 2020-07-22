@@ -195,11 +195,12 @@ export class CuentaPage implements OnInit {
   // Acciones
 
   async muestraProducto(producto: Producto) {
+    producto.total = producto.precio
     const modal = await this.modalCtrl.create({
       component: ProductoPage,
       enterAnimation,
       leaveAnimation,
-      componentProps: {producto, idNegocio: this.datos.idNegocio}
+      componentProps: {producto, idNegocio: this.datos.idNegocio, modifica: true}
     })
     modal.onWillDismiss().then(async (resp) => {
       if (resp.data) {
@@ -254,7 +255,11 @@ export class CuentaPage implements OnInit {
       leaveAnimation: leaveAnimationDerecha,
       componentProps: {formas_pago_aceptadas: this.datosNegocio.formas_pago}
     })
-    modal.onWillDismiss().then(resp => resp.data ? this.formaPago = resp.data : null)
+    modal.onWillDismiss().then(resp => {
+      resp.data ? this.formaPago = resp.data : null
+      if (this.formaPago.forma === 'efectivo') this.comision = 0
+      else this.comision = ((this.cuenta * 0.04) + 3) * 1.16
+    })
 
     return await modal.present()
   }
@@ -301,7 +306,7 @@ export class CuentaPage implements OnInit {
           }
         }
       }
-      await this.alertSerivce.presentLoading()
+      await this.alertSerivce.presentLoading('Estamos generando tu orden. Este proceso tomará sólo un momento')
       const cliente: Cliente = {
         direccion: this.direccion,
         nombre: this.uidService.getNombre() || 'No registrado',
