@@ -58,7 +58,7 @@
         <!-- Avances -->
         <ion-card *ngIf="!pedido.cancelado_by_negocio">
             <h2 class="comfortaa">Status</h2>
-            <h3 *ngIf="pedido.aceptado && pedido.entrega === 'inmediato'" style="margin-left: 1rem;">Entrega: {{pedido.aceptado | date:'h:mm a'}}</h3>
+            <h3 *ngIf="pedido.aceptado && pedido.entrega === 'inmediato'" style="margin-left: 1rem;">Entrega: {{pedido.aceptado + 900000 | date:'h:mm a'}}</h3>
             <h3 *ngIf="pedido.aceptado && pedido.entrega === 'planeado'" style="margin-left: 1rem;">Entrega estimada: {{pedido.aceptado | date:'EEEE d/MMMM/y'}}</h3>
             <ion-grid class="ion-no-padding">
                 <ng-container *ngIf="pedido.aceptado; else avancesTemp">
@@ -77,7 +77,7 @@
                             </ion-col>
                             <ion-col size="10" class="ion-align-self-center">
                                 <ion-label color="dark" style="padding: 1.5rem 0;">
-                                    <h5>{{avance.concepto}}</h5>
+                                    <h5 class="ion-text-wrap">{{avance.concepto}}</h5>
                                     <h6 class="medium" style="font-size: small;" *ngIf="pedido.entrega === 'planeado'">{{avance.fecha | date:'short'}}</h6>
                                 </ion-label>
                             </ion-col>
@@ -93,7 +93,7 @@
                                 <ion-icon class="icono" name="ellipse" color="medium"></ion-icon>
                             </ion-col>
                             <ion-col size="10" class="ion-align-self-center">
-                                <ion-label color="medium" style="padding: 1.5rem 0;">{{avance.concepto}}</ion-label>
+                                <ion-label class="ion-text-wrap" color="medium" style="padding: 1.5rem 0;">{{avance.concepto}}</ion-label>
                             </ion-col>
                         </ng-template>
                     </ion-row>
@@ -101,7 +101,7 @@
                 <ng-template #avancesTemp>
                     <!-- Sin avances -->
                     <ion-progress-bar style="width: 80%; margin-left: 10%;" type="indeterminate"></ion-progress-bar>
-                    <ion-item style="text-align: center;">
+                    <ion-item style="text-align: center;" lines="none">
                         <ion-label class="ion-text-wrap" color="medium">Esperando confirmación de {{pedido.negocio.nombreNegocio}}</ion-label>
                     </ion-item>
                 </ng-template>

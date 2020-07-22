@@ -87,8 +87,8 @@
 
 <app-no-network></app-no-network>
 
-<ion-footer>
-    <ion-toolbar>
+<ion-footer class="ion-no-border">
+    <ion-toolbar class="fondo-content">
         <ng-container *ngIf="modifica; else modTemplate">
             <ion-button class="boton-cart ion-text-wrap" expand="block" color="primary" (click)="agregarProducto()" [disabled]="!canContinue || recalculando" shape="round">
                 <strong style="margin: 0.5rem">Actualizar</strong> {{producto.total | currency:'CAD':'symbol-narrow':'1.0-0'}}

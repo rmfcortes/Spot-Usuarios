@@ -50,7 +50,11 @@ export class ProductoPage implements OnInit {
       this.producto.total = this.producto.precio
       this.producto.cantidad = 1
     }
-    if (this.modifica) this.recalculaTotal()
+    if (this.modifica && this.producto.complementos && this.producto.complementos.length > 0) this.recalculaTotal()
+    else {
+      this.recalculando = false
+      if (this.producto.cantidad) this.producto.total = this.producto.cantidad * this.producto.precio
+    }
   }
 
   recalculaTotal() {
@@ -72,7 +76,6 @@ export class ProductoPage implements OnInit {
 
   async getVariables() {
     this.variables = await this.productoService.getVariables(this.idNegocio, this.producto.id)
-    console.log(this.variables);
     if (this.variables.length > 0) {
       this.variables.forEach(v => this.obligatoriosPendientes.push(v.obligatorio))
       this.checkObligatorios()
@@ -153,7 +156,6 @@ export class ProductoPage implements OnInit {
 
   checkObligatorios() {
     this.canContinue = true
-    console.log(this.obligatoriosPendientes);
     this.obligatoriosPendientes.forEach(o => o ? this.canContinue = false : null)
   }
 
@@ -166,6 +168,7 @@ export class ProductoPage implements OnInit {
   }
 
   minusProduct() {
+    console.log(this.producto);
     if (this.producto.cantidad === 1) return
     const ele = this.inputCant.nativeElement
     this.animationService.animBrinca(ele)

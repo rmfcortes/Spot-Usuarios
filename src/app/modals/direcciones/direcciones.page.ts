@@ -145,7 +145,6 @@ export class DireccionesPage implements OnInit {
     this.map = google.maps
     this.geocoder.geocode({'placeId': id}, (results, status) => {
       this.ngZone.run(async () => {
-        console.log(status);
         if (status === 'OK') {
           if (results[0]) {
             this.comparaCobertura(results[0])

@@ -244,6 +244,7 @@ export class CuentaPage implements OnInit {
         this.cart.splice(i, 1)
         if (this.cuenta === 0) this.closeCart()
         this.datosNegocio.envio = await this.costoEnvio()
+        this.calculaPropina(this.propina_sel)
       }
     })
   }

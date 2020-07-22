@@ -3,7 +3,7 @@
 
         <!-- Header con dirección de entrega -->
         <ng-container *ngIf="infoReady; else infoReadyCabezal">
-            <div class="cabezal">
+            <div class="cabezal gradient">
                 <ion-item lines="none">
                     <ion-icon color="light" slot="start" name="chevron-back" (click)="closeCart()"></ion-icon>
                     <ion-label color="warning">Entregar en: </ion-label>
@@ -128,10 +128,10 @@
                             </div>
                             <ion-label style="margin-left: 2rem;">**** {{formaPago.forma}}</ion-label>
                         </ion-item>           
-                        <ion-item lines="none" *ngIf="!datosNegocio.formas_pago.efectivo">
+                        <ion-item lines="none" *ngIf="!datosNegocio.formas_pago.efectivo" style="text-align: center;">
                             <ion-label color="medium" style="font-size: smaller;" class="ion-text-wrap">Este negocio no acepta pagos en efectivo</ion-label>
                         </ion-item>                        
-                        <ion-item lines="none" *ngIf="!datosNegocio.formas_pago.tarjeta">
+                        <ion-item lines="none" *ngIf="!datosNegocio.formas_pago.tarjeta" style="text-align: center;">
                             <ion-label color="medium" style="font-size: smaller;" class="ion-text-wrap">Este negocio no acepta pagos con tarjeta</ion-label>
                         </ion-item>
                     </ion-list>

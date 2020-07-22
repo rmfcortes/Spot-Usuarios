@@ -3,10 +3,8 @@ import { AngularFireDatabase } from '@angular/fire/database';
 
 import { UidService } from './uid.service';
 
-import { Direccion, Ubicacion } from '../interfaces/direcciones';
 import { FormaPago } from '../interfaces/forma-pago.interface';
 import { DatosNegocioParaPedido } from '../interfaces/pedido';
-import { Region } from '../interfaces/region.interface';
 import { Producto } from '../interfaces/producto';
 
 @Injectable({

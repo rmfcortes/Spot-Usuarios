@@ -84,6 +84,7 @@ export class NegocioPage {
   // Get info inicial
 
   ionViewWillEnter() {
+    this.productos = []
     this.uid = this.uidService.getUid()
     this.origen_categoria = history.state.origen_categoria
     this.categoria = this.activatedRoute.snapshot.paramMap.get('cat')
@@ -252,8 +253,6 @@ export class NegocioPage {
     }
     this.getProds(event)
 
-    // App logic to determine if all data is loaded
-    // and disable the infinite scroll
     if (this.noMore) event.target.disabled = true
   }
 
@@ -296,7 +295,10 @@ export class NegocioPage {
       leaveAnimation,
       componentProps: {cuenta: this.cuenta, datos, productos: this.productos}
     })
-    modal.onWillDismiss().then(async () => this.cuenta = await this.negocioService.getCart(this.uid, this.negocio.id))
+    modal.onWillDismiss().then(async () => {
+      this.cuenta = await this.negocioService.getCart(this.uid, this.negocio.id)
+      this.productos.forEach(async(p) => p.productos = await this.negocioService.comparaCart(p.productos))
+    })
     return await modal.present()
   }
 
@@ -362,11 +364,7 @@ export class NegocioPage {
     }
     this.getProdsFiltrados(event)
 
-    // App logic to determine if all data is loaded
-    // and disable the infinite scroll
-    if (this.noMore) {
-      event.target.disabled = true
-    }
+    if (this.noMore) event.target.disabled = true
   }
 
   async verInfo() {
@@ -393,9 +391,7 @@ export class NegocioPage {
       component: LoginPage,
       cssClass: 'my-custom-modal-css',
     })
-    modal.onWillDismiss().then(() => {
-      this.uid = this.uidService.getUid()
-    })
+    modal.onWillDismiss().then(() => this.uid = this.uidService.getUid())
     return await modal.present()
   }
 

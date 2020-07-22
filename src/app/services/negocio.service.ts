@@ -14,8 +14,8 @@ import { Direccion } from '../interfaces/direcciones';
 })
 export class NegocioService {
 
-  cart: Cart;
-  count = 0;
+  cart: Cart
+  count = 0
 
   constructor(
     private db: AngularFireDatabase,
@@ -69,13 +69,11 @@ export class NegocioService {
   getCart(uid, idNegocio): Promise<number> {
     return new Promise((resolve, reject) => {
       const cartSub = this.db.object(`usuarios/${uid}/cart/${idNegocio}`).valueChanges().subscribe((cart: Cart) => {
-        cartSub.unsubscribe();
+        cartSub.unsubscribe()
         this.cart = cart
         if (cart && cart.detalles) {
           let cuenta = 0
-          Object.values(cart.detalles).forEach(c => {
-            cuenta += c.total
-          });
+          Object.values(cart.detalles).forEach(c => cuenta += c.total)
           resolve(cuenta)
         } else {
           resolve(0)
@@ -90,18 +88,14 @@ export class NegocioService {
         const x = this.db.list(`negocios/productos/${categoria}/${id}/${pasillo}`, data =>
           data.orderByKey().limitToFirst(batch).startAt(lastKey)).valueChanges().subscribe(async (productos: Producto[]) => {
             x.unsubscribe()
-            if (this.cart && this.cart.detalles) {
-              productos = await this.comparaCart(productos)
-            }
+            if (this.cart && this.cart.detalles) productos = await this.comparaCart(productos)
             resolve(productos)
           })
       } else {
         const x = this.db.list(`negocios/productos/${categoria}/${id}/${pasillo}`, data =>
           data.orderByKey().limitToFirst(batch)).valueChanges().subscribe(async (productos: Producto[]) => {
             x.unsubscribe()
-            if (this.cart && this.cart.detalles) {
-              productos = await this.comparaCart(productos)
-            }
+            if (this.cart && this.cart.detalles) productos = await this.comparaCart(productos)
             resolve(productos)
           })
       }
@@ -110,14 +104,15 @@ export class NegocioService {
 
   comparaCart(productos: Producto[]): Promise<Producto[]> {
     return new Promise((resolve, reject) => {
-      if (this.cart.cantidades) {
-        for (const producto of productos) {
+      for (const producto of productos) {
+        if (this.cart && this.cart.cantidades) {
           if (this.cart.cantidades[producto.id]) producto.agregados = this.cart.cantidades[producto.id]
+          else producto.agregados = null
+        } else {
+          producto.agregados = null
         }
-        resolve(productos)
-      } else {
-        resolve(productos)
       }
+      resolve(productos)
     })
   }
 
