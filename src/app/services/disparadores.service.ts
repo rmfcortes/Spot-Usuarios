@@ -149,18 +149,18 @@ export class DisparadoresService {
             role: 'cancel',
             cssClass: 'secondary',
             handler: () => {
-              resolve(false);
+              resolve(false)
             }
           }, {
             text: 'Agregar',
             handler: (data) => {
-              resolve(data);
+              resolve(data)
             }
           }
         ]
       });
-      await alert.present();
-    });
+      await alert.present()
+    })
   }
 
   async presentLoading(message?) {

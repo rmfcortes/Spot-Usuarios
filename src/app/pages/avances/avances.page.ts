@@ -54,6 +54,7 @@ export class AvancesPage implements OnInit {
   pedidoSub: Subscription
   entregadoSub: Subscription
   ubicacionSub: Subscription
+  canceladoSub: Subscription
   repartidorSub: Subscription
   tipoEntregaSub: Subscription
 
@@ -86,11 +87,9 @@ export class AvancesPage implements OnInit {
   }
 
   ionViewWillEnter() {
+    this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
     const id = this.activatedRoute.snapshot.paramMap.get('id')
     this.getPedido(id)
-    this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-      this.regresar()
-    })
   }
 
   ionViewDidEnter() {
@@ -193,13 +192,16 @@ export class AvancesPage implements OnInit {
       this.pedido = pedido
       // this.loadMap()
       if (!this.pedido.aceptado) {
+        this.trackCancelado()
         this.pedidoSub = this.pedidoService.trackAcept(id).subscribe((resp: number) => {
-          if (resp) {
-            this.pedidoSub.unsubscribe()
-            this.pedido.aceptado = resp
-            this.listenRepartidor(id)
-            this.trackAvances()
-          } else  this.infoReady = true
+          this.ngZone.run(() => {
+            if (resp) {
+              this.pedidoSub.unsubscribe()
+              this.pedido.aceptado = resp
+              this.listenRepartidor(id)
+              this.trackAvances()
+            } else  this.infoReady = true
+          })
         })
       } else {
         this.trackAvances()
@@ -214,15 +216,18 @@ export class AvancesPage implements OnInit {
 
   listenRepartidor(id) {
     if (!this.pedido.repartidor) {
+      if (this.repartidorSub) this.repartidorSub.unsubscribe()
       this.repartidorSub = this.pedidoService.trackRepartidor(id).subscribe((resp: Repartidor) => {
-        if (resp) {
-          this.repartidorSub.unsubscribe()
-          this.pedido.repartidor = resp
-          this.infoReady = true
-          this.isMapReady()
-        } else {
-          this.infoReady = true
-        }
+        this.ngZone.run(() => {
+          if (resp) {
+            this.repartidorSub.unsubscribe()
+            this.pedido.repartidor = resp
+            this.infoReady = true
+            this.isMapReady()
+          } else {
+            this.infoReady = true
+          }
+        })
       })
     } else {
       this.infoReady = true
@@ -253,16 +258,20 @@ export class AvancesPage implements OnInit {
   // Listener
 
   trackTipoEntrega() {
+    if (this.tipoEntregaSub) this.tipoEntregaSub.unsubscribe()
     this.tipoEntregaSub = this.pedidoService.trackTipoEntrega(this.pedido.id).subscribe((tipo: string) => {
-      if (tipo === 'inmediato' || tipo === 'planeado') {
-        this.pedido.entrega = tipo
-        this.listenRepartidor(this.pedido.id)
-      }
+      this.ngZone.run(() => {
+        if (tipo === 'inmediato' || tipo === 'planeado') {
+          this.pedido.entrega = tipo
+          this.listenRepartidor(this.pedido.id)
+        }
+      })
     })
   }
 
   trackAvances() {
     this.pedido.avances = []
+    this.pedidoService.trackAvances(this.pedido.id).query.ref.off('child_added')
     this.pedidoService.trackAvances(this.pedido.id).query.ref.on('child_added', snapshot => {
       this.ngZone.run(() => this.pedido.avances.push(snapshot.val()))
     })
@@ -289,53 +298,79 @@ export class AvancesPage implements OnInit {
     }
     this.trackEntregado()
     this.listenNewMsg()
+    if (this.repartidorSub) this.repartidorSub.unsubscribe()
     this.repartidorSub = this.pedidoService.trackUbicacion(this.pedido.repartidor.id).subscribe((ubicacion: Ubicacion) => {
-      if (ubicacion) {
-        this.pedido.repartidor.lng = ubicacion.lng
-        this.pedido.repartidor.lat = ubicacion.lat
-        // const position: ILatLng = {
-        //   lat: ubicacion.lat,
-        //   lng: ubicacion.lng
-        // }
-        // if (!this.repartidorMarker) {
-        //   this.repartidorMarker = this.map.addMarkerSync({
-        //     icon: this.repartidorIcon,
-        //     animation: 'DROP',
-        //     position
-        //   })
-        // } else {
-        //   this.repartidorMarker.setPosition(position)
-        // }
-        // const markers: ILatLng[] = [position, this.clienteLatLng, this.negocioLatLng]
-        // this.map.moveCamera({
-        //   target: markers,
-        //   padding: 100
-        // })
-      }
+      this.ngZone.run(() => {
+        if (ubicacion) {
+          this.pedido.repartidor.lng = ubicacion.lng
+          this.pedido.repartidor.lat = ubicacion.lat
+          // const position: ILatLng = {
+          //   lat: ubicacion.lat,
+          //   lng: ubicacion.lng
+          // }
+          // if (!this.repartidorMarker) {
+          //   this.repartidorMarker = this.map.addMarkerSync({
+          //     icon: this.repartidorIcon,
+          //     animation: 'DROP',
+          //     position
+          //   })
+          // } else {
+          //   this.repartidorMarker.setPosition(position)
+          // }
+          // const markers: ILatLng[] = [position, this.clienteLatLng, this.negocioLatLng]
+          // this.map.moveCamera({
+          //   target: markers,
+          //   padding: 100
+          // })
+        }
+      })
+    })
+  }
+
+  trackCancelado() {
+    if (this.canceladoSub) this.canceladoSub.unsubscribe()
+    this.canceladoSub = this.pedidoService.trackCancelado(this.pedido.id).subscribe((cancelado: number) => {
+      this.ngZone.run(async () => {
+        if (cancelado && cancelado > 0) {
+          this.pedido.razon_cancelacion = await this.pedidoService.getRazonCancelacion(this.pedido.id)
+          if (this.msgSub) this.msgSub.unsubscribe()
+          if (this.pedidoSub) this.pedidoSub.unsubscribe()
+          if (this.ubicacionSub) this.ubicacionSub.unsubscribe()
+          if (this.entregadoSub) this.entregadoSub.unsubscribe()
+          if (this.repartidorSub) this.repartidorSub.unsubscribe()
+          this.pedido.cancelado_by_negocio = cancelado
+        }
+      })
     })
   }
 
   trackEntregado() {
+    if (this.entregadoSub) this.entregadoSub.unsubscribe()
     this.entregadoSub = this.pedidoService.trackEntregado(this.pedido.id).subscribe(resp => {
-      if (resp) {
-        if (this.msgSub) this.msgSub.unsubscribe()
-        if (this.pedidoSub) this.pedidoSub.unsubscribe()
-        if (this.ubicacionSub) this.ubicacionSub.unsubscribe()
-        if (this.entregadoSub) this.entregadoSub.unsubscribe()
-        if (this.repartidorSub) this.repartidorSub.unsubscribe()
-        this.verCalificar()
-      }
+      this.ngZone.run(() => {
+        if (resp) {
+          if (this.msgSub) this.msgSub.unsubscribe()
+          if (this.pedidoSub) this.pedidoSub.unsubscribe()
+          if (this.ubicacionSub) this.ubicacionSub.unsubscribe()
+          if (this.entregadoSub) this.entregadoSub.unsubscribe()
+          if (this.repartidorSub) this.repartidorSub.unsubscribe()
+          this.verCalificar()
+        }
+      })
     })
   }
 
   listenNewMsg() {
+    if (this.msgSub) this.msgSub.unsubscribe()
     this.msgSub = this.chatService.listenMsgPedido(this.pedido.id).subscribe((unRead: UnreadMsg) => {
-      if (unRead && unRead.cantidad > 0) {
-        this.newMsg = true
-        this.alertService.presentToast('Nuevo mensaje de ' + this.pedido.repartidor.nombre)
-      } else {
-        this.newMsg = false
-      }
+      this.ngZone.run(() => {
+        if (unRead && unRead.cantidad > 0) {
+          this.newMsg = true
+          this.alertService.presentToast('Nuevo mensaje de ' + this.pedido.repartidor.nombre)
+        } else {
+          this.newMsg = false
+        }
+      })
     })
   }
 

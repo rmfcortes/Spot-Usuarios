@@ -8,6 +8,7 @@ import { ChatPage } from './chat.page';
 import { BubblesComponent } from 'src/app/components/bubbles/bubbles.component';
 
 import { AutosizeModule } from 'ngx-autosize';
+import { SharedModule } from 'src/app/shared/shared.module';
 
 
 @NgModule({
@@ -15,6 +16,7 @@ import { AutosizeModule } from 'ngx-autosize';
     CommonModule,
     FormsModule,
     IonicModule,
+    SharedModule,
     AutosizeModule,
   ],
   declarations: [ChatPage, BubblesComponent],

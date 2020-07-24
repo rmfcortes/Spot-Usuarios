@@ -10,6 +10,7 @@ import { ProductoPage } from '../producto/producto.page';
 import { DisparadoresService } from 'src/app/services/disparadores.service';
 import { AnimationsService } from 'src/app/services/animations.service';
 import { NegocioService } from 'src/app/services/negocio.service';
+import { NetworkService } from 'src/app/services/network.service';
 import { PedidoService } from 'src/app/services/pedido.service';
 import { PagosService } from 'src/app/services/pagos.service';
 import { CartService } from 'src/app/services/cart.service';
@@ -26,6 +27,7 @@ import { enterAnimationDerecha } from 'src/app/animations/enterDerecha';
 import { leaveAnimationDerecha } from 'src/app/animations/leaveDerecha';
 import { enterAnimation } from 'src/app/animations/enter';
 import { leaveAnimation } from 'src/app/animations/leave';
+import { async } from '@angular/core/testing';
 
 @Component({
   selector: 'app-cuenta',
@@ -90,6 +92,8 @@ export class CuentaPage implements OnInit {
 
   script: HTMLScriptElement
 
+  netSub: Subscription
+
   constructor(
     private router: Router,
     private platform: Platform,
@@ -99,6 +103,7 @@ export class CuentaPage implements OnInit {
     private alertSerivce: DisparadoresService,
     private negocioService: NegocioService,
     private pedidoService: PedidoService,
+    private netService: NetworkService,
     private pagoService: PagosService,
     private cartService: CartService,
     private uidService: UidService,
@@ -268,78 +273,85 @@ export class CuentaPage implements OnInit {
   // Salida
 
   async ordenar() {
-    if (this.comision > 0) this.comision = Math.round((this.comision + Number.EPSILON) * 100) / 100
-    if (this.datosNegocio.envio > 0) this.datosNegocio.envio = Math.round((this.datosNegocio.envio + Number.EPSILON) * 100) / 100
-    if (this.propina) this.propina = Math.round((this.propina + Number.EPSILON) * 100) / 100
-    this.cuenta = Math.round((this.cuenta + Number.EPSILON) * 100) / 100
-    if (!this.direccion) {
-      this.alertSerivce.presentAlertAction(
-        'Agrega dirección',
-        'Por favor agrega una dirección de entrega antes de continuar con el pedido.')
-        .then(resp => {
-          if (resp) this.mostrarDirecciones()
+    if (this.netSub) this.netSub.unsubscribe()
+    this.netSub = this.netService.isConnected.subscribe(async (isCon) => {
+      if (!isCon) {
+        this.alertSerivce.presentAlert('', 'Por favor revisa tu conexión a internet. Para generar el pedido es necesaria una conexión a internet')
+        return
+      }
+      if (this.comision > 0) this.comision = Math.round((this.comision + Number.EPSILON) * 100) / 100
+      if (this.datosNegocio.envio > 0) this.datosNegocio.envio = Math.round((this.datosNegocio.envio + Number.EPSILON) * 100) / 100
+      if (this.propina) this.propina = Math.round((this.propina + Number.EPSILON) * 100) / 100
+      this.cuenta = Math.round((this.cuenta + Number.EPSILON) * 100) / 100
+      if (!this.direccion) {
+        this.alertSerivce.presentAlertAction(
+          'Agrega dirección',
+          'Por favor agrega una dirección de entrega antes de continuar con el pedido.')
+          .then(resp => {
+            if (resp) this.mostrarDirecciones()
+            return
+          })
+        return
+      }
+      if (!this.formaPago) {
+        this.alertSerivce.presentAlertAction(
+          'Forma de pago',
+          'Antes de continuar por favor agrega una forma de pago'
+        ).then(resp => {
+          if (resp) this.formasPago()
           return
         })
-      return
-    }
-    if (!this.formaPago) {
-      this.alertSerivce.presentAlertAction(
-        'Forma de pago',
-        'Antes de continuar por favor agrega una forma de pago'
-      ).then(resp => {
-        if (resp) this.formasPago()
         return
-      })
-      return
-    }
-    try {      
-      const telefono: string = await this.pedidoService.getTelefono()
-      if (!telefono) {
-        const resp: any = await this.alertSerivce.presentPromptTelefono()
-        let tel
-        if (resp) {
-          tel = resp.telefono.replace(/ /g, "")
-          if (tel.length === 10) {
-            this.pedidoService.guardarTelefono(resp.telefono)
-          } else {
-            this.alertSerivce.presentAlert('Número incorrecto', 'El teléfono agregado es incorrecto, por favor intenta de nuevo')
-            return
+      }
+      try {      
+        const telefono: string = await this.pedidoService.getTelefono()
+        if (!telefono) {
+          const resp: any = await this.alertSerivce.presentPromptTelefono()
+          let tel
+          if (resp) {
+            tel = resp.telefono.replace(/ /g, "")
+            if (tel.length === 10) {
+              this.pedidoService.guardarTelefono(resp.telefono)
+            } else {
+              this.alertSerivce.presentAlert('Número incorrecto', 'El teléfono agregado es incorrecto, por favor intenta de nuevo')
+              return
+            }
           }
         }
+        await this.alertSerivce.presentLoading('Estamos generando tu orden. Este proceso tomará sólo un momento')
+        const cliente: Cliente = {
+          direccion: this.direccion,
+          nombre: this.uidService.getNombre() || 'No registrado',
+          telefono,
+          uid: this.uidService.getUid()
+        }
+        const pedido: Pedido = {
+          aceptado: false,
+          categoria: this.datos.categoria,
+          cliente,
+          comision: this.comision,
+          createdAt: Date.now(),
+          envio: this.datosNegocio.envio,
+          propina: this.propina,
+          negocio: this.datosNegocio,
+          productos: this.cart,
+          total: this.cuenta + this.datosNegocio.envio + this.comision + this.propina,
+          entrega: this.datosNegocio.entrega || 'indefinido',
+          avances: [],
+          formaPago: this.formaPago,
+          region: this.uidService.getRegion()
+        }
+        pedido.total = Math.round((pedido.total + Number.EPSILON) * 100) / 100
+        if (this.formaPago.tipo !== 'efectivo') pedido.idOrder =  await this.pagoService.cobrar(pedido)
+        await this.pedidoService.createPedido(pedido)
+        this.alertSerivce.dismissLoading()
+        this.router.navigate(['/avances', pedido.id])
+        this.closeCart()
+      } catch (error) {
+        this.alertSerivce.dismissLoading()
+        this.alertSerivce.presentAlert('Error', 'Lo sentimos algo salió mal, por favor intenta de nuevo ' + error)
       }
-      await this.alertSerivce.presentLoading('Estamos generando tu orden. Este proceso tomará sólo un momento')
-      const cliente: Cliente = {
-        direccion: this.direccion,
-        nombre: this.uidService.getNombre() || 'No registrado',
-        telefono,
-        uid: this.uidService.getUid()
-      }
-      const pedido: Pedido = {
-        aceptado: false,
-        categoria: this.datos.categoria,
-        cliente,
-        comision: this.comision,
-        createdAt: Date.now(),
-        envio: this.datosNegocio.envio,
-        propina: this.propina,
-        negocio: this.datosNegocio,
-        productos: this.cart,
-        total: this.cuenta + this.datosNegocio.envio + this.comision + this.propina,
-        entrega: this.datosNegocio.entrega || 'indefinido',
-        avances: [],
-        formaPago: this.formaPago,
-        region: this.uidService.getRegion()
-      }
-      pedido.total = Math.round((pedido.total + Number.EPSILON) * 100) / 100
-      if (this.formaPago.tipo !== 'efectivo') pedido.idOrder =  await this.pagoService.cobrar(pedido)
-      await this.pedidoService.createPedido(pedido)
-      this.alertSerivce.dismissLoading()
-      this.router.navigate(['/avances', pedido.id])
-      this.closeCart()
-    } catch (error) {
-      this.alertSerivce.dismissLoading()
-      this.alertSerivce.presentAlert('Error', 'Lo sentimos algo salió mal, por favor intenta de nuevo ' + error)
-    }
+    })
   }
 
   closeCart() {

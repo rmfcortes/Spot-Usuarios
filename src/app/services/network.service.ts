@@ -7,31 +7,23 @@ import { BehaviorSubject, Subscription } from 'rxjs';
 })
 export class NetworkService {
 
-  public isConnected = new BehaviorSubject(true);
-  connectSub: Subscription;
-  disconnectSub: Subscription;
+  connectSub: Subscription
+  disconnectSub: Subscription
+  public isConnected = new BehaviorSubject(true)
 
-  constructor(
-    private network: Network,
-  ) { }
+  constructor( private network: Network ) { }
 
   checkNetStatus() {
-    if (!this.disconnectSub) {
-      this.disconnectSub = this.network.onDisconnect().subscribe(() => {
-        this.isConnected.next(false);
-      });
-    }
+    if (this.disconnectSub) this.disconnectSub.unsubscribe()
+    this.disconnectSub = this.network.onDisconnect().subscribe(() => this.isConnected.next(false))
 
-    if (!this.connectSub) {
-      this.connectSub = this.network.onConnect().subscribe(() => {
-        this.isConnected.next(true);
-      });
-    }
+    if (this.connectSub) this.connectSub.unsubscribe()
+      this.connectSub = this.network.onConnect().subscribe(() => this.isConnected.next(true))
   }
 
   stopCheckNet() {
-    if (this.disconnectSub) { this.disconnectSub.unsubscribe(); }
-    if (this.connectSub) { this.connectSub.unsubscribe(); }
+    if (this.disconnectSub) this.disconnectSub.unsubscribe()
+    if (this.connectSub) this.connectSub.unsubscribe()
   }
 
 }

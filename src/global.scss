@@ -53,6 +53,12 @@
     overflow: hidden;
 }
 
+.alert-wrapper {
+    border: 1px solid var(--ion-color-primary);
+    border-radius: 20px !important;
+    overflow: hidden;
+}
+
 ion-content {
     --background: #fdf8f1e5 !important;
 }

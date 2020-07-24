@@ -22,6 +22,9 @@
             <ion-label>Efectivo</ion-label>
         </ion-item>
     </ion-card>
+    <ion-item lines="none" *ngIf="!formas_pago_aceptadas.efectivo" style="text-align: center;">
+        <ion-label color="primary" style="font-size: smaller;" class="ion-text-wrap">Este negocio no acepta pagos en efectivo</ion-label>
+    </ion-item>   
     <ion-card style="margin-top: 1rem;">
         <!-- Aquí irían la lista de tarjetas -->
         <div *ngIf="formas_pago_aceptadas && formas_pago_aceptadas.tarjeta">
@@ -46,10 +49,7 @@
                 <ion-label style="margin-left: 2rem;">**** {{item.forma}}</ion-label>
             </ion-item>
         </div>
-    </ion-card>
-    <ion-item lines="none" *ngIf="!formas_pago_aceptadas.efectivo" style="text-align: center;">
-        <ion-label color="primary" style="font-size: smaller;" class="ion-text-wrap">Este negocio no acepta pagos en efectivo</ion-label>
-    </ion-item>                        
+    </ion-card>                     
     <ion-item lines="none" *ngIf="!formas_pago_aceptadas.tarjeta" style="text-align: center;">
         <ion-label color="primary" style="font-size: smaller;" class="ion-text-wrap">Este negocio no acepta pagos con tarjeta</ion-label>
     </ion-item>

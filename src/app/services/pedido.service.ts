@@ -82,6 +82,22 @@ export class PedidoService {
     return this.db.object(`usuarios/${uid}/pedidos/historial/${idPedido}/entregado`).valueChanges()
   }
 
+  trackCancelado(idPedido: string) {
+    const uid = this.uidService.getUid()
+    return this.db.object(`usuarios/${uid}/pedidos/activos/${idPedido}/cancelado_by_negocio`).valueChanges()
+  }
+
+  getRazonCancelacion(idPedido: string): Promise<string> {
+    return new Promise((resolve, reject) => {      
+      const uid = this.uidService.getUid()
+      const razSub = this.db.object(`usuarios/${uid}/pedidos/activos/${idPedido}/razon_cancelacion`).valueChanges()
+      .subscribe((razon: string) => {
+        razSub.unsubscribe()
+        resolve(razon)
+      })
+    })
+  }
+
   trackUbicacion(idRepartidor: string) {
     return this.db.object(`ubicaciones/${idRepartidor}`).valueChanges()
   }

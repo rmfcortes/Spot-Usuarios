@@ -8,12 +8,14 @@ import { CuentaPage } from './cuenta.page';
 
 import { DireccionesPageModule } from '../direcciones/direcciones.module';
 import { FormasPagoPageModule } from '../formas-pago/formas-pago.module';
+import { SharedModule } from 'src/app/shared/shared.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
+    SharedModule,
     FormasPagoPageModule,
     DireccionesPageModule,
   ],

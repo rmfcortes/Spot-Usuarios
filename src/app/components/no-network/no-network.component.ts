@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone } from '@angular/core';
 
 import { NetworkService } from 'src/app/services/network.service';
 
@@ -9,24 +9,19 @@ import { NetworkService } from 'src/app/services/network.service';
 })
 export class NoNetworkComponent implements OnInit {
 
-  network = true;
+  network = true
 
   constructor(
+    private ngZone: NgZone,
     private netService: NetworkService,
   ) { }
 
   ngOnInit() {
-    this.listenNet();
+    this.listenNet()
   }
 
   listenNet() {
-    this.netService.isConnected.subscribe(resp => {
-      if (resp) {
-        this.network = true;
-      } else {
-        this.network = false;
-      }
-    });
+    this.netService.isConnected.subscribe(resp => this.ngZone.run(() => resp ? this.network = true : this.network = false))
   }
 
 }

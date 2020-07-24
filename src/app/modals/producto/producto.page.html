@@ -85,9 +85,8 @@
     </ion-button>
 </ion-content>
 
-<app-no-network></app-no-network>
-
 <ion-footer class="ion-no-border">
+    <app-no-network></app-no-network>
     <ion-toolbar class="fondo-content">
         <ng-container *ngIf="modifica; else modTemplate">
             <ion-button class="boton-cart ion-text-wrap" expand="block" color="primary" (click)="agregarProducto()" [disabled]="!canContinue || recalculando" shape="round">

@@ -297,10 +297,11 @@
         </ng-template>
 
     </div>
-
+    
 </ion-content>
 
 <ion-footer class="ion-no-border">
+    <app-no-network></app-no-network>
     <ion-toolbar class="fondo-content">
         <ion-button class="boton-margen gradient--" expand="block" [disabled]="cuenta === 0 || !infoReady" (click)="ordenar()" shape="round">
             Generar pedido
