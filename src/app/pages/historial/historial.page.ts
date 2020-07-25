@@ -20,7 +20,7 @@ import { leaveAnimation } from 'src/app/animations/leave';
 })
 export class HistorialPage implements OnInit {
 
-  batch = 5
+  batch = 10
   lastKey = ''
   noMore = false
 

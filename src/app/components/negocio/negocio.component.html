@@ -24,6 +24,6 @@
           <p *ngIf="item.envio_gratis_pedMin" class="primario">Envío gratis</p>
           <app-stars *ngIf="item.promedio" [calificacion]="item.promedio" [readOnly]="true" [size]="'x-small'"></app-stars>
         </ion-label>
-        <ion-badge color="primary" mode="ios">Cerrado</ion-badge>
+        <ion-badge class="gradient--" mode="ios">Cerrado</ion-badge>
     </ng-template>
 </ion-item>

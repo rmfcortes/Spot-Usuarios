@@ -1,8 +1,6 @@
 <ion-card *ngFor="let item of sections; let i = index; trackBy: trackSections" [style.display]="item.productos && item.productos.length > 0 ? 'initial' : 'none'">
+    <h2>{{item.nombre | titlecase}}</h2>
     <ion-card>
-        <ion-list-header>
-            <ion-label color="primary">{{item.nombre | titlecase}}</ion-label>
-        </ion-list-header>
         <ion-item *ngFor="let prod of item.productos; let y = index; trackBy: trackProducts" style="--padding-start: 0; margin-top: 1rem; cursor: pointer;" lines="none" detail (click)="presentProduct(prod)">
             <ion-grid class="ion-no-padding">
                 <ion-row>

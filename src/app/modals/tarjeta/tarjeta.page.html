@@ -5,7 +5,7 @@
                 <ion-icon slot="start" name="chevron-back"></ion-icon>
             </ion-button>
         </ion-buttons>
-        <ion-title>Tarjeta de crédito/débito</ion-title>
+        <ion-title style="font-weight: 700;">Tarjeta de crédito/débito</ion-title>
     </ion-toolbar>
 </ion-header>
 
@@ -30,7 +30,7 @@
                 <ion-label position="floating">Nombre del titular</ion-label>
                 <ion-input [(ngModel)]="tarjeta.nombre" placeholder="Juan Perez" required name="nombre" type="text" tabindex="4" #d (keyup.enter)="$event.target.blur();"></ion-input>
             </ion-item>
-            <ion-button color="primary" type="submit" [disabled]="!forma.valid || loading" expand="block" shape="round" class="margen-boton" style="margin: 1.5rem 0;">
+            <ion-button type="submit" [disabled]="!forma.valid || loading" expand="block" shape="round" class="margen-boton gradient--" style="margin: 1.5rem 0;">
                 <ng-container *ngIf="loading; else loadingTemp">
                     <ion-spinner name="dots" color="light"></ion-spinner>
                 </ng-container>
@@ -46,7 +46,7 @@
     </ion-card>
     <div class="cuadro-ayuda shadow-large" id="ayuda">
         <div>
-            <h2 style="color: var(--ion-color-primary); text-align: center;">{{titulo}}</h2>
+            <h2 style="text-align: center; font-weight: 700; color: black;">{{titulo}}</h2>
             <ion-grid fixed>
                 <ion-row>
                     <ion-col size="8">
@@ -58,7 +58,7 @@
                 </ion-row>
             </ion-grid>
         </div>
-        <ion-button (click)="quitaAyuda()" expand="block" shape="round" class="boton-margen" style="margin-bottom: 1rem;">
+        <ion-button (click)="quitaAyuda()" expand="block" shape="round" class="boton-margen gradient--" style="margin-bottom: 1rem;">
             Entendido
         </ion-button>
     </div>

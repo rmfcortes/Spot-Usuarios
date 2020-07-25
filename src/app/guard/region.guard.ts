@@ -24,9 +24,7 @@ export class RegionGuard implements CanActivate {
     state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
       return this.regionService.getRegion()
       .then(resp => {
-        if (!resp) {
-          throw false
-        }
+        if (!resp) throw false
         return this.direccionService.getDireccion()
       })
       .then(async (dir) => {

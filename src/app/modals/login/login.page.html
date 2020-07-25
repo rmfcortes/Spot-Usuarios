@@ -2,7 +2,9 @@
     <ion-slides [options]="slideOpts">
         <ion-slide>
             <div style="width: 100%; height: 100%">
-                <ion-img src="../../../assets/img/backgrounds/login-fondo.jpg"></ion-img>
+                <div style="width: 100%; text-align: center; margin-top: 1.5rem;">
+                    <ion-img src="../../../assets/img/logo.jpg" style="width: 35%; margin: auto;"></ion-img>
+                </div>
                 <div class="botones">
                     <ion-button (click)="loginFace()" class="btn-face" shape="round" expand="block">
                         <ion-icon class="mr-5" name="logo-facebook"></ion-icon>
@@ -11,8 +13,8 @@
                     <img style="margin-bottom: 1rem;" src="../../../assets/img/backgrounds/o.jpg" alt="">
                     <ion-input (keyup.enter)="$event.target.blur();" type="text" [(ngModel)]="correo" class="input-usuario" placeholder="correo@gmail.com"></ion-input>
                     <ion-input (keyup.enter)="$event.target.blur();" type="password" [(ngModel)]="pass" class="input-usuario" placeholder="Contraseña"></ion-input>
-                    <ion-label color="primary" style="float: right; margin-bottom: 1.2rem; font-size: xx-small;" (click)="resetPass()">¿Olvidaste tu contraseña?</ion-label>
-                    <ion-button [disabled]="!correo || !pass" (click)="ingresarConCorreo()" color="primary" shape="round" expand="block">
+                    <ion-label style="float: right; margin-bottom: 1.2rem; font-size: xx-small;" (click)="resetPass()">¿Olvidaste tu contraseña?</ion-label>
+                    <ion-button [disabled]="!correo || !pass" (click)="ingresarConCorreo()" class="gradient--" shape="round" expand="block">
                         Iniciar sesión
                     </ion-button>
                     <ion-item lines="none" style="margin-top: 2.2rem; --background: transparent;">
@@ -43,7 +45,7 @@
                         <ion-item lines="none">
                             <ion-input (keyup.enter)="$event.target.blur();" type="password" class="input-registra" required  placeholder="Confirmar contraseña" [(ngModel)]="usuario.passConfirm" name="passConfirm" minlength="6"></ion-input>
                         </ion-item>
-                        <ion-button style="margin-top: 2rem" [disabled]="!formaCuenta.valid" expand="block" shape="round" type="submit" class="botones">
+                        <ion-button style="margin-top: 2rem" [disabled]="!formaCuenta.valid" expand="block" shape="round" type="submit" class="botones gradient--">
                             Crear cuenta
                         </ion-button>
                     </form>

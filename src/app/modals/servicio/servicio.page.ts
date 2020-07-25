@@ -36,7 +36,7 @@ export class ServicioPage implements OnInit {
     const tel = '+52' + this.whats;
     this.socialSharing.shareViaWhatsAppToReceiver(
       tel,
-      'Hola, vi tu negocio en Spot, quiero agendar una cita'
+      'Hola, vi tu negocio en Plaza, quiero agendar una cita'
     ).then(resp => {
       console.log('Success');
     }).catch(err => {

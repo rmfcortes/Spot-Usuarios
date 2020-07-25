@@ -2,7 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
-import { ModalController, IonInfiniteScroll, NavController, Platform } from '@ionic/angular';
+import { ModalController, IonInfiniteScroll, Platform } from '@ionic/angular';
 
 import { SocialSharing } from '@ionic-native/social-sharing/ngx';
 import { CallNumber } from '@ionic-native/call-number/ngx';
@@ -314,7 +314,7 @@ export class NegocioServiciosPage{
     const tel = '+52' + this.whats
     this.socialSharing.shareViaWhatsAppToReceiver(
       tel,
-      'Hola, vi tu negocio en Spot, me interesa más información'
+      'Hola, vi tu negocio en Plaza, me interesa más información'
     ).catch(err => this.alertService.presentAlert('Error', err))
   }
 

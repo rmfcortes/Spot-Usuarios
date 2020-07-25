@@ -1,7 +1,5 @@
 <div [id]="item.nombre" *ngFor="let item of sections; let i = index; trackBy: trackSections" [style.display]="item.productos && item.productos.length > 0 ? 'initial' : 'none'">
-    <ion-item lines="none">
-        <h6 class="ion-text-wrap primario">{{item.nombre | titlecase}}</h6>
-    </ion-item>
+    <h2>{{item.nombre | titlecase}}</h2>
     <ngx-masonry [options]="myOptions" style="width: 100%; padding: 0.75rem;">
         <div ngxMasonryItem *ngFor="let prod of item.productos; trackBy: trackProducts" style="width: 44%; margin-bottom: 0.5rem;">
             <ion-card class="card radius10 background-card" style="cursor: pointer;" (click)="presentProduct(prod)">

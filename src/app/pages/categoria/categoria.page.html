@@ -5,7 +5,7 @@
                 <ion-icon slot="start" name="chevron-back"></ion-icon>
             </ion-button>
         </ion-buttons>
-        <ion-title class="comfortaa" style="font-size: large;">{{categoria | titlecase}}</ion-title>
+        <ion-title style="font-size: large; font-weight: 700;">{{categoria | titlecase}}</ion-title>
     </ion-toolbar>
     <ion-toolbar class="fondo-content" *ngIf="subCategorias.length > 1">
         <ion-segment scrollable [value]="subCategoria">

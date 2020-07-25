@@ -50,10 +50,10 @@ export class RegionService {
   getFromDB(uid: string): Promise<boolean> {
     return new Promise((resolve, reject) => {      
       this.db.object(`usuarios/${uid}/region`).query.ref.once('value', snap => {
-        if (snap) {
+        if (snap.val()) {
           this.setRegion(snap.val())
           return resolve(true)
-        }
+        } else resolve(false)
       })
     })
   }
@@ -63,6 +63,8 @@ export class RegionService {
     return new Promise (async (resolve, reject) => {
       this.storageService.guardaString('region', region)
       this.uidService.setRegion(region)
+      const uid = this.uidService.getUid()
+      if (uid) this.db.object(`usuarios/${uid}/region`).set(region)
       resolve()
     })
   }

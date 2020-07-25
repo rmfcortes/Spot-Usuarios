@@ -10,6 +10,14 @@
     overflow: hidden;
 }
 
+.ovalo {
+    width: 100%;
+    background: white;
+    border-radius: 500px;
+    padding: 0.9rem;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.15), 0 6px 20px 0 rgba(0, 0, 0, 0.10);
+}
+
 .profile {
     margin-top: 0vh;
     padding-top: 0.5rem;
@@ -23,7 +31,7 @@
 }
 
 h2 {
-    font-family: 'Comfortaa';
+    font-weight: 700;
 }
 
 .btn-pedidos{

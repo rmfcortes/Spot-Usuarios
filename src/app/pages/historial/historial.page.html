@@ -3,7 +3,7 @@
         <ion-buttons slot="start">
             <ion-menu-button></ion-menu-button>
         </ion-buttons>
-        <ion-title>Historial</ion-title>
+        <ion-title style="font-weight: 700;">Historial</ion-title>
     </ion-toolbar>
 </ion-header>
 
@@ -24,7 +24,7 @@
                         <p style="color: var(--ion-color-danger);">Cancelado</p>
                     </ng-template>
                 </ion-label>
-                <ion-badge color="primary" *ngIf="!item.calificacion && !item.cancelado_by_negocio">Calificar</ion-badge>
+                <ion-badge class="gradient--" *ngIf="!item.calificacion && !item.cancelado_by_negocio">Calificar</ion-badge>
             </ion-item>
         </ion-card>
     </ng-container>

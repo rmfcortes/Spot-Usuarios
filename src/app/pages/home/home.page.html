@@ -2,18 +2,18 @@
     <div class="profile gradient">
         <ng-container *ngIf="uid; else menuTemplate">
             <ion-item lines="none">
-                <ion-menu-button slot="start" color="light"></ion-menu-button>
+                <ion-menu-button slot="end" color="light"></ion-menu-button>
             </ion-item>
-            <h1 style="color: white; margin-left: 1rem; margin-top: 0;" class="comfortaa"><strong>¿Qué producto o servicio buscas?</strong></h1>
+            <h1 style="color: white; margin-left: 1rem; margin-top: 0; font-weight: 700;"><strong>¿Qué producto o servicio buscas?</strong></h1>
         </ng-container>
         <ng-template #menuTemplate>
-            <ion-buttons slot="start">
-                <ion-button (click)="login()" color="light" style="margin-bottom: 1rem;">
+            <ion-buttons slot="end" style="right: 1rem; position: absolute;">
+                <ion-button (click)="login()" color="light" fill="outline" shape="round">
                     Iniciar sesión
                     <ion-icon slot="start" name="log-in"></ion-icon>
                 </ion-button>
             </ion-buttons>            
-            <h1 style="color: white;">¿Qué producto o servicio buscas?</h1>   
+            <h1 style="color: white; margin-left: 1rem; margin-top: 3.5rem; font-weight: 700;">¿Qué producto o servicio buscas?</h1>   
         </ng-template>
     </div>
     <div class="cuadro-opciones">
@@ -30,21 +30,20 @@
 
     <!-- Busqueda -->
 
+    <ion-grid *ngIf="negMatch.length > 0">
+        <div id="tituloBusqueda">
+            <ion-row>
+                <ion-col size="8">
+                    <h2 style="margin-left: 1rem">Resultados búsqueda</h2>
+                </ion-col>
+                <ion-col size="4" (click)="resetBusqueda()" class="ion-align-self-center">
+                    <ion-label color="primary" style="font-size: smaller; float: right; margin-right: 0.5rem;">Limpiar</ion-label>
+                </ion-col>
+            </ion-row>
+        </div>
+    </ion-grid>
     <ion-card *ngIf="negMatch.length > 0" id="cardBusqueda">
-        <ion-grid>
-            <div id="tituloBusqueda">
-                <ion-row>
-                    <ion-col size="8">
-                        <h2 style="margin-left: 1rem; color: var(--ion-color-primary);">Resultados búsqueda</h2>
-                    </ion-col>
-                    <ion-col size="4" (click)="resetBusqueda()" class="ion-align-self-center">
-                        <ion-label color="primary" style="font-size: smaller; float: right; margin-right: 0.5rem;">Limpiar</ion-label>
-                    </ion-col>
-                </ion-row>
-            </div>
-        </ion-grid>
         <app-negocio [negocios]="negMatch" [direccion]="direccion" (verNeg)="verProducto($event)"></app-negocio>
-
     </ion-card>
 
 
@@ -88,17 +87,19 @@
     <ng-container *ngIf="catsReady; else catsTemplate">
         <h2 style="margin-left: 1rem" *ngIf="masVendidos.length > 0">Categorías</h2>
         <ion-slides [options]="slideCategorias" *ngIf="categorias.length > 0">
-            <ion-slide *ngFor="let item of categorias" (click)="irACategoria(item.categoria)">
-                <ion-grid fixed>
-                    <ion-row>
-                        <ion-col size="12">
-                            <preload-image [ratio]="{w: 1, h: 0.8125}" [src]="item.foto" class="radius"></preload-image>
-                        </ion-col>
-                        <ion-col size="12">
-                            <ion-label class="ion-text-wrap" style="font-size: xx-small;">{{item.categoria | titlecase}}</ion-label>
-                        </ion-col>
-                    </ion-row>
-                </ion-grid>
+            <ion-slide *ngFor="let item of categorias" (click)="irACategoria(item.categoria)" style="padding: 0.5rem;">
+                <div class="ovalo">
+                    <ion-grid fixed class="ion-no-padding">
+                        <ion-row class="ion-no-padding"> 
+                            <ion-col size="12">
+                                <preload-image [ratio]="{w: 1, h: 0.8125}" [src]="item.foto"></preload-image>
+                            </ion-col>
+                            <ion-col size="12">
+                                <ion-label style="font-size: xx-small; overflow: hidden; white-space: nowrap;">{{item.categoria | titlecase}}</ion-label>
+                            </ion-col>
+                        </ion-row>
+                    </ion-grid>
+                </div>
             </ion-slide>
         </ion-slides>
     </ng-container>
@@ -124,8 +125,8 @@
                 <ion-col size="8">
                     <h2 style="margin-left: 1rem">Promociones</h2>
                 </ion-col>
-                <ion-col size="4" *ngIf="hayMas" (click)="verOfertas()" class="ion-align-self-center">
-                    <ion-label color="primary" style="font-size: smaller; float: right; ; margin-right: 1.2rem;">Ver todas</ion-label>
+                <ion-col size="4" (click)="verOfertas()" class="ion-align-self-center">
+                    <ion-label color="primary" *ngIf="hayMas" style="font-size: smaller; float: right; ; margin-right: 1.2rem;">Ver todas</ion-label>
                 </ion-col>
             </ion-row>
         </ion-grid>
@@ -133,8 +134,8 @@
             <ion-slide *ngFor="let item of ofertas" (click)="irAOferta(item)" style="padding: 0 0.5rem;">
                 <preload-image [ratio]="{w: 1, h: 0.45}" [src]="item.foto" class="radius"></preload-image>
             </ion-slide>
-            <ion-slide *ngIf="hayMas" (click)="verOfertas()" style="padding: 0 0.5rem;">
-                <ion-img src="../../../assets/img/botones/verTodas.png"></ion-img>
+            <ion-slide (click)="verOfertas()" *ngIf="hayMas" style="padding: 0 0.5rem;">
+                <ion-img style="width: 30%;" src="../../../assets/img/botones/verTodas.png"></ion-img>
             </ion-slide>
         </ion-slides>
     </ng-container>
@@ -167,7 +168,7 @@
                                             <strong>{{item.nombre}}</strong>
                                         </div>
                                         <div style="height: 0.5rem"></div>
-                                        <div class="nombreNegocio comfortaa">
+                                        <div class="nombreNegocio">
                                             {{item.nombreNegocio}}
                                         </div>
                                         <div style="height: 0.5rem"></div>
@@ -186,7 +187,7 @@
     <!-- + visitados por ti -->
     <ng-container *ngIf="pedidosReady && catsReady && promosReady && catsReady && visitadosReady; else visTemplate">
         <ion-card *ngIf="negociosVisitados.length > 0">
-            <h2 style="margin-left: 1rem; color: var(--ion-color-primary)">Tus favoritos</h2>
+            <h2 style="margin-left: 1rem; color: black;">Tus favoritos</h2>
             <app-negocio [negocios]="negociosVisitados" [direccion]="direccion" (verNeg)="verProductoConInfo($event)"></app-negocio>
             <div style="height: 1rem;"></div>
         </ion-card>
@@ -206,7 +207,7 @@
     <!-- + Populares -->
     <div *ngIf="pedidosReady && catsReady && promosReady && catsReady && visitadosReady && popularesReady">
         <ion-card style="margin-top: 0.75rem;">
-            <h2 style="margin-left: 1rem; color: var(--ion-color-primary)" *ngIf="negociosPopulares.length > 0">Los más populares</h2>
+            <h2 style="margin-left: 1rem; color: black;" *ngIf="negociosPopulares.length > 0">Los más populares</h2>
             <app-negocio [negocios]="negociosPopulares" [direccion]="direccion" (verNeg)="verProductoConInfo($event)"></app-negocio>
             <div style="height: 1rem;"></div>
         </ion-card>

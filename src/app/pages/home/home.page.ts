@@ -57,8 +57,8 @@ export class HomePage implements OnInit, OnDestroy {
       // when window width is =< 200px
       200: { slidesPerView: 2.5 },
       380: { slidesPerView: 3.3 },
-      640: { slidesPerView: 4.5 },
-      900: { slidesPerView: 5.5}
+      640: { slidesPerView: 3.6, spaceBetween: 15 },
+      900: { slidesPerView: 7.5}
     }
   }
 
@@ -195,6 +195,7 @@ export class HomePage implements OnInit, OnDestroy {
     this.categoriaService.getPopulares().then(async (populares)  => {
       this.negociosPopulares = populares
       this.negociosPopulares.sort((a, b) => b.visitas - a.visitas)
+      this.negociosPopulares.sort((a, b) => a === b ? 0 : a ? 1 : -1)
       this.costoEnvio(this.negociosPopulares)
       this.popularesReady = true
     })
@@ -252,6 +253,7 @@ export class HomePage implements OnInit, OnDestroy {
               info.visitas = x.visitas
               this.negociosVisitados.push(info)
               this.negociosVisitados.sort((a, b) => b.visitas - a.visitas)
+              this.negociosVisitados.sort((a, b) => a === b ? 0 : a ? 1 : -1)
               this.costoEnvio(this.negociosVisitados)
             }
           })
