@@ -94,6 +94,12 @@ export class CuentaPage implements OnInit {
 
   netSub: Subscription
 
+  telefono: string
+
+  confirmar = false
+  cuadroAyuda: HTMLElement
+  claseAyuda: HTMLElement
+
   constructor(
     private router: Router,
     private platform: Platform,
@@ -116,6 +122,7 @@ export class CuentaPage implements OnInit {
     this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
       this.closeCart()
     })
+    this.pedidoService.getTelefono().then(tel => this.telefono = tel)
   }
   
   getDireccion() {
@@ -302,56 +309,73 @@ export class CuentaPage implements OnInit {
           return
         })
         return
-      }
-      try {      
-        const telefono: string = await this.pedidoService.getTelefono()
-        if (!telefono) {
-          const resp: any = await this.alertSerivce.presentPromptTelefono()
-          let tel
-          if (resp) {
-            tel = resp.telefono.replace(/ /g, "")
-            if (tel.length === 10) {
-              this.pedidoService.guardarTelefono(resp.telefono)
-            } else {
-              this.alertSerivce.presentAlert('Número incorrecto', 'El teléfono agregado es incorrecto, por favor intenta de nuevo')
-              return
-            }
+      }   
+      if (!this.telefono) {
+        const resp: any = await this.alertSerivce.presentPromptTelefono()
+        let tel
+        if (resp) {
+          tel = resp.telefono.replace(/ /g, "")
+          if (tel.length === 10) {
+            this.telefono = resp.telefono
+            this.pedidoService.guardarTelefono(resp.telefono)
+          } else {
+            this.alertSerivce.presentAlert('Número incorrecto', 'El teléfono agregado es incorrecto, por favor intenta de nuevo')
+            return
           }
         }
-        await this.alertSerivce.presentLoading('Estamos generando tu orden. Este proceso tomará sólo un momento')
-        const cliente: Cliente = {
-          direccion: this.direccion,
-          nombre: this.uidService.getNombre() || 'No registrado',
-          telefono,
-          uid: this.uidService.getUid()
-        }
-        const pedido: Pedido = {
-          aceptado: false,
-          categoria: this.datos.categoria,
-          cliente,
-          comision: this.comision,
-          createdAt: Date.now(),
-          envio: this.datosNegocio.envio,
-          propina: this.propina,
-          negocio: this.datosNegocio,
-          productos: this.cart,
-          total: this.cuenta + this.datosNegocio.envio + this.comision + this.propina,
-          entrega: this.datosNegocio.entrega || 'indefinido',
-          avances: [],
-          formaPago: this.formaPago,
-          region: this.uidService.getRegion()
-        }
-        pedido.total = Math.round((pedido.total + Number.EPSILON) * 100) / 100
-        if (this.formaPago.tipo !== 'efectivo') pedido.idOrder =  await this.pagoService.cobrar(pedido)
-        await this.pedidoService.createPedido(pedido)
-        this.alertSerivce.dismissLoading()
-        this.router.navigate(['/avances', pedido.id])
-        this.closeCart()
-      } catch (error) {
-        this.alertSerivce.dismissLoading()
-        this.alertSerivce.presentAlert('Error', 'Lo sentimos algo salió mal, por favor intenta de nuevo ' + error)
       }
+      this.claseAyuda = document.querySelector('.cuadro-ayuda') as HTMLElement
+      this.claseAyuda.style.setProperty('visibility', 'visible')
+      this.cuadroAyuda= document.getElementById('confirm')
+      this.animationService.animEntradaDebajo(this.cuadroAyuda)
+      this.confirmar = true
     })
+  }
+
+  async confirmarPedido() {
+    try {      
+      await this.alertSerivce.presentLoading('Estamos generando tu orden. Este proceso tomará sólo un momento')
+      const cliente: Cliente = {
+        direccion: this.direccion,
+        nombre: this.uidService.getNombre() || 'No registrado',
+        telefono: this.telefono,
+        uid: this.uidService.getUid()
+      }
+      const pedido: Pedido = {
+        aceptado: false,
+        categoria: this.datos.categoria,
+        cliente,
+        comision: this.comision,
+        createdAt: Date.now(),
+        envio: this.datosNegocio.envio,
+        propina: this.propina,
+        negocio: this.datosNegocio,
+        productos: this.cart,
+        total: this.cuenta + this.datosNegocio.envio + this.comision + this.propina,
+        entrega: this.datosNegocio.entrega || 'indefinido',
+        avances: [],
+        formaPago: this.formaPago,
+        region: this.uidService.getRegion()
+      }
+      pedido.total = Math.round((pedido.total + Number.EPSILON) * 100) / 100
+      if (this.formaPago.tipo !== 'efectivo') pedido.idOrder =  await this.pagoService.cobrar(pedido)
+      await this.pedidoService.createPedido(pedido)
+      this.alertSerivce.dismissLoading()
+      this.router.navigate(['/avances', pedido.id])
+      this.confirmar = false
+      this.claseAyuda.style.setProperty('visibility', 'hidden')
+      this.animationService.salidaDebajo(this.cuadroAyuda)
+      this.closeCart()
+    } catch (error) {
+      this.alertSerivce.dismissLoading()
+      this.alertSerivce.presentAlert('Error', 'Lo sentimos algo salió mal, por favor intenta de nuevo ' + error)
+    }
+  }
+
+  cancelarConfirm() {
+    this.confirmar = false
+    this.claseAyuda.style.setProperty('visibility', 'hidden')
+    this.animationService.salidaDebajo(this.cuadroAyuda)
   }
 
   closeCart() {

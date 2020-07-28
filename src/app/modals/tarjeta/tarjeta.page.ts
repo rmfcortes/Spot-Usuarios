@@ -24,18 +24,18 @@ export class TarjetaPage implements OnInit {
     nombre: '',
   }
 
-  titulo: string;
-  mensaje: string;
+  titulo: string
+  mensaje: string
   imagen: string
-  cuadroAyuda: any;
-  claseAyuda: any;
+  cuadroAyuda: HTMLElement
+  claseAyuda: HTMLElement
 
   imagenes =  {
     cvc: '../../../assets/img/cvc.jpg',
     fecha: '../../../assets/img/vencimiento.jpg'
   }
 
-  loading = false;
+  loading = false
 
   constructor(
     private modalCtrl: ModalController,

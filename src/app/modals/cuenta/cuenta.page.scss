@@ -31,3 +31,13 @@
 ion-thumbnail {
     max-width: 1.75rem;
 }
+
+.cuadro-ayuda {
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    background: white;
+    border-radius: 40px 40px 0 0;
+    visibility: hidden;
+    z-index: 100;
+}

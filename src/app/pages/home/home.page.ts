@@ -152,6 +152,7 @@ export class HomePage implements OnInit, OnDestroy {
       const nombre = 'app'
       navigator[nombre].exitApp()
     })
+    if (this.uid) this.getPedidosActivos()
   }
 
   getUid() {

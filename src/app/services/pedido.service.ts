@@ -115,9 +115,6 @@ export class PedidoService {
   async guardarTelefono(tel: string) {
     const uid = this.uidService.getUid()
     await this.db.object(`usuarios/${uid}/datos/telefono`).set(tel)
-    const user = await this.authFirebase.auth.currentUser
-    user.phoneNumber = '+52' + tel
-    this.authFirebase.auth.updateCurrentUser(user)
  }
 
   listenCalificar() {

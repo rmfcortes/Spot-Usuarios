@@ -12,7 +12,7 @@
 
         <!-- Cancelacion -->
         <ion-card *ngIf="pedido.cancelado_by_negocio">
-            <h2 class="comfortaa">Pedido cancelado</h2>
+            <h2>Pedido cancelado</h2>
             <ion-item lines="none">
                 <ion-label color="medium" class="ion-text-wrap">
                     Tú dinero ya ha sido reembolsado. Aún así, lamentamos que el negocio cancelara tu pedido por la siguiente razón: <strong>{{pedido.razon_cancelacion}}</strong>
@@ -23,13 +23,13 @@
 
         <!-- Contacto -->
         <ion-card *ngIf="!pedido.cancelado_by_negocio">
-            <h2 class="comfortaa">Contacto</h2>
+            <h2>Contacto</h2>
             <ion-item lines="none">
                 <ion-thumbnail slot="start">
                     <img [src]="pedido.negocio.logo" />
                 </ion-thumbnail>
                 <ion-label>
-                    <h3 class="comfortaa">{{pedido.negocio.nombreNegocio}}</h3>
+                    <h3>{{pedido.negocio.nombreNegocio}}</h3>
                 </ion-label>
                 <ion-icon slot="end" name="call"></ion-icon>
             </ion-item>
@@ -38,7 +38,7 @@
                     <img [src]="pedido.repartidor.foto"/>
                 </ion-avatar>
                 <ion-label>
-                    <h3 class="comfortaa">{{pedido.repartidor.nombre}}</h3>
+                    <h3>{{pedido.repartidor.nombre}}</h3>
                     <p>Repartidor</p>
                 </ion-label>
                 <ng-container *ngIf="newMsg; else msgTemplate">
@@ -57,7 +57,7 @@
 
         <!-- Avances -->
         <ion-card *ngIf="!pedido.cancelado_by_negocio">
-            <h2 class="comfortaa">Status</h2>
+            <h2>Status</h2>
             <h3 *ngIf="pedido.aceptado && pedido.entrega === 'inmediato'" style="margin-left: 1rem;">Entrega: {{pedido.aceptado + 900000 | date:'h:mm a'}}</h3>
             <h3 *ngIf="pedido.aceptado && pedido.entrega === 'planeado'" style="margin-left: 1rem;">Entrega estimada: {{pedido.aceptado | date:'EEEE d/MMMM/y'}}</h3>
             <ion-grid class="ion-no-padding">
@@ -112,7 +112,7 @@
 
         <!-- Mapa -->
         <ion-card *ngIf="pedido.entrega === 'inmediato' && !pedido.cancelado_by_negocio || pedido.repartidor && !pedido.cancelado_by_negocio">
-            <h2 class="comfortaa">Rastreo</h2>
+            <h2>Rastreo</h2>
             <div class="marco">
                 <agm-map style="height: 45vh" [latitude]="20.627006" [longitude]="-103.416554" [disableDefaultUI]="true" [streetViewControl]="false" [zoomControl]="false" [fitBounds]="true" (mapReady)="mapReady($event)">
                     <agm-marker [agmFitBounds]="true" [iconUrl]='{"url": icon,"scaledSize": {"height": 75, "width": 50}}' [latitude]="pedido.cliente.direccion.lat" [longitude]="pedido.cliente.direccion.lng" [animation]="'DROP'"></agm-marker>
@@ -131,7 +131,7 @@
     <!-- Cargando información -->
     <ng-template #elseTemplate>
         <ion-card>
-            <h2 class="comfortaa">Contacto</h2>
+            <h2>Contacto</h2>
             <h2>
                 <ion-skeleton-text animated style="width: 35%"></ion-skeleton-text>
             </h2>
@@ -157,7 +157,7 @@
 
         <!-- Status -->
         <ion-card>
-            <h2 class="comfortaa">Status</h2>
+            <h2>Status</h2>
             <ion-item lines="none">
                 <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
             </ion-item>
@@ -174,7 +174,7 @@
 </ion-content>
 
 <ion-footer *ngIf="!hasPermission">
-    <ion-toolbar color="primary" (click)="muestraPermisos()">
+    <ion-toolbar class="gradient--" (click)="muestraPermisos()">
         <ion-title>
             <ion-item lines="none">
                 <ion-icon slot="start" name="notifications" color="light"></ion-icon>

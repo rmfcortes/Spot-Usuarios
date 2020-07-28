@@ -48,22 +48,30 @@
 
 
     <!-- Pedidos -->
+    <ion-grid *ngIf="pedidosReady && catsReady && pedidos.length > 0" class="ion-no-padding">
+        <ion-row>
+            <ion-col size="8">
+                <h2 style="margin-left: 1rem" class="ion-text-wrap">Pedidos en curso</h2>
+            </ion-col>
+            <ion-col size="4" (click)="verPedidos = true" class="ion-align-self-center" *ngIf="pedidos.length > 2 && !verPedidos">
+                <ion-label color="primary" style="font-size: smaller; float: right; ; margin-right: 1.2rem;">Ver todos</ion-label>
+            </ion-col>
+        </ion-row>
+    </ion-grid>
     <ion-card *ngIf="pedidosReady && catsReady && pedidos.length > 0">
-        <ion-item lines="none">
-            <ion-label color="primary">
-                <h2 style="margin-left: 1rem" *ngIf="pedidos.length > 0" class="ion-text-wrap">Pedidos en curso</h2>
-            </ion-label>
-            <ion-label color="medium" slot="end" *ngIf="pedidos.length > 2 && !verPedidos" (click)="verPedidos = true" style="font-size: smaller;">Ver más
-                <ion-icon style="margin-left: 0.5rem;" name="chevron-down"></ion-icon>
-            </ion-label>
-        </ion-item>
         <ng-container *ngIf="!verPedidos; else pedidosTemplate">
             <ion-item *ngIf="pedidos.length > 0" (click)="verPedido(pedidos[0])" detail style="--detail-icon-color: var(--ion-color-primary)" lines="none">
+                <ion-thumbnail style="max-width: 2rem;">
+                    <img [src]="pedidos[0].negocio.logo" />
+                </ion-thumbnail>
                 <ion-label color="medium">{{pedidos[0].negocio.nombreNegocio}}</ion-label>
                 <ion-badge color="primary" *ngIf="pedidos[0].unRead > 0">{{pedidos[0].unRead}}</ion-badge>
                 <ion-badge color="danger" *ngIf="pedidos[0].cancelado_by_negocio">Cancelado</ion-badge>
             </ion-item>
             <ion-item *ngIf="pedidos.length > 1" (click)="verPedido(pedidos[1])" detail style="--detail-icon-color: var(--ion-color-primary)" lines="none">
+                <ion-thumbnail style="max-width: 2rem;">
+                    <img [src]="pedidos[1].negocio.logo" />
+                </ion-thumbnail>
                 <ion-label color="medium">{{pedidos[1].negocio.nombreNegocio}}</ion-label>
                 <ion-badge color="primary" *ngIf="pedidos[1].unRead > 0">{{pedidos[1].unRead}}</ion-badge>
                 <ion-badge color="danger" *ngIf="pedidos[1].cancelado_by_negocio">Cancelado</ion-badge>
@@ -71,6 +79,9 @@
         </ng-container>
         <ng-template #pedidosTemplate>
             <ion-item *ngFor="let item of pedidos" detail (click)="verPedido(item)" style="--detail-icon-color: var(--ion-color-primary)" lines="none">
+                <ion-thumbnail style="max-width: 2rem;">
+                    <img [src]="item.negocio.logo" />
+                </ion-thumbnail>
                 <ion-label color="medium">{{item.negocio.nombreNegocio}}</ion-label>
                 <ion-badge color="primary" *ngIf="item.unRead > 0">{{item.unRead}}</ion-badge>
                 <ion-badge color="danger" *ngIf="item.cancelado_by_negocio">Cancelado</ion-badge>
@@ -125,8 +136,8 @@
                 <ion-col size="8">
                     <h2 style="margin-left: 1rem">Promociones</h2>
                 </ion-col>
-                <ion-col size="4" (click)="verOfertas()" class="ion-align-self-center">
-                    <ion-label color="primary" *ngIf="hayMas" style="font-size: smaller; float: right; ; margin-right: 1.2rem;">Ver todas</ion-label>
+                <ion-col size="4" (click)="verOfertas()" class="ion-align-self-center" *ngIf="hayMas">
+                    <ion-label color="primary" style="font-size: smaller; float: right; ; margin-right: 1.2rem;">Ver todas</ion-label>
                 </ion-col>
             </ion-row>
         </ion-grid>

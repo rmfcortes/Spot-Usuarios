@@ -297,6 +297,7 @@
         </ng-template>
 
     </div>
+
     
 </ion-content>
 
@@ -308,3 +309,51 @@
         </ion-button>
     </ion-toolbar>
 </ion-footer>
+
+<div style="width: 100vw; height: 100vh; background: chocolate; opacity: 0.5; position: absolute;" *ngIf="confirmar"></div>
+
+<div class="cuadro-ayuda shadow-large" id="confirm">
+    <ion-item lines="none">
+        <ion-icon slot="start" name="location" color="primary"></ion-icon>
+        <ion-label>
+            <h2>Entregar en:</h2>
+            <p class="ion-text-wrap">{{direccion.direccion}}</p>
+        </ion-label>
+    </ion-item>        
+    <ion-item lines="none" *ngIf="formaPago && formaPago.id === 'efectivo'">
+        <ion-icon slot="start" name="cash" color="success"></ion-icon>
+        <ion-label>
+            <h2>Forma de pago:</h2>
+            <p>Efectivo</p>
+        </ion-label>
+    </ion-item>
+    <ion-item lines="none" *ngIf="formaPago && formaPago.id !== 'efectivo'">
+        <div [ngSwitch]="formaPago.tipo">
+            <div *ngSwitchCase="'visa'">
+                <ion-thumbnail>
+                    <img src="../../../assets/img/iconos/Visa_Inc._logo.svg.png" />
+                </ion-thumbnail>
+            </div>
+            <div *ngSwitchCase="'mastercard'">
+                <ion-thumbnail >
+                    <img src="../../../assets/img/iconos/mastercard.png" />
+                </ion-thumbnail>
+            </div>
+            <div *ngSwitchCase="'amex'">
+                <ion-thumbnail>
+                    <img src="../../../assets/img/iconos/amex.jpg" />
+                </ion-thumbnail>
+            </div>
+        </div>
+        <ion-label style="margin-left: 2rem;">
+            <h2>Forma de pago:</h2>
+            <p>**** {{formaPago.forma}}</p>
+        </ion-label>
+    </ion-item>
+    <ion-button (click)="confirmarPedido()" expand="block" shape="round" class="boton-margen gradient--" style="margin-bottom: 1rem;">
+        Confirmar
+    </ion-button>        
+    <ion-button (click)="cancelarConfirm()" expand="block" fill="clear" color="medium" class="boton-margen" style="margin-bottom: 1rem;">
+        Cancelar
+    </ion-button>
+</div>

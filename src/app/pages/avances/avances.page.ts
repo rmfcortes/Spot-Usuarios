@@ -461,6 +461,7 @@ export class AvancesPage implements OnInit {
     if (this.back) this.back.unsubscribe()
     if (this.msgSub) this.msgSub.unsubscribe()
     if (this.pedidoSub) this.pedidoSub.unsubscribe()
+    if (this.canceladoSub) this.canceladoSub.unsubscribe()
     if (this.ubicacionSub) this.ubicacionSub.unsubscribe()
     if (this.entregadoSub) this.entregadoSub.unsubscribe()
     if (this.repartidorSub) this.repartidorSub.unsubscribe()
