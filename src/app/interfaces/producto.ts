@@ -49,6 +49,18 @@ export interface MasVendido {
     ventas?: number;
 }
 
+export interface MasConsultado {
+    categoria: string;
+    descripcion: string;
+    id: string;
+    idNegocio: string;
+    nombre: string;
+    nombreNegocio: string;
+    precio: number;
+    url: string;
+    consultas?: number;
+}
+
 export interface Cart{
     detalles: Producto[];
     cantidades: number[];

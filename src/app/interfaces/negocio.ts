@@ -4,6 +4,7 @@ import { Direccion } from './direcciones';
 export interface Negocio {
     abierto: boolean;
     calificaciones;
+    categoria: string;
     foto: string;
     id: string;
     nombre: string;
@@ -20,7 +21,7 @@ export interface Negocio {
 
 export interface DetallesNegocio {
     descripcion: string;
-    telefono: number;
+    telefono: string;
     horario: Horario[];
     direccion?: string;
     lat: number;

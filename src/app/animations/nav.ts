@@ -1,7 +1,7 @@
 import { Animation } from '@ionic/core'
 import { AnimationController } from '@ionic/angular'
 
-export const enterPageAnimation = (baseEl: HTMLElement, opts?: any): Animation => {
+export function enterPageAnimation (baseEl: HTMLElement, opts?: any): Animation {
 
     const DURATION = 450
 

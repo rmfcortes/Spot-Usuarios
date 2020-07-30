@@ -63,6 +63,8 @@ export class CategoriaPage implements OnInit, OnDestroy{
   direccion: Direccion
   costo_envio: CostoEnvio
 
+  filtro = 'destacado'
+
   constructor(
     private ngZone: NgZone,
     private router: Router,
@@ -92,6 +94,18 @@ export class CategoriaPage implements OnInit, OnDestroy{
     })
   }
 
+  setFiltro(filtro: string) {
+    this.negociosReady = false
+    this.negocios = []
+    this.lastValue = null
+    this.lastKey = ''
+    this.noMore = false
+    this.status = 'abiertos'
+    this.infiniteScroll.disabled = false
+    this.filtro = filtro
+    this.getNegocios()
+  }
+
   getSubCategorias() {
     this.categoriaService.getSubCategorias(this.categoria)
     .then(subcategorias => {
@@ -116,7 +130,7 @@ export class CategoriaPage implements OnInit, OnDestroy{
 
   async getNegocios(event?) {
     this.categoriaService
-      .getNegocios(this.status, this.categoria, this.subCategoria, this.batch + 1, this.lastKey, this.lastValue)
+      .getNegocios(this.filtro, this.status, this.categoria, this.subCategoria, this.batch + 1, this.lastKey, this.lastValue)
       .then(async (negocios) => {
         if (negocios.length === this.batch + 1) {
           this.lastKey = negocios[0].id

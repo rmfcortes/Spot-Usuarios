@@ -28,8 +28,8 @@ export class ServicioPage implements OnInit {
 
   ngOnInit() {
     this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-      this.regresar();
-    });
+      this.regresar()
+    })
   }
 
   async contactViaWhatsApp() {
@@ -37,16 +37,14 @@ export class ServicioPage implements OnInit {
     this.socialSharing.shareViaWhatsAppToReceiver(
       tel,
       'Hola, vi tu negocio en Plaza, quiero agendar una cita'
-    ).then(resp => {
-      console.log('Success');
-    }).catch(err => {
-      this.alertService.presentAlert('Error', err);
-    });
+    ).catch(err => {
+      this.alertService.presentAlert('Error', err)
+    })
   }
 
   regresar() {
-    if (this.back) {this.back.unsubscribe()}
-    this.modalCtrl.dismiss();
+    if (this.back) this.back.unsubscribe()
+    this.modalCtrl.dismiss()
   }
 
 }

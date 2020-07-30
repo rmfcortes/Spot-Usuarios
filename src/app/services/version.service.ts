@@ -4,7 +4,6 @@ import { AppVersion } from '@ionic-native/app-version/ngx';
 import { Market } from '@ionic-native/market/ngx';
 
 import { AngularFireDatabase } from '@angular/fire/database';
-import { UidService } from './uid.service';
 import { DisparadoresService } from './disparadores.service';
 
 @Injectable({
@@ -23,16 +22,16 @@ export class VersionService {
     const number = await this.appVersion.getVersionNumber();
     this.db.object(`1version`).valueChanges().subscribe(async (current) => {
       if (number !== current) {
-        this.alertService.presentAlertUpdate('Nueva versión de Spot', 'Hay una versión de Spot, '+
+        this.alertService.presentAlertUpdate('Nueva versión de Plaza', 'Hay una versión de Plaza, '+
         'Obtén las últimas funcionalidades tu app. Trabajamos constantemente para darte el mejor servicio')
         .then(async (resp) => {
           if (resp) {
-            const pack = await this.appVersion.getPackageName();
-            this.market.open(pack);
+            const pack = await this.appVersion.getPackageName()
+            this.market.open(pack)
           }
-        });
+        })
       }
-    });
+    })
   }
 
 }

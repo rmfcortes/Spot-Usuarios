@@ -19,6 +19,7 @@ import { Oferta, InfoGral, NegocioBusqueda } from 'src/app/interfaces/negocio';
 import { Categoria } from 'src/app/interfaces/categoria.interface';
 import { UnreadMsg } from 'src/app/interfaces/chat.interface';
 import { CostoEnvio } from '../../interfaces/envio.interface';
+import { MasConsultado } from '../../interfaces/producto';
 import { Direccion } from '../../interfaces/direcciones';
 import { MasVendido } from 'src/app/interfaces/producto';
 import { Pedido } from 'src/app/interfaces/pedido';
@@ -56,7 +57,7 @@ export class HomePage implements OnInit, OnDestroy {
     breakpoints: {
       // when window width is =< 200px
       200: { slidesPerView: 2.5 },
-      380: { slidesPerView: 3.3 },
+      380: { slidesPerView: 4.2, spaceBetween: 8 },
       640: { slidesPerView: 4.6, spaceBetween: 10 },
       900: { slidesPerView: 7.5}
     }
@@ -90,22 +91,22 @@ export class HomePage implements OnInit, OnDestroy {
   negociosBusqueda: NegocioBusqueda[] = []
   negMatch: NegocioBusqueda[] = []
 
+  masConsultados: MasConsultado[] = []
   negociosVisitados: InfoGral[] = []
   negociosPopulares: InfoGral[] = []
   masVendidos: MasVendido[] = []
 
-  pedidosReady = false
-  promosReady = false
   catsReady = false
+  promosReady = false
+  pedidosReady = false
+  vendidosReady = false
   visitadosReady = false
   popularesReady = false
-  vendidosReady = false
+  consultadosReady = false
 
   buscando = false
 
   back: Subscription
-  vendidosSub: Subscription
-  popularesSub: Subscription
 
   direccion: Direccion
 
@@ -134,6 +135,7 @@ export class HomePage implements OnInit, OnDestroy {
     this.getOfertas()
     this.getPopulares()
     this.getMasVendidos()
+    this.getMasConsultados()
     this.listenCambios()
     this.listenRegion()
   }
@@ -195,8 +197,10 @@ export class HomePage implements OnInit, OnDestroy {
   getPopulares() {
     this.categoriaService.getPopulares().then(async (populares)  => {
       this.negociosPopulares = populares
+      this.negociosPopulares.sort((a, b) => b.calificaciones - a.calificaciones)
+      this.negociosPopulares.sort((a, b) => b.promedio - a.promedio)
       this.negociosPopulares.sort((a, b) => b.visitas - a.visitas)
-      this.negociosPopulares.sort((a, b) => a === b ? 0 : a ? 1 : -1)
+      this.negociosPopulares.sort((a, b) => a.abierto === b.abierto ? 0 : a ? 1 : -1)
       this.costoEnvio(this.negociosPopulares)
       this.popularesReady = true
     })
@@ -223,10 +227,18 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   getMasVendidos() {
-    this.vendidosSub = this.categoriaService.getMasVendidos().subscribe((vendidos: MasVendido[]) => {
+    this.categoriaService.getMasVendidos().then(vendidos => {
       this.masVendidos = vendidos
       this.masVendidos.sort((a, b) => b.ventas - a.ventas)
       this.vendidosReady = true
+    })
+  }
+
+  getMasConsultados() {
+    this.categoriaService.getMasConsultados().then(consultados => {
+      this.masConsultados = consultados
+      this.masConsultados.sort((a, b) => b.consultas - a.consultas)
+      this.consultadosReady = true
     })
   }
 
@@ -250,6 +262,7 @@ export class HomePage implements OnInit, OnDestroy {
       if (n.length > 0) {
         n.forEach(async (x) => {
           this.ofertaService.getStatus(x.idNegocio).then((info: InfoGral) => {
+            console.log(info);
             if (info) {
               info.visitas = x.visitas
               this.negociosVisitados.push(info)

@@ -21,10 +21,6 @@ const routes: Routes = [
     loadChildren: () => import('./pages/negocio-servicios/negocio-servicios.module').then( m => m.NegocioServiciosPageModule), canActivate: [RegionGuard]
   },
   {
-    path: 'mapa/:id',
-    loadChildren: () => import('./pages/mapa/mapa.module').then( m => m.MapaPageModule), canActivate: [RegionGuard]
-  },
-  {
     path: 'historial',
     loadChildren: () => import('./pages/historial/historial.module').then( m => m.HistorialPageModule), canActivate: [RegionGuard]
   },

@@ -4,17 +4,20 @@
         <preload-image [ratio]="{w: 1, h: 0.75}" [src]="serv.url"></preload-image>
         <div class="triangle-topleft" *ngIf="serv.agregados"></div>
         <div class="badge">{{serv.agregados}}</div>
-        <ion-card-header>
+        <ion-card-header class="ion-no-padding">
             <ion-card-title>
                 <ion-item lines="none">
-                    <ion-label color="primary">
+                    <ion-label>
                         <h2 class="ion-text-wrap">{{serv.nombre}}</h2>
                     </ion-label>
+                    <ion-button fill="clear">
+                        Ver más
+                    </ion-button>
                 </ion-item>
             </ion-card-title>
         </ion-card-header>
         <ion-card-content>
-            <h6>{{(serv.descripcion.length > 130) ? (serv.descripcion | slice:0:130) + '...' : serv.descripcion}}
+            <h6 style="line-height: 1.5;">{{(serv.descripcion.length > 130) ? (serv.descripcion | slice:0:130) + '...' : serv.descripcion}}
             </h6>
         </ion-card-content>
     </ion-card>

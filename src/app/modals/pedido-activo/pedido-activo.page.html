@@ -34,7 +34,7 @@
                         <h2 style="margin-left: 0;">{{pedido.negocio.nombreNegocio}}</h2>
                         <p class="ion-text-wrap">{{pedido.calificacion.negocio.comentarios}}</p>
                         <p>
-                            <app-stars style="margin: auto;" [calificacion]="pedido.calificacion.negocio.puntos" [readOnly]="true" (calficar)="repartidor.puntos = $event"></app-stars>
+                            <app-stars style="margin: auto;" [calificacion]="pedido.calificacion.negocio.puntos" [readOnly]="true"></app-stars>
                         </p>
                     </ion-label>
                 </ion-item>
@@ -46,7 +46,7 @@
                         <h2 style="margin-left: 0;">{{pedido.repartidor.nombre}}</h2>
                         <p class="ion-text-wrap">{{pedido.calificacion.repartidor.comentarios}}</p>
                         <p>
-                            <app-stars style="margin: auto;" [calificacion]="pedido.calificacion.repartidor.puntos" [readOnly]="true" (calficar)="repartidor.puntos = $event"></app-stars>
+                            <app-stars style="margin: auto;" [calificacion]="pedido.calificacion.repartidor.puntos" [readOnly]="true"></app-stars>
                         </p>
                     </ion-label>
                 </ion-item>

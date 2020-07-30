@@ -48,7 +48,7 @@
 
 
     <!-- Pedidos -->
-    <ion-grid *ngIf="pedidosReady && catsReady && pedidos.length > 0" class="ion-no-padding">
+    <ion-grid *ngIf="pedidosReady && pedidos.length > 0" class="ion-no-padding">
         <ion-row>
             <ion-col size="8">
                 <h3 style="margin-left: 1rem" class="ion-text-wrap">Pedidos en curso</h3>
@@ -58,7 +58,7 @@
             </ion-col>
         </ion-row>
     </ion-grid>
-    <ion-card *ngIf="pedidosReady && catsReady && pedidos.length > 0">
+    <ion-card *ngIf="pedidosReady && pedidos.length > 0">
         <ng-container *ngIf="!verPedidos; else pedidosTemplate">
             <ion-item *ngIf="pedidos.length > 0" (click)="verPedido(pedidos[0])" detail style="--detail-icon-color: var(--ion-color-primary)" lines="none">
                 <ion-thumbnail style="max-width: 2rem;">
@@ -95,7 +95,7 @@
     </ion-card>
 
     <!-- Categorias -->
-    <ng-container *ngIf="catsReady; else catsTemplate">
+    <ng-container *ngIf="catsReady && pedidosReady; else catsTemplate">
         <h3 style="margin-left: 1rem" *ngIf="masVendidos.length > 0">Categorías</h3>
         <ion-slides [options]="slideCategorias" *ngIf="categorias.length > 0">
             <ion-slide *ngFor="let item of categorias" (click)="irACategoria(item.categoria)" style="padding: 0.5rem;">
@@ -161,8 +161,8 @@
 
 
     <!-- + vendidos -->
-    <div *ngIf="pedidosReady && catsReady && promosReady && catsReady && visitadosReady && popularesReady && vendidosReady">
-        <h3 style="margin-left: 1rem" *ngIf="masVendidos.length > 0">Lo más vendido</h3>
+    <div *ngIf="pedidosReady && catsReady && promosReady && vendidosReady">
+        <h3 style="margin-left: 1rem" *ngIf="masVendidos.length > 0">Productos más vendidos</h3>
         <ion-slides [options]="slideVendidos" *ngIf="masVendidos.length > 0">
             <ion-slide *ngFor="let item of masVendidos" (click)="irAOferta(item)">
                 <ion-card>                    
@@ -195,8 +195,43 @@
     </div>
 
 
+        <!-- + consultados -->
+    <div *ngIf="pedidosReady && catsReady && promosReady && vendidosReady && masConsultados">
+        <h3 style="margin-left: 1rem" *ngIf="masConsultados.length > 0">Servicios más consultados</h3>
+        <ion-slides [options]="slideVendidos" *ngIf="masConsultados.length > 0">
+            <ion-slide *ngFor="let item of masConsultados" (click)="irAOferta(item)">
+                <ion-card>                    
+                    <ion-grid fixed>
+                        <ion-row>
+                            <ion-col size="12">
+                                <preload-image [ratio]="{w: 1, h: 0.75}" [src]="item.url" style="border-radius: 10px;"></preload-image>
+                            </ion-col>
+                            <ion-col size="12">
+                                <ion-item lines="none">
+                                    <ion-label class="ion-text-wrap">
+                                        <!-- <h2>{{(item.nombre.length > 15) ? (item.nombre | slice:0:15) + '...' : item.nombre}}</h2> -->
+                                        <div class="nombreProducto">
+                                            <strong>{{item.nombre}}</strong>
+                                        </div>
+                                        <div style="height: 0.5rem"></div>
+                                        <div class="nombreNegocio">
+                                            {{item.nombreNegocio}}
+                                        </div>
+                                        <div style="height: 0.5rem"></div>
+                                        <h2 *ngIf="item.precio" style="color: var(--ion-color-primary)">{{item.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}</h2>
+                                    </ion-label>
+                                </ion-item>
+                            </ion-col>
+                        </ion-row>
+                    </ion-grid>
+                </ion-card>
+            </ion-slide>
+        </ion-slides>
+    </div>
+
+
     <!-- + visitados por ti -->
-    <ng-container *ngIf="pedidosReady && catsReady && promosReady && catsReady && visitadosReady; else visTemplate">
+    <ng-container *ngIf="pedidosReady && catsReady && promosReady && vendidosReady && visitadosReady && masConsultados; else visTemplate">
         <ion-card *ngIf="negociosVisitados.length > 0">
             <ion-item-divider>
                 <h3 style="color: black;">Tus favoritos</h3>
@@ -218,7 +253,7 @@
 
 
     <!-- + Populares -->
-    <div *ngIf="pedidosReady && catsReady && promosReady && catsReady && visitadosReady && popularesReady">
+    <div *ngIf="pedidosReady && catsReady && promosReady && vendidosReady && visitadosReady && popularesReady && masConsultados">
         <ion-card style="margin-top: 0.75rem;">
             <ion-item-divider>
                 <h3 style="color: black;" *ngIf="negociosPopulares.length > 0">Los más populares</h3>

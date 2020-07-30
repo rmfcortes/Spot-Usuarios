@@ -2,12 +2,15 @@ import { Component, OnInit, Input } from '@angular/core';
 import { ModalController, Platform } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 
+import { CallNumber } from '@ionic-native/call-number/ngx';
+
 import { NegocioService } from 'src/app/services/negocio.service';
 import { UidService } from 'src/app/services/uid.service';
 
 import { DatosParaCuenta, NegocioInfo, DetallesNegocio } from 'src/app/interfaces/negocio';
 import { Dia } from 'src/app/interfaces/horario.interface';
 import { GoogleMap } from '@ionic-native/google-maps';
+import { DisparadoresService } from 'src/app/services/disparadores.service';
 
 
 @Component({
@@ -35,7 +38,9 @@ export class InfoSucursalPage implements OnInit {
 
   constructor(
     private platform: Platform,
+    private callNumber: CallNumber,
     private modalController: ModalController,
+    private alertService: DisparadoresService,
     private negocioService: NegocioService,
     private uidService: UidService,
   ) { }
@@ -51,6 +56,11 @@ export class InfoSucursalPage implements OnInit {
     this.mapReady = true
     this.map = event
     this.styleMap()
+  }
+
+  llamar(numero: string) {
+    this.callNumber.callNumber(numero, true)
+    .catch(err => this.alertService.presentAlert('Error', 'Lo sentimos, surgió un error al ejecutar la llamada'))
   }
 
   styleMap()  {

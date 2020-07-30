@@ -1,40 +1,40 @@
 <ng-container *ngIf="!error; else errorTemplate">
     <ng-container *ngIf="infoReady; else infoTemplate">
         <ion-content>
-        <div *ngIf="portada" style="background: white;">
-            <div  class="portada_box"> 
-                <img style="width: 100%;" [src]="portada" alt="">
+            <div *ngIf="portada" style="background: white;">
+                <div class="portada_box"> 
+                    <img style="width: 100%;" [src]="portada" alt="">
+                </div>
+                <div class="header">
+                    <ion-item lines="none">
+                        <ion-icon slot="start" color="primary" name="chevron-back" style="font-size: medium;" (click)="regresar()"></ion-icon>
+                        <ion-label (click)="regresar()">
+                            <h2>{{negocio.nombre}}</h2>
+                        </ion-label>
+                        <ion-button slot="end" (click)="verInfo()" fill="clear" color="dark">
+                            Ver más
+                        </ion-button>
+                    </ion-item>
+                </div>
+                <ng-container *ngIf="pasillos.pasillos.length > 1; else segmentTemplate">
+                    <div style="background: white; z-index: 150; position: sticky !important; position: -webkit-sticky; top: 2rem">
+                        <ion-segment scrollable [value]="pasilloFiltro ? pasilloFiltro : 'todos'">
+                            <ion-segment-button (click)="resetProds()" value="todos">
+                                Todos
+                            </ion-segment-button>
+                            <ion-segment-button (click)="resetProds('Ofertas')" *ngIf="hasOfertas" value="ofertas">
+                                Ofertas
+                            </ion-segment-button>
+                            <ion-segment-button (click)="resetProds(item.nombre)" *ngFor="let item of pasillos.pasillos" [value]="item">
+                                {{item.nombre}}
+                            </ion-segment-button>
+                        </ion-segment>
+                    </div>
+                </ng-container>
+                <ng-template #segmentTemplate>
+                    <div style="height: 1rem; background: white; z-index: 150; position: sticky !important; top: 2rem"></div>
+                </ng-template>
             </div>
-            <!-- <div class="logo_box shadow">
-                <ion-buttons slot="end">
-                    <ion-button fill="clear" (click)="verInfo()">
-                        Ver más
-                    </ion-button>
-                </ion-buttons>
-            </div> -->
-            <div class="header">
-                <ion-item lines="none">
-                    <ion-icon slot="start" color="primary" name="chevron-back" style="font-size: medium;" (click)="regresar()"></ion-icon>
-                    <ion-label>
-                        <h2 class="primario">{{negocio.nombre}}</h2>
-                    </ion-label>
-                    <ion-button slot="end" (click)="verInfo()" fill="clear">
-                        Ver más
-                    </ion-button>
-                </ion-item>
-            </div>
-            <ion-segment scrollable>
-                <ion-segment-button (click)="resetProds()">
-                    Todos
-                </ion-segment-button>
-                <ion-segment-button (click)="resetProds('Ofertas')" *ngIf="hasOfertas">
-                    Ofertas
-                </ion-segment-button>
-                <ion-segment-button (click)="resetProds(item.nombre)" *ngFor="let item of pasillos.pasillos" class="ion-text-wrap">
-                    {{item.nombre}}
-                </ion-segment-button>
-            </ion-segment>
-        </div>
 
             <ng-container *ngIf="cargandoProds; else cargandoTemp">
                 <ion-item lines="none">
@@ -86,23 +86,23 @@
 
         <app-no-network></app-no-network>
 
-        <ion-footer>
-            <ion-toolbar color="light" style="text-align:center;">
+        <ion-footer class="ion-no-border">
+            <ion-toolbar class="fondo-content" style="text-align:center; border-top: var(--ion-color-primary) 2px solid;">
                 <ng-container *ngIf="negocio.abierto; else footTemplate">
                     <ion-grid fixed class="ion-no-padding">
                         <ion-row>
                             <ion-col size="4">
-                                <ion-button shape="round" (click)="llamar()" shape="round">
+                                <ion-button shape="round" (click)="llamar()" class="gradient--">
                                     <ion-icon slot="icon-only" name="call"></ion-icon>
                                 </ion-button>
                             </ion-col>
                             <ion-col size="4">
-                                <ion-button shape="round" (click)="contactViaWhatsApp()" shape="round">
+                                <ion-button shape="round" (click)="contactViaWhatsApp()" class="gradient--">
                                     <ion-icon slot="icon-only" name="logo-whatsapp"></ion-icon>
                                 </ion-button>
                             </ion-col>
                             <ion-col size="4">
-                                <ion-button shape="round" (click)="verInfo()" shape="round">
+                                <ion-button shape="round" (click)="verInfo()" class="gradient--">
                                     <ion-icon slot="icon-only" name="location"></ion-icon>
                                 </ion-button>
                             </ion-col>

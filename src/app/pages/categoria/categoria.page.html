@@ -48,6 +48,18 @@
         </ion-list>
     </ng-template>
 
+    <!-- Filtros -->
+    <ion-item lines="none" *ngIf="promosReady">
+        <ion-chip mode="ios" [ngClass]="{'gradient--' : filtro === 'destacado'}" (click)="setFiltro('destacado')">
+            <ion-label color="light" *ngIf="filtro === 'destacado'">Destacados</ion-label>
+            <ion-label  *ngIf="filtro !== 'destacado'">Destacados</ion-label>
+        </ion-chip>
+        <ion-chip mode="ios" [ngClass]="{'gradient--' : filtro === 'envio_gratis'}" (click)="setFiltro('envio_gratis')">
+            <ion-label color="light" *ngIf="filtro === 'envio_gratis'">Envío gratis</ion-label>
+            <ion-label  *ngIf="filtro !== 'envio_gratis'">Envío gratis</ion-label>
+        </ion-chip>             
+    </ion-item>
+
 
     <!-- Lista negocios -->
 

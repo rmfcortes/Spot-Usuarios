@@ -8,6 +8,7 @@ import { InfoSucursalPage } from './info-sucursal.page';
 import { AgmCoreModule } from '@agm/core';
 
 import { environment } from 'src/environments/environment';
+import { CallNumber } from '@ionic-native/call-number/ngx';
 
 @NgModule({
   imports: [
@@ -18,7 +19,8 @@ import { environment } from 'src/environments/environment';
       apiKey: environment.mapsApiKey
     }),
   ],
+  providers: [CallNumber],
   declarations: [InfoSucursalPage],
-  entryComponents: [InfoSucursalPage]
+  entryComponents: [InfoSucursalPage],
 })
 export class InfoSucursalPageModule {}

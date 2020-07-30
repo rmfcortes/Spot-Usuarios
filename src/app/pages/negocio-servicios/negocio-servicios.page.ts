@@ -14,10 +14,10 @@ import { NegocioServiciosService } from 'src/app/services/negocio-servicios.serv
 import { DisparadoresService } from 'src/app/services/disparadores.service';
 
 import { Negocio, DatosParaCuenta, InfoPasillos, ProductoPasillo } from 'src/app/interfaces/negocio';
+import { Producto } from 'src/app/interfaces/producto';
 
 import { enterAnimation } from 'src/app/animations/enter';
 import { leaveAnimation } from 'src/app/animations/leave';
-import { Producto } from 'src/app/interfaces/producto';
 
 
 @Component({
@@ -105,7 +105,7 @@ export class NegocioServiciosPage{
     this.portada = detalles.portada
     this.telefono = detalles.telefono
     this.pasillos.pasillos = detalles.pasillos
-    this.vista = detalles.vista || 'cards'
+    this.vista = detalles.vista || 'list-img'
     this.whats = detalles.whats
     this.pasillos.pasillos = this.pasillos.pasillos.sort((a, b) => a.prioridad - b.prioridad)
     this.getInfoServicios()
@@ -293,21 +293,19 @@ export class NegocioServiciosPage{
 
   // Acciones
 
-  async verServicio(servicio) {
+  async verServicio(servicio: Producto) {
     const modal = await this.modalController.create({
       component: ServicioPage,
       enterAnimation,
       leaveAnimation,
       componentProps: {servicio, whats: this.whats}
     })
-
+    this.negServicios.setConsulta(servicio, this.categoria, this.negocio.id, this.negocio.nombre)
     return await modal.present()
   }
 
   llamar() {
     this.callNumber.callNumber(this.telefono.toString(), true)
-      .then(res => console.log('Launched dialer!', res))
-      .catch(err => console.error(err))
   }
 
   async contactViaWhatsApp() {

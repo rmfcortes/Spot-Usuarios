@@ -41,8 +41,8 @@
             </div>
             <!-- Header, nombre de Negocio -->
             <div class="header">
-                <ion-item lines="none">
-                    <ion-icon slot="start" color="primary" name="chevron-back" style="font-size: medium;" (click)="regresar()"></ion-icon>
+                <ion-item lines="none" (click)="regresar()">
+                    <ion-icon slot="start" color="primary" name="chevron-back" style="font-size: medium;"></ion-icon>
                     <ion-label>
                         <h2>{{negocio.nombre}}</h2>
                     </ion-label>
