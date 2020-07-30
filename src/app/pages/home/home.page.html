@@ -30,11 +30,11 @@
 
     <!-- Busqueda -->
 
-    <ion-grid *ngIf="negMatch.length > 0">
+    <ion-grid *ngIf="negMatch.length > 0" class="ion-no-padding">
         <div id="tituloBusqueda">
             <ion-row>
                 <ion-col size="8">
-                    <h2 style="margin-left: 1rem">Resultados búsqueda</h2>
+                    <h3 style="margin-left: 1rem" class="ion-text-wrap">Resultados búsqueda</h3>
                 </ion-col>
                 <ion-col size="4" (click)="resetBusqueda()" class="ion-align-self-center">
                     <ion-label color="primary" style="font-size: smaller; float: right; margin-right: 0.5rem;">Limpiar</ion-label>
@@ -51,7 +51,7 @@
     <ion-grid *ngIf="pedidosReady && catsReady && pedidos.length > 0" class="ion-no-padding">
         <ion-row>
             <ion-col size="8">
-                <h2 style="margin-left: 1rem" class="ion-text-wrap">Pedidos en curso</h2>
+                <h3 style="margin-left: 1rem" class="ion-text-wrap">Pedidos en curso</h3>
             </ion-col>
             <ion-col size="4" (click)="verPedidos = true" class="ion-align-self-center" *ngIf="pedidos.length > 2 && !verPedidos">
                 <ion-label color="primary" style="font-size: smaller; float: right; ; margin-right: 1.2rem;">Ver todos</ion-label>
@@ -96,21 +96,21 @@
 
     <!-- Categorias -->
     <ng-container *ngIf="catsReady; else catsTemplate">
-        <h2 style="margin-left: 1rem" *ngIf="masVendidos.length > 0">Categorías</h2>
+        <h3 style="margin-left: 1rem" *ngIf="masVendidos.length > 0">Categorías</h3>
         <ion-slides [options]="slideCategorias" *ngIf="categorias.length > 0">
             <ion-slide *ngFor="let item of categorias" (click)="irACategoria(item.categoria)" style="padding: 0.5rem;">
-                <div class="ovalo">
-                    <ion-grid fixed class="ion-no-padding">
-                        <ion-row class="ion-no-padding"> 
-                            <ion-col size="12">
+                <ion-grid fixed class="ion-no-padding">
+                    <ion-row class="ion-no-padding"> 
+                        <ion-col size="12">
+                            <div class="ovalo">
                                 <preload-image [ratio]="{w: 1, h: 0.8125}" [src]="item.foto"></preload-image>
-                            </ion-col>
-                            <ion-col size="12">
-                                <ion-label style="font-size: xx-small; overflow: hidden; white-space: nowrap;">{{item.categoria | titlecase}}</ion-label>
-                            </ion-col>
-                        </ion-row>
-                    </ion-grid>
-                </div>
+                            </div>
+                        </ion-col>
+                        <ion-col size="12">
+                            <ion-label class="cat_color">{{item.categoria | titlecase}}</ion-label>
+                        </ion-col>
+                    </ion-row>
+                </ion-grid>
             </ion-slide>
         </ion-slides>
     </ng-container>
@@ -134,7 +134,7 @@
         <ion-grid *ngIf="ofertas.length > 0" class="ion-no-padding">
             <ion-row>
                 <ion-col size="8">
-                    <h2 style="margin-left: 1rem">Promociones</h2>
+                    <h3 style="margin-left: 1rem">Promociones</h3>
                 </ion-col>
                 <ion-col size="4" (click)="verOfertas()" class="ion-align-self-center" *ngIf="hayMas">
                     <ion-label color="primary" style="font-size: smaller; float: right; ; margin-right: 1.2rem;">Ver todas</ion-label>
@@ -143,7 +143,7 @@
         </ion-grid>
         <ion-slides [options]="slideOpts" *ngIf="ofertas.length > 0" style="margin-bottom: 1.1rem;">
             <ion-slide *ngFor="let item of ofertas" (click)="irAOferta(item)" style="padding: 0 0.5rem;">
-                <preload-image [ratio]="{w: 1, h: 0.45}" [src]="item.foto" class="radius"></preload-image>
+                <preload-image [ratio]="{w: 1, h: 0.45}" [src]="item.foto" style="border-radius: 15px;"></preload-image>
             </ion-slide>
             <ion-slide (click)="verOfertas()" *ngIf="hayMas" style="padding: 0 0.5rem;">
                 <ion-img style="width: 30%;" src="../../../assets/img/botones/verTodas.png"></ion-img>
@@ -162,7 +162,7 @@
 
     <!-- + vendidos -->
     <div *ngIf="pedidosReady && catsReady && promosReady && catsReady && visitadosReady && popularesReady && vendidosReady">
-        <h2 style="margin-left: 1rem" *ngIf="masVendidos.length > 0">Lo más vendido</h2>
+        <h3 style="margin-left: 1rem" *ngIf="masVendidos.length > 0">Lo más vendido</h3>
         <ion-slides [options]="slideVendidos" *ngIf="masVendidos.length > 0">
             <ion-slide *ngFor="let item of masVendidos" (click)="irAOferta(item)">
                 <ion-card>                    
@@ -198,7 +198,9 @@
     <!-- + visitados por ti -->
     <ng-container *ngIf="pedidosReady && catsReady && promosReady && catsReady && visitadosReady; else visTemplate">
         <ion-card *ngIf="negociosVisitados.length > 0">
-            <h2 style="margin-left: 1rem; color: black;">Tus favoritos</h2>
+            <ion-item-divider>
+                <h3 style="color: black;">Tus favoritos</h3>
+            </ion-item-divider>
             <app-negocio [negocios]="negociosVisitados" [direccion]="direccion" (verNeg)="verProductoConInfo($event)"></app-negocio>
             <div style="height: 1rem;"></div>
         </ion-card>
@@ -218,7 +220,9 @@
     <!-- + Populares -->
     <div *ngIf="pedidosReady && catsReady && promosReady && catsReady && visitadosReady && popularesReady">
         <ion-card style="margin-top: 0.75rem;">
-            <h2 style="margin-left: 1rem; color: black;" *ngIf="negociosPopulares.length > 0">Los más populares</h2>
+            <ion-item-divider>
+                <h3 style="color: black;" *ngIf="negociosPopulares.length > 0">Los más populares</h3>
+            </ion-item-divider>
             <app-negocio [negocios]="negociosPopulares" [direccion]="direccion" (verNeg)="verProductoConInfo($event)"></app-negocio>
             <div style="height: 1rem;"></div>
         </ion-card>

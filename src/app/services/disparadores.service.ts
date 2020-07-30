@@ -76,10 +76,10 @@ export class DisparadoresService {
             }
           }
         ]
-      });
+      })
 
-      await alert.present();
-    });
+      await alert.present()
+    })
   }
 
   async presentAlertUpdate(titulo, msn) {
@@ -106,8 +106,8 @@ export class DisparadoresService {
         ]
       });
 
-      await alert.present();
-    });
+      await alert.present()
+    })
   }
 
   async presentAlertError(error) {
@@ -124,9 +124,9 @@ export class DisparadoresService {
           }
         }
       ]
-    });
+    })
 
-    await alert.present();
+    await alert.present()
   }
 
   async presentPromptTelefono() {

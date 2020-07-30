@@ -10,6 +10,14 @@
     overflow: hidden;
 }
 
+.cat_color {
+    color: #a0a0a0ff;
+    font-size: xx-small;
+    font-weight: 700;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
 .ovalo {
     width: 100%;
     background: white;
@@ -30,7 +38,7 @@
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.15), 0 6px 20px 0 rgba(0, 0, 0, 0.10);
 }
 
-h2 {
+h2, h3 {
     font-weight: 700;
 }
 

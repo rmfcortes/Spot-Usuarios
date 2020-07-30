@@ -307,8 +307,14 @@ export class NegocioPage {
     const productos = await this.negocioService
       .getProductosLista(this.categoria, this.negocio.id, this.pasilloFiltro, this.batch + 1, this.lastKey)
     this.cambiandoPasillo = false
-    this.lastKey = productos[productos.length - 1].id
-    this.cargaFiltrados(productos, event)
+    if (productos && productos.length > 0) {
+      this.lastKey = productos[productos.length - 1].id
+      this.cargaFiltrados(productos, event)
+    } else {
+      this.noMore = true
+      this.infoReady = true
+      this.cargandoProds = false
+    }
   }
 
   cargaFiltrados(productos, event) {

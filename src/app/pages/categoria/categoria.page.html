@@ -32,7 +32,7 @@
         </ion-grid>
         <ion-slides [options]="slideOpts" style="margin-bottom: 1rem;">
             <ion-slide *ngFor="let item of ofertas" (click)="irAOferta(item)" style="padding: 0 0.5rem;">
-                <preload-image [ratio]="{w: 1, h: 0.45}" [src]="item.foto" class="radius"></preload-image>
+                <preload-image [ratio]="{w: 1, h: 0.45}" [src]="item.foto" style="border-radius: 15px;"></preload-image>
             </ion-slide>
             <ion-slide *ngIf="hayMas" (click)="verOfertas()" style="padding: 0 0.5rem;">
                 <ion-img src="../../../assets/img/botones/verTodas.png"></ion-img>

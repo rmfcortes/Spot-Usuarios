@@ -57,7 +57,7 @@ export class HomePage implements OnInit, OnDestroy {
       // when window width is =< 200px
       200: { slidesPerView: 2.5 },
       380: { slidesPerView: 3.3 },
-      640: { slidesPerView: 3.6, spaceBetween: 15 },
+      640: { slidesPerView: 4.6, spaceBetween: 10 },
       900: { slidesPerView: 7.5}
     }
   }
