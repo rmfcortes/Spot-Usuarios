@@ -3,7 +3,7 @@
 
         <!-- Header -->
         <ion-item lines="none">
-            <ion-icon color="primary" slot="start" name="chevron-back" (click)="regresar()"></ion-icon>
+            <ion-icon slot="start" name="chevron-back" (click)="regresar()"></ion-icon>
             <ion-button (click)="verPedido()" expand="block" fill="clear" slot="end">
                 Ver detalles
             </ion-button>
@@ -12,7 +12,9 @@
 
         <!-- Cancelacion -->
         <ion-card *ngIf="pedido.cancelado_by_negocio">
-            <h2>Pedido cancelado</h2>
+            <ion-item lines="full">
+                <h2>Pedido cancelado</h2>
+            </ion-item>
             <ion-item lines="none">
                 <ion-label color="medium" class="ion-text-wrap">
                     Tú dinero ya ha sido reembolsado. Aún así, lamentamos que el negocio cancelara tu pedido por la siguiente razón: <strong>{{pedido.razon_cancelacion}}</strong>
@@ -23,7 +25,9 @@
 
         <!-- Contacto -->
         <ion-card *ngIf="!pedido.cancelado_by_negocio">
-            <h2>Contacto</h2>
+            <ion-item lines="full">
+                <h2>Contacto</h2>
+            </ion-item>
             <ion-item lines="none">
                 <ion-thumbnail slot="start">
                     <img [src]="pedido.negocio.logo" />
@@ -57,7 +61,9 @@
 
         <!-- Avances -->
         <ion-card *ngIf="!pedido.cancelado_by_negocio">
-            <h2>Status</h2>
+            <ion-item lines="full">
+                <h2>Status</h2>
+            </ion-item>
             <h3 *ngIf="pedido.aceptado && pedido.entrega === 'inmediato'" style="margin-left: 1rem;">Entrega: {{pedido.aceptado + 900000 | date:'h:mm a'}}</h3>
             <h3 *ngIf="pedido.aceptado && pedido.entrega === 'planeado'" style="margin-left: 1rem;">Entrega estimada: {{pedido.aceptado | date:'EEEE d/MMMM/y'}}</h3>
             <ion-grid class="ion-no-padding">
@@ -112,7 +118,9 @@
 
         <!-- Mapa -->
         <ion-card *ngIf="pedido.entrega === 'inmediato' && !pedido.cancelado_by_negocio || pedido.repartidor && !pedido.cancelado_by_negocio">
-            <h2>Rastreo</h2>
+            <ion-item lines="full">
+                <h2>Rastreo</h2>
+            </ion-item>
             <div class="marco">
                 <agm-map style="height: 45vh" [latitude]="20.627006" [longitude]="-103.416554" [disableDefaultUI]="true" [streetViewControl]="false" [zoomControl]="false" [fitBounds]="true" (mapReady)="mapReady($event)">
                     <agm-marker [agmFitBounds]="true" [iconUrl]='{"url": icon,"scaledSize": {"height": 75, "width": 50}}' [latitude]="pedido.cliente.direccion.lat" [longitude]="pedido.cliente.direccion.lng" [animation]="'DROP'"></agm-marker>
@@ -178,7 +186,7 @@
         <ion-title>
             <ion-item lines="none">
                 <ion-icon slot="start" name="notifications" color="light"></ion-icon>
-                <ion-label color="light">Activar notificaciones</ion-label>
+                <ion-label color="light" style="font-weight: 700;">Activar notificaciones</ion-label>
             </ion-item>
         </ion-title>
     </ion-toolbar>

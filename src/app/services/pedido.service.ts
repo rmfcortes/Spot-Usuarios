@@ -29,6 +29,11 @@ export class PedidoService {
     return this.db.object(`usuarios/${uid}/pedidos/activos`)
   }
 
+  listenEntregado(idPedido: string) {
+    const uid = this.uidService.getUid()
+    return this.db.object(`usuarios/${uid}/pedidos/activos/${idPedido}`)
+  }
+
   async createPedido(pedido: Pedido) {
     return new Promise(async (resolve, reject) => {
       try {

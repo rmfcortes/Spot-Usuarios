@@ -16,13 +16,13 @@ export class ChatService {
 
 
   listenMsg() {
-    const idCliente = this.uidService.getUid();
-    return this.db.list(`usuarios/${idCliente}/chat/unread`).valueChanges();
+    const idCliente = this.uidService.getUid()
+    return this.db.list(`usuarios/${idCliente}/chat/unread`).valueChanges()
   }
 
   listenMsgPedido(idPedido: string) {
-    const idCliente = this.uidService.getUid();
-    return this.db.object(`usuarios/${idCliente}/chat/unread/${idPedido}`).valueChanges();
+    const idCliente = this.uidService.getUid()
+    return this.db.object(`usuarios/${idCliente}/chat/unread/${idPedido}`).valueChanges()
   }
 
   setSeen(idPedido: string) {
@@ -31,14 +31,14 @@ export class ChatService {
   }
 
   publicarMsg(msg: Mensaje, idPedido: string) {
-    const idCliente = this.uidService.getUid();
-    this.db.list(`usuarios/${idCliente}/chat/status/${idPedido}`).remove();
-    this.db.list(`usuarios/${idCliente}/chat/todos/${idPedido}`).push(msg);
+    const idCliente = this.uidService.getUid()
+    this.db.list(`usuarios/${idCliente}/chat/status/${idPedido}`).remove()
+    this.db.list(`usuarios/${idCliente}/chat/todos/${idPedido}`).push(msg)
   }
 
   listenTodosMsg(idPedido: string) {
-    const idCliente = this.uidService.getUid();
-    return this.db.list(`usuarios/${idCliente}/chat/todos/${idPedido}`);
+    const idCliente = this.uidService.getUid()
+    return this.db.list(`usuarios/${idCliente}/chat/todos/${idPedido}`)
   }
 
   listenStatus(idPedido: string) {

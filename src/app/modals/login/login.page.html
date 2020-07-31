@@ -11,7 +11,7 @@
                         Iniciar con Facebook
                     </ion-button>
                     <img style="margin-bottom: 1rem;" src="../../../assets/img/backgrounds/o.jpg" alt="">
-                    <ion-input (keyup.enter)="$event.target.blur();" type="text" [(ngModel)]="correo" class="input-usuario" placeholder="correo@gmail.com"></ion-input>
+                    <ion-input (keyup.enter)="$event.target.blur();" type="email" [(ngModel)]="correo" class="input-usuario" placeholder="correo@gmail.com"></ion-input>
                     <ion-input (keyup.enter)="$event.target.blur();" type="password" [(ngModel)]="pass" class="input-usuario" placeholder="Contraseña"></ion-input>
                     <ion-label style="float: right; margin-bottom: 1.2rem; font-size: xx-small;" (click)="resetPass()">¿Olvidaste tu contraseña?</ion-label>
                     <ion-button [disabled]="!correo || !pass" (click)="ingresarConCorreo()" class="gradient--" shape="round" expand="block">

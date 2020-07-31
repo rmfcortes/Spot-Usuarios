@@ -14,8 +14,10 @@
 <ion-content>
 
     <!-- Cancelado -->
-    <h2 *ngIf="pedido.cancelado_by_negocio">Pedido rechazado</h2>
     <ion-card *ngIf="pedido.cancelado_by_negocio">
+        <ion-item lines="full">
+            <h2>Pedido rechazado</h2>
+        </ion-item>
         <ion-item lines="none">
             <ion-label color="medium" class="ion-text-wrap"><strong>Motivo:</strong> {{pedido.razon_cancelacion}}</ion-label>
         </ion-item>
@@ -23,9 +25,11 @@
 
     <!-- Calificar -->
     <div *ngIf="pedido.entregado && !pedido.cancelado_by_negocio">
-        <h2>Calificación</h2>
         <ng-container *ngIf="pedido.calificacion; else calificacionTemplate">
             <ion-card>
+                <ion-item lines="full">
+                    <h2>Calificación</h2>
+                </ion-item>
                 <ion-item lines="none">
                     <ion-thumbnail>
                         <img [src]="pedido.negocio.logo" />
@@ -54,6 +58,9 @@
         </ng-container>
         <ng-template #calificacionTemplate>
             <ion-card (click)="verCalificar()">
+                <ion-item lines="full">
+                    <h2>Calificación</h2>
+                </ion-item>
                 <ion-item lines="none">
                     <ion-label color="medium">
                         Pendiente de calificación
@@ -64,13 +71,13 @@
                 </ion-item>
             </ion-card>
         </ng-template>
-
-
     </div>
 
     <!-- Detalles entrega -->
-    <h2>Entrega</h2>
     <ion-card>
+        <ion-item lines="full">
+            <h2>Entrega</h2>
+        </ion-item>
         <ion-item *ngIf="pedido.cliente.telefono" lines="none">
             <ion-label>{{pedido.cliente.nombre}}: {{pedido.cliente.telefono}}</ion-label>
         </ion-item>
@@ -80,8 +87,10 @@
     </ion-card>
 
     <!-- Lista productos -->
-    <h2>Productos</h2>
     <ion-card>
+        <ion-item lines="full">
+            <h2>Productos</h2>
+        </ion-item>
         <ion-item style="--padding-start: 0; padding-top: 1rem;" *ngFor="let prod of pedido.productos" lines="none">
             <ion-grid class="ion-no-padding">
                 <ion-row>
