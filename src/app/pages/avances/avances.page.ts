@@ -239,20 +239,12 @@ export class AvancesPage implements OnInit {
 
   async getTelefono() {
     this.tel = await this.pedidoService.getTelefono()
-    if (!this.tel) {
-      setTimeout(() => {
-        this.telReady = false
-      }, 2000)
-    } else {
-      this.telReady = true
-    }
+    if (!this.tel) setTimeout(() => this.telReady = false, 2000)
+    else this.telReady = true
   }
 
   getToken() {
-    this.pedidoService.getToken().then(resp => {
-      if (resp) this.hasPermission = true
-      else this.hasPermission = false
-    })
+    this.pedidoService.getToken().then(resp => resp ? this.hasPermission = true : this.hasPermission = false)
   }
 
   // Listener
@@ -279,11 +271,7 @@ export class AvancesPage implements OnInit {
 
   isMapReady() {
     if (this.map) this.trackRepartidor()
-    else {
-      setTimeout(() => {
-        this.isMapReady()
-      }, 300)
-    }
+    else setTimeout(() => this.isMapReady(), 300)
   }
 
   trackRepartidor() {
@@ -416,8 +404,8 @@ export class AvancesPage implements OnInit {
 
   llamar(numero) {
     this.callNumber.callNumber(numero, true)
-      .then(res => console.log('Launched dialer!', res))
-      .catch(err => console.error(err))
+    .then(res => console.log('Launched dialer!', res))
+    .catch(err => console.error(err))
   }
 
   async muestraChat() {
@@ -432,7 +420,7 @@ export class AvancesPage implements OnInit {
         nombre: this.pedido.repartidor.nombre,
         foto: this.pedido.repartidor.foto
       }
-    });
+    })
 
     modal.onDidDismiss().then(() => this.listenNewMsg())
 

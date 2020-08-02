@@ -14,10 +14,10 @@ import { Producto } from 'src/app/interfaces/producto';
 })
 export class ServicioPage implements OnInit {
 
-  @Input() servicio: Producto;
-  @Input() whats: String;
+  @Input() servicio: Producto
+  @Input() whats: String
 
-  back: Subscription;
+  back: Subscription
 
   constructor(
     private platform: Platform,
@@ -32,8 +32,9 @@ export class ServicioPage implements OnInit {
     })
   }
 
+  
   async contactViaWhatsApp() {
-    const tel = '+52' + this.whats;
+    const tel = '+52' + this.whats
     this.socialSharing.shareViaWhatsAppToReceiver(
       tel,
       'Hola, vi tu negocio en Plaza, quiero agendar una cita'

@@ -161,9 +161,9 @@
 
 
     <!-- + vendidos -->
-    <div *ngIf="pedidosReady && catsReady && promosReady && vendidosReady">
-        <h3 style="margin-left: 1rem" *ngIf="masVendidos.length > 0">Productos más vendidos</h3>
-        <ion-slides [options]="slideVendidos" *ngIf="masVendidos.length > 0">
+    <div *ngIf="pedidosReady && catsReady && promosReady && vendidosReady && masVendidos.length > 0">
+        <h3 style="margin-left: 1rem">Productos más vendidos</h3>
+        <ion-slides [options]="slideVendidos">
             <ion-slide *ngFor="let item of masVendidos" (click)="irAOferta(item)">
                 <ion-card>                    
                     <ion-grid fixed>
@@ -196,9 +196,9 @@
 
 
         <!-- + consultados -->
-    <div *ngIf="pedidosReady && catsReady && promosReady && vendidosReady && masConsultados">
-        <h3 style="margin-left: 1rem" *ngIf="masConsultados.length > 0">Servicios más consultados</h3>
-        <ion-slides [options]="slideVendidos" *ngIf="masConsultados.length > 0">
+    <div *ngIf="pedidosReady && catsReady && promosReady && vendidosReady && masConsultados && masConsultados.length > 0">
+        <h3 style="margin-left: 1rem">Servicios más consultados</h3>
+        <ion-slides [options]="slideVendidos">
             <ion-slide *ngFor="let item of masConsultados" (click)="irAOferta(item)">
                 <ion-card>                    
                     <ion-grid fixed>

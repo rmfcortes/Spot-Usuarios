@@ -84,7 +84,12 @@ export class NegocioPage {
   // Get info inicial
 
   ionViewWillEnter() {
+    this.yPasillo = 0
+    this.lastKey = ''
     this.productos = []
+    this.noMore = false
+    this.infiniteCall = 1
+    this.productosCargados = 0
     this.uid = this.uidService.getUid()
     this.origen_categoria = history.state.origen_categoria
     this.categoria = this.activatedRoute.snapshot.paramMap.get('cat')
@@ -258,6 +263,14 @@ export class NegocioPage {
 
   // Acciones
   async muestraProducto(producto: Producto) {
+    if (!this.negocio.abierto) {
+      this.commonService.presentAlert('', 'Esta tienda esta cerrada, por favor vuelve más tarde')
+      return
+    }    
+    if (producto.agotado) {
+      this.commonService.presentAlert('Producto agotado', 'Lo sentimos, este producto está temporalmente agotado')
+      return
+    }
     producto.cantidad = 1
     producto.total = producto.precio
     producto.complementos = []

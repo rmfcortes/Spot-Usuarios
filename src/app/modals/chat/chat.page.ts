@@ -55,6 +55,7 @@ export class ChatPage implements OnInit {
   }
 
   listenEntregado() {
+    this.pedidoService.listenEntregado(this.idPedido).query.ref.off('child_removed')
     this.pedidoService.listenEntregado(this.idPedido).query.ref.on('child_removed', snapshot => {
       this.ngZone.run(() => this.regresar())
     })
@@ -75,14 +76,18 @@ export class ChatPage implements OnInit {
   }
 
   listenNotification() {
+    if (this.notiSub) this.notiSub.unsubscribe()
     this.notiSub = this.chatService.listenMsgPedido(this.idPedido).subscribe((mensaje: UnreadMsg) => {
-      if (mensaje && mensaje.cantidad > 0) {
-        this.chatService.setSeen(this.idPedido)
-      }
+      this.ngZone.run(() => {
+        if (mensaje && mensaje.cantidad > 0) {
+          this.chatService.setSeen(this.idPedido)
+        }
+      })
     })
   }
 
   listenMsg() {
+    this.chatService.listenTodosMsg(this.idPedido).query.ref.off('child_added')
     this.chatService.listenTodosMsg(this.idPedido).query.ref.on('child_added', snapshot => {
       this.ngZone.run(() => {
         this.messages.push(snapshot.val())
@@ -94,8 +99,9 @@ export class ChatPage implements OnInit {
   }
 
   listenState() {
+    if (this.stateSub) this.stateSub.unsubscribe()
     this.stateSub = this.chatService.listenStatus(this.idPedido).subscribe((estado: any) => {
-      this.status = estado || null
+      this.ngZone.run(() => this.status = estado || null)
     })
   }
 

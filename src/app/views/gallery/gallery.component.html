@@ -3,10 +3,17 @@
     <ion-grid class="ion-no-padding">
         <ion-row>
             <ion-col size="4" *ngFor="let prod of item.productos; trackBy: trackProducts">
-                <preload-image [ratio]="{w: 1, h: .75}" [src]="prod.url" class="shadow" (click)="presentProduct(prod)" style="cursor: pointer; background: white;">
-                </preload-image>
-                <div class="triangle-topleft" *ngIf="prod.agregados"></div>
-                <div class="badge">{{prod.agregados}}</div>
+                <ng-container *ngIf="!prod.agotado; else agotadoTemp">
+                    <preload-image [ratio]="{w: 1, h: .75}" [src]="prod.url" class="shadow" (click)="presentProduct(prod)" style="background: white;">
+                    </preload-image>
+                    <div class="triangle-topleft" *ngIf="prod.agregados"></div>
+                    <div class="badge">{{prod.agregados}}</div>
+                </ng-container>
+                <ng-template #agotadoTemp>
+                    <preload-image [ratio]="{w: 1, h: .75}" [src]="prod.url" class="shadow agotado" (click)="presentProduct(prod)" style="background: white;">
+                    </preload-image>
+                    <ion-badge color="dark" class="centrar" mode="ios">Agotado</ion-badge>
+                </ng-template>
             </ion-col>
         </ion-row>
     </ion-grid>

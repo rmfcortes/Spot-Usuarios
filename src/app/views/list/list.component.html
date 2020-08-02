@@ -1,11 +1,18 @@
 <div *ngFor="let item of sections; let i = index; trackBy: trackSections" [style.display]="item.productos && item.productos.length > 0 ? 'initial' : 'none'">
-    <h2>{{item.nombre | titlecase}}</h2>
     <ion-card>
-        <ion-item *ngFor="let serv of item.productos; let y = index; trackBy: trackProducts" style="--padding-start: 0; cursor: pointer;" detail (click)="presentProduct(serv)">
-            <ion-item lines="none">
+        <ion-item lines="full">
+            <h2>{{item.nombre | titlecase}}</h2>
+        </ion-item>
+        <ion-item lines="none" *ngFor="let serv of item.productos; let y = index; trackBy: trackProducts; let odd = odd" lines="none" [ngClass]="{'contraste': odd}" detail (click)="presentProduct(serv)">
+            <ng-container *ngIf="!serv.agotado; else agotadoTemp">                
                 <h6 class="ion-text-wrap">{{serv.nombre}}</h6>
-                <ion-badge color="primary" mode="ios" *ngIf="serv.agregados">{{serv.agregados}}</ion-badge>
-            </ion-item>
+                <ion-badge slot="end" color="primary" mode="ios" *ngIf="serv.agregados">{{serv.agregados}}</ion-badge>              
+            </ng-container>
+            <ng-template #agotadoTemp>
+                <h6 class="ion-text-wrap medium" style="text-decoration: line-through;">{{serv.nombre}}</h6>
+                <ion-badge slot="end" color="medium" mode="ios">Agotado</ion-badge>              
+            </ng-template>
+            
         </ion-item>
     </ion-card>
 </div>

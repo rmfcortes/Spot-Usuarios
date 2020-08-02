@@ -40,7 +40,7 @@ export class AppComponent implements OnDestroy{
     private authService: AuthService,
     private uidService: UidService,
   ) {
-    this.initializeApp();
+    this.initializeApp()
   }
 
   initializeApp() {
@@ -51,12 +51,12 @@ export class AppComponent implements OnDestroy{
           event.stopPropagation()
         }, false)
       })
-      this.statusBar.styleDefault()
-      this.splashScreen.hide()
-      this.netService.checkNetStatus()
       this.getUser()
+      this.splashScreen.hide()
+      this.statusBar.styleDefault()
+      this.netService.checkNetStatus()
       this.versionService.checkUpdates()
-    });
+    })
   }
 
   getUser() {
@@ -83,7 +83,7 @@ export class AppComponent implements OnDestroy{
       component: DireccionesPage,
       enterAnimation,
       componentProps: {changeRegion: true}
-    });
+    })
     modal.onWillDismiss().then(resp => {
       if (resp.data) {
         this.regionService.setRegion(resp.data)

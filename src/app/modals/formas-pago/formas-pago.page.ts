@@ -22,10 +22,8 @@ export class FormasPagoPage implements OnInit {
 
   @Input() formas_pago_aceptadas: FormaPagoPermitida
 
-  tarjetas: FormaPago[] = [ ]
-
   err: string
-
+  tarjetas: FormaPago[] = [ ]
   script: HTMLScriptElement
 
   constructor(

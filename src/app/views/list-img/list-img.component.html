@@ -1,20 +1,33 @@
 <ion-card *ngFor="let item of sections; let i = index; trackBy: trackSections" [style.display]="item.productos && item.productos.length > 0 ? 'initial' : 'none'">
-    <h2>{{item.nombre | titlecase}}</h2>
     <ion-card>
+        <ion-item lines="full">
+            <h2>{{item.nombre | titlecase}}</h2>
+        </ion-item>
         <ion-item *ngFor="let prod of item.productos; let y = index; trackBy: trackProducts" style="--padding-start: 0; margin-top: 1rem; cursor: pointer;" lines="none" detail (click)="presentProduct(prod)">
             <ion-grid class="ion-no-padding">
                 <ion-row>
                     <ion-col size="4">
-                        <ion-img [src]="prod.url" style="height: 100%; width: 100%; max-height: 7rem; object-fit: cover;" (ionImgWillLoad)="ionImgWillLoad($event)"></ion-img>
+                        <ion-img [src]="prod.url" [ngClass]="{'agotado' : prod.agotado}" (ionImgWillLoad)="ionImgWillLoad($event)"></ion-img>
+                        <ion-badge class="centrar ion-text-wrap" color="dark" mode="ios" *ngIf="prod.agotado">Agotado</ion-badge>
                     </ion-col>
                     <ion-col size="8">
-                        <ion-item lines="none">
-                            <ion-label class="ion-text-wrap">
-                                <h2>{{(prod.nombre.length > 25) ? (prod.nombre | slice:0:25) + '...' : prod.nombre}}</h2>
-                                <h2 *ngIf="prod.precio" style="color: var(--ion-color-primary)">{{prod.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}</h2>
-                            </ion-label>
-                            <ion-badge color="primary" mode="ios" *ngIf="prod.agregados">{{prod.agregados}}</ion-badge>
-                        </ion-item>
+                        <ng-container *ngIf="!prod.agotado; else agotadoTemp">                            
+                            <ion-item lines="none">
+                                <ion-label class="ion-text-wrap">
+                                    <h2>{{(prod.nombre.length > 25) ? (prod.nombre | slice:0:25) + '...' : prod.nombre}}</h2>
+                                    <h2 *ngIf="prod.precio" style="color: var(--ion-color-primary)">{{prod.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}</h2>
+                                </ion-label>
+                                <ion-badge color="primary" mode="ios" *ngIf="prod.agregados">{{prod.agregados}}</ion-badge>
+                            </ion-item>
+                        </ng-container>
+                        <ng-template #agotadoTemp>
+                            <ion-item lines="none">
+                                <ion-label class="ion-text-wrap">
+                                    <h2 style="color: var(--ion-color-medium);">{{(prod.nombre.length > 25) ? (prod.nombre | slice:0:25) + '...' : prod.nombre}}</h2>
+                                    <h2 *ngIf="prod.precio" style="color: var(--ion-color-medium);">{{prod.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}</h2>
+                                </ion-label>
+                            </ion-item>
+                        </ng-template>
                     </ion-col>
                 </ion-row>
             </ion-grid>

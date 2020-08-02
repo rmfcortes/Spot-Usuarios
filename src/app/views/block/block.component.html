@@ -1,16 +1,31 @@
 <div [id]="item.nombre" *ngFor="let item of sections; let i = index; trackBy: trackSections" [style.display]="item.productos && item.productos.length > 0 ? 'initial' : 'none'">
+    
     <h2>{{item.nombre | titlecase}}</h2>
     <ngx-masonry [options]="myOptions" style="width: 100%; padding: 0.75rem;">
         <div ngxMasonryItem *ngFor="let prod of item.productos; trackBy: trackProducts" style="width: 44%; margin-bottom: 0.5rem;">
-            <ion-card class="card radius10 background-card" style="cursor: pointer;" (click)="presentProduct(prod)">
-                <img [src]="prod.url" width="100%">
-                <div class="price-box" *ngIf="prod.precio">
-                    {{prod.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}
-                </div>
-                <h6 class="ion-text-wrap" style="margin: 0 0.5rem 1rem 0.5rem">{{prod.nombre}}</h6>
-                <div class="triangle-topleft" *ngIf="prod.agregados"></div>
-                <div class="badge">{{prod.agregados}}</div>
-            </ion-card>
+            <ng-container *ngIf="!prod.agotado; else agotadoTemp">
+                <ion-card class="card radius10 background-card" style="cursor: pointer;" (click)="presentProduct(prod)">
+                    <img [src]="prod.url" width="100%">
+                    <div class="price-box" *ngIf="prod.precio">
+                        {{prod.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}
+                    </div>
+                    <h6 class="ion-text-wrap" style="margin: 0 0.5rem 1rem 0.5rem">{{prod.nombre}}</h6>
+                    <div class="triangle-topleft" *ngIf="prod.agregados"></div>
+                    <div class="badge">{{prod.agregados}}</div>
+                </ion-card>                               
+            </ng-container>
+            <ng-template #agotadoTemp>
+                <ion-card class="card radius10 background-card" style="cursor: pointer;" (click)="presentProduct(prod)">
+                    <div style="position: relative;">
+                        <img [src]="prod.url" class="agotado" width="100%">
+                        <ion-badge color="dark" class="centrar" mode="ios">Agotado</ion-badge>
+                    </div>
+                    <div class="price-box" style="background: var(--ion-color-medium);" *ngIf="prod.precio">
+                        {{prod.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}
+                    </div>
+                    <h6 class="ion-text-wrap" style="margin: 0 0.5rem 1rem 0.5rem">{{prod.nombre}}</h6>
+                </ion-card>                
+            </ng-template>
         </div>
     </ngx-masonry>
 </div>

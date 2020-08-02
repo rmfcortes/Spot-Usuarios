@@ -1,4 +1,5 @@
 export interface Producto {
+    agotado: boolean;
     codigo: string;
     descripcion: string;
     id: string;
@@ -38,6 +39,7 @@ export interface Complemento {
 }
 
 export interface MasVendido {
+    agotado: boolean;
     categoria: string;
     descripcion: string;
     id: string;

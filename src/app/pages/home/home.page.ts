@@ -229,6 +229,7 @@ export class HomePage implements OnInit, OnDestroy {
   getMasVendidos() {
     this.categoriaService.getMasVendidos().then(vendidos => {
       this.masVendidos = vendidos
+      this.masVendidos = this.masVendidos.filter(v => !v.agotado)
       this.masVendidos.sort((a, b) => b.ventas - a.ventas)
       this.vendidosReady = true
     })
@@ -262,7 +263,6 @@ export class HomePage implements OnInit, OnDestroy {
       if (n.length > 0) {
         n.forEach(async (x) => {
           this.ofertaService.getStatus(x.idNegocio).then((info: InfoGral) => {
-            console.log(info);
             if (info) {
               info.visitas = x.visitas
               this.negociosVisitados.push(info)
@@ -280,15 +280,17 @@ export class HomePage implements OnInit, OnDestroy {
   getPedidosActivos() {
     if (this.pedSub) this.pedSub.unsubscribe()
     this.pedSub = this.pedidoService.getPedidosActivos().subscribe((pedidos: Pedido[]) => {
-      if (pedidos && pedidos.length > 0) {
-        this.pedidos = pedidos
-        this.listenNewMsg()
-        this.listenEntregados()
-        this.pedidos.reverse()
-      } else {
-        this.pedSub.unsubscribe()
-      }
-      this.pedidosReady = true
+      this.ngZone.run(() => {
+        if (pedidos && pedidos.length > 0) {
+          this.pedidos = pedidos
+          this.listenNewMsg()
+          this.listenEntregados()
+          this.pedidos.reverse()
+        } else {
+          this.pedSub.unsubscribe()
+        }
+        this.pedidosReady = true
+      })
     })
   }
 
@@ -300,7 +302,7 @@ export class HomePage implements OnInit, OnDestroy {
       }
       this.ofertas = ofertas.reverse()
       this.promosReady = true
-    });
+    })
   }
 
     // Listeners
@@ -328,10 +330,12 @@ export class HomePage implements OnInit, OnDestroy {
   listenNewMsg() {
     if (this.msgSub) this.msgSub.unsubscribe()
     this.msgSub = this.chatService.listenMsg().subscribe((unReadmsg: UnreadMsg[]) => {
-      this.pedidos.forEach(p => {
-        const i = unReadmsg.findIndex(u => u.idPedido === p.id)
-        if (i >= 0) p.unRead = unReadmsg[i].cantidad
-        else  p.unRead = 0
+      this.ngZone.run(() => {
+        this.pedidos.forEach(p => {
+          const i = unReadmsg.findIndex(u => u.idPedido === p.id)
+          if (i >= 0) p.unRead = unReadmsg[i].cantidad
+          else  p.unRead = 0
+        })
       })
     })
   }
