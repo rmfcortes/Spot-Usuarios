@@ -89,8 +89,17 @@ export class NegocioServiciosService {
       precio: servicio.precio ? servicio.precio : 1,
       url: servicio.url,
     }
-    this.db.object(`vendidos-servicios/${region}/${servicio.id}`).update(consultado)
-    this.db.object(`vendidos-servicios/${region}/${servicio.id}/consultas`).query.ref.transaction(consultas => consultas ? consultas + 1 : 1)
+    const subSub = this.db.list(`perfiles/${idNegocio}/subCategoria`).valueChanges().subscribe(subs => {
+      subSub.unsubscribe()
+      this.db.object(`vendidos-servicios/${region}/todos/${servicio.id}`).update(consultado)
+      this.db.object(`vendidos-servicios/${region}/categorias/${categoria}/${servicio.id}`).update(consultado)
+      this.db.object(`vendidos-servicios/${region}/todos/${servicio.id}/consultas`).query.ref.transaction(consultas => consultas ? consultas + 1 : 1)
+      this.db.object(`vendidos-servicios/${region}/categorias/${categoria}/${servicio.id}/consultas`).query.ref.transaction(consultas => consultas ? consultas + 1 : 1)
+      for (const sub of subs) {
+        this.db.object(`vendidos-servicios/${region}/subCategorias/${categoria}/${sub}/${servicio.id}`).update(consultado)
+        this.db.object(`vendidos-servicios/${region}/subCategorias/${categoria}/${sub}/${servicio.id}/consultas`).query.ref.transaction(consultas => consultas ? consultas + 1 : 1)
+      }
+    })
   }
 
 

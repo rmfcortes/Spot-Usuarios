@@ -57,7 +57,7 @@ export class HomePage implements OnInit, OnDestroy {
     breakpoints: {
       // when window width is =< 200px
       200: { slidesPerView: 2.5 },
-      380: { slidesPerView: 4.2, spaceBetween: 8 },
+      380: { slidesPerView: 4.6, spaceBetween: 8 },
       640: { slidesPerView: 4.6, spaceBetween: 10 },
       900: { slidesPerView: 7.5}
     }
@@ -70,7 +70,7 @@ export class HomePage implements OnInit, OnDestroy {
     breakpoints: {
       // when window width is =< 200px
       200: { slidesPerView: 1.3 },
-      380: { slidesPerView: 1.3 },
+      380: { slidesPerView: 2.3 },
       640: { slidesPerView: 2.3 },
       900: { slidesPerView: 3.5}
     }
@@ -185,6 +185,20 @@ export class HomePage implements OnInit, OnDestroy {
     })
   }
 
+  getVisitas() { // para ordenar categorías
+    this.categoriaService.getVisitas(this.uid).then(visitas => {
+      if (visitas) {
+        this.categorias.forEach(c => c.visitas = 0)
+        Object.entries(visitas).forEach(v => {
+          const i = this.categorias.findIndex(c => c.categoria === v[0])
+          if (i >= 0) this.categorias[i].visitas = v[1]
+        })
+        this.categorias.sort((a, b) => b.visitas - a.visitas)
+      }
+      this.catsReady = true
+    })
+  }
+
   getCategorias() {
     return new Promise((resolve, reject) => {
       this.categoriaService.getCategorias().then(categorias => {
@@ -194,15 +208,31 @@ export class HomePage implements OnInit, OnDestroy {
     })
   }
 
-  getPopulares() {
-    this.categoriaService.getPopulares().then(async (populares)  => {
-      this.negociosPopulares = populares
-      this.negociosPopulares.sort((a, b) => b.calificaciones - a.calificaciones)
-      this.negociosPopulares.sort((a, b) => b.promedio - a.promedio)
-      this.negociosPopulares.sort((a, b) => b.visitas - a.visitas)
-      this.negociosPopulares.sort((a, b) => a.abierto === b.abierto ? 0 : a ? 1 : -1)
-      this.costoEnvio(this.negociosPopulares)
-      this.popularesReady = true
+  getPedidosActivos() {
+    if (this.pedSub) this.pedSub.unsubscribe()
+    this.pedSub = this.pedidoService.getPedidosActivos().subscribe((pedidos: Pedido[]) => {
+      this.ngZone.run(() => {
+        if (pedidos && pedidos.length > 0) {
+          this.pedidos = pedidos
+          this.listenNewMsg()
+          this.listenEntregados()
+          this.pedidos.reverse()
+        } else {
+          this.pedSub.unsubscribe()
+        }
+        this.pedidosReady = true
+      })
+    })
+  }
+
+  getOfertas() {
+    this.ofertaService.getOfertas(this.batch + 1, 'todas').then((ofertas: Oferta[]) => {
+      if (ofertas.length === this.batch + 1) {
+        this.hayMas = true
+        ofertas.shift()
+      }
+      this.ofertas = ofertas.reverse()
+      this.promosReady = true
     })
   }
 
@@ -243,21 +273,7 @@ export class HomePage implements OnInit, OnDestroy {
     })
   }
 
-  getVisitas() {
-    this.categoriaService.getVisitas(this.uid).then(visitas => {
-      if (visitas) {
-        this.categorias.forEach(c => c.visitas = 0)
-        Object.entries(visitas).forEach(v => {
-          const i = this.categorias.findIndex(c => c.categoria === v[0])
-          if (i >= 0) this.categorias[i].visitas = v[1]
-        })
-        this.categorias.sort((a, b) => b.visitas - a.visitas)
-      }
-      this.catsReady = true
-    })
-  }
-
-  getNegociosVisitados() {
+  getNegociosVisitados() { // Mis Favoritos
     this.negociosVisitados = []
     this.categoriaService.getVisitasNegocios(this.uid).then(n => {
       if (n.length > 0) {
@@ -267,7 +283,7 @@ export class HomePage implements OnInit, OnDestroy {
               info.visitas = x.visitas
               this.negociosVisitados.push(info)
               this.negociosVisitados.sort((a, b) => b.visitas - a.visitas)
-              this.negociosVisitados.sort((a, b) => a === b ? 0 : a ? 1 : -1)
+              this.negociosVisitados.sort((a, b) => a.abierto === b.abierto ? 0 : a.abierto ? -1 : 1)
               this.costoEnvio(this.negociosVisitados)
             }
           })
@@ -277,31 +293,15 @@ export class HomePage implements OnInit, OnDestroy {
     })
   }
 
-  getPedidosActivos() {
-    if (this.pedSub) this.pedSub.unsubscribe()
-    this.pedSub = this.pedidoService.getPedidosActivos().subscribe((pedidos: Pedido[]) => {
-      this.ngZone.run(() => {
-        if (pedidos && pedidos.length > 0) {
-          this.pedidos = pedidos
-          this.listenNewMsg()
-          this.listenEntregados()
-          this.pedidos.reverse()
-        } else {
-          this.pedSub.unsubscribe()
-        }
-        this.pedidosReady = true
-      })
-    })
-  }
-
-  getOfertas() {
-    this.ofertaService.getOfertas(this.batch + 1, 'todas').then((ofertas: Oferta[]) => {
-      if (ofertas.length === this.batch + 1) {
-        this.hayMas = true
-        ofertas.shift()
-      }
-      this.ofertas = ofertas.reverse()
-      this.promosReady = true
+  getPopulares() {
+    this.categoriaService.getPopulares().then(async (populares)  => {
+      this.negociosPopulares = populares
+      this.negociosPopulares.sort((a, b) => b.calificaciones - a.calificaciones)
+      this.negociosPopulares.sort((a, b) => b.promedio - a.promedio)
+      this.negociosPopulares.sort((a, b) => b.visitas - a.visitas)
+      this.negociosPopulares.sort((a, b) => a.abierto === b.abierto ? 0 : a.abierto ? -1 : 1)
+      this.costoEnvio(this.negociosPopulares)
+      this.popularesReady = true
     })
   }
 
@@ -413,6 +413,15 @@ export class HomePage implements OnInit, OnDestroy {
     .then(() => this.negMatch = [])
   }
 
+  async verOfertas() {
+    const modal = await this.modalController.create({
+      component: OfertasPage,
+      componentProps: {categoria: 'todas', batch: this.batch}
+    })
+
+    return modal.present()
+  }
+
   async verCategorias() {
     const modal = await this.modalController.create({
       component: CategoriasPage,
@@ -427,15 +436,6 @@ export class HomePage implements OnInit, OnDestroy {
     })
 
     return await modal.present()
-  }
-
-  async verOfertas() {
-    const modal = await this.modalController.create({
-      component: OfertasPage,
-      componentProps: {categoria: 'todas', batch: this.batch}
-    })
-
-    return modal.present()
   }
 
   // Redirección

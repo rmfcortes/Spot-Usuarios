@@ -269,9 +269,11 @@ export class CuentaPage implements OnInit {
       componentProps: {formas_pago_aceptadas: this.datosNegocio.formas_pago}
     })
     modal.onWillDismiss().then(resp => {
-      resp.data ? this.formaPago = resp.data : null
-      if (this.formaPago.forma === 'efectivo') this.comision = 0
-      else this.comision = ((this.cuenta * 0.04) + 3) * 1.16
+      this.formaPago = resp.data ? resp.data : null
+      if (this.formaPago) {
+        if (this.formaPago.forma === 'efectivo') this.comision = 0
+        else this.comision = ((this.cuenta * 0.04) + 3) * 1.16
+      }
     })
 
     return await modal.present()

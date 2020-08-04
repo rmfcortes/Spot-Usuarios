@@ -2,6 +2,8 @@ import { Component, OnInit, Input } from '@angular/core';
 import { ModalController, Platform } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 
+import { Categoria } from 'src/app/interfaces/categoria.interface';
+
 @Component({
   selector: 'app-categorias',
   templateUrl: './categorias.page.html',
@@ -9,7 +11,7 @@ import { Subscription } from 'rxjs';
 })
 export class CategoriasPage implements OnInit {
 
-  @Input() categorias
+  @Input() categorias: Categoria[]
 
   back: Subscription
 
@@ -19,9 +21,7 @@ export class CategoriasPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-      this.regresar();
-    });
+    this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
   }
 
   irCategoria(categoria) {

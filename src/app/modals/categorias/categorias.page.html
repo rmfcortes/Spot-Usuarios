@@ -1,8 +1,11 @@
 <ion-content>
     <ion-grid fixed>
-        <ion-row>
-            <ion-col size="4" *ngFor="let item of categorias" (click)="irCategoria(item.categoria)">
-                <preload-image [ratio]="{w: 1, h: 1}" [src]="item.foto" class="radius"></preload-image>
+        <ion-row> 
+            <ion-col size="4" *ngFor="let item of categorias" style="text-align: center; margin-top: 1rem;" (click)="irCategoria(item.categoria)">
+                <div class="ovalo">
+                    <preload-image [ratio]="{w: 1, h: 0.8125}" [src]="item.foto"></preload-image>
+                </div>
+                <ion-label class="cat_color">{{item.categoria | titlecase}}</ion-label>
             </ion-col>
         </ion-row>
     </ion-grid>

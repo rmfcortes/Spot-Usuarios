@@ -1,3 +1,26 @@
-h2 {
+h2, h3 {
     font-weight: 700;
 }
+.nombreProducto {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    max-width: 100%;
+    overflow: hidden;
+    font-size: small;
+    text-overflow: ellipsis;
+    height:2.2rem /* fallback */
+ }
+
+ .nombreNegocio {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-height: 1rem;
+    -webkit-box-orient: vertical;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: small;
+    color: var(--ion-color-medium);
+    height:2rem /* fallback */
+ }

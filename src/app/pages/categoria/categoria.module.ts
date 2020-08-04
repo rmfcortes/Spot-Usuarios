@@ -10,6 +10,7 @@ import { CategoriaPage } from './categoria.page';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { OfertasPageModule } from 'src/app/modals/ofertas/ofertas.module';
 import { StarsModule } from 'src/app/shared/stars.module';
+import { CategoriasPageModule } from 'src/app/modals/categorias/categorias.module';
 
 @NgModule({
   imports: [
@@ -19,6 +20,7 @@ import { StarsModule } from 'src/app/shared/stars.module';
     StarsModule,
     SharedModule,
     OfertasPageModule,
+    CategoriasPageModule,
     CategoriaPageRoutingModule
   ],
   declarations: [CategoriaPage]

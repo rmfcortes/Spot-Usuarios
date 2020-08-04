@@ -1,8 +1,9 @@
 import { Component, ViewChild, NgZone, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
 import { IonInfiniteScroll, ModalController, Platform } from '@ionic/angular';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
+import { CategoriasPage } from 'src/app/modals/categorias/categorias.page';
 import { OfertasPage } from 'src/app/modals/ofertas/ofertas.page';
 
 import { DisparadoresService } from 'src/app/services/disparadores.service';
@@ -10,9 +11,14 @@ import { CategoriasService } from 'src/app/services/categorias.service';
 import { OfertasService } from 'src/app/services/ofertas.service';
 import { UidService } from 'src/app/services/uid.service';
 
+import { MasConsultado, MasVendido } from 'src/app/interfaces/producto';
 import { Negocio, Oferta, InfoGral } from 'src/app/interfaces/negocio';
+import { Categoria } from 'src/app/interfaces/categoria.interface';
 import { CostoEnvio } from 'src/app/interfaces/envio.interface';
 import { Direccion } from 'src/app/interfaces/direcciones';
+
+import { enterAnimationCategoria } from 'src/app/animations/enterCat';
+import { leaveAnimationCategoria } from 'src/app/animations/leaveCat';
 
 @Component({
   selector: 'app-categoria',
@@ -24,10 +30,16 @@ export class CategoriaPage implements OnInit, OnDestroy{
   @ViewChild(IonInfiniteScroll, {static: false}) infiniteScroll: IonInfiniteScroll
 
   categoria: string
+  categorias: Categoria[] = []
   subCategorias: string[] = []
   ofertas: Oferta[] = []
   negocios: Negocio[] = []
   status = 'abiertos'
+
+  masConsultados: MasConsultado[] = []
+  masVendidos: MasVendido[] = []
+  vendidosReady = false
+  consultadosReady = false
 
   lastKey = ''
   lastValue = null
@@ -55,6 +67,19 @@ export class CategoriaPage implements OnInit, OnDestroy{
     freeMode: true
   }
 
+  slideVendidos = {
+    centeredSlides: false,
+    initialSlide: 0,
+    freeMode: true,
+    breakpoints: {
+      // when window width is =< 200px
+      200: { slidesPerView: 1.3 },
+      380: { slidesPerView: 2.3 },
+      640: { slidesPerView: 2.3 },
+      900: { slidesPerView: 3.5}
+    }
+  }
+
   promosReady = false
   negociosReady = false
 
@@ -64,6 +89,8 @@ export class CategoriaPage implements OnInit, OnDestroy{
   costo_envio: CostoEnvio
 
   filtro = 'destacado'
+
+  uid: string
 
   constructor(
     private ngZone: NgZone,
@@ -82,16 +109,18 @@ export class CategoriaPage implements OnInit, OnDestroy{
   ngOnInit() {
     this.categoria = this.activatedRoute.snapshot.paramMap.get('cat')
     this.direccion = this.uidService.getDireccion()
-    this.getSubCategorias()
+    this.getTodo()
     this.getOfertas()
-    this.getNegocios()
     this.listenCambios()
+    this.getCategorias()
+    this.getSubCategorias()
   }
 
   ionViewWillEnter() {
     this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
       this.router.navigate(['/home'])
     })
+    this.uid = this.uidService.getUid()
   }
 
   setFiltro(filtro: string) {
@@ -113,6 +142,15 @@ export class CategoriaPage implements OnInit, OnDestroy{
       this.subCategorias.unshift('todos')
     })
     .catch((err) => console.log(err))
+  }
+
+  getTodo() {
+    this.negociosReady = false
+    this.vendidosReady = false
+    this.consultadosReady = false
+    this.getNegocios()
+    this.getMasVendidos()
+    this.getMasConsultados()
   }
 
   async getOfertas() {
@@ -156,6 +194,42 @@ export class CategoriaPage implements OnInit, OnDestroy{
       .catch((err) => console.log(err))
   }
 
+  getMasVendidos() {
+    this.masVendidos = []
+    if (this.subCategoria === 'todos') {
+      this.categoriaService.getMasVendidosCategoria(this.categoria).then(vendidos => {
+        this.masVendidos = vendidos
+        this.masVendidos = this.masVendidos.filter(v => !v.agotado)
+        this.masVendidos.sort((a, b) => b.ventas - a.ventas)
+        this.vendidosReady = true
+      })
+    } else {
+      this.categoriaService.getMasVendidosSubCategoria(this.categoria, this.subCategoria).then(vendidos => {
+        this.masVendidos = vendidos
+        this.masVendidos = this.masVendidos.filter(v => !v.agotado)
+        this.masVendidos.sort((a, b) => b.ventas - a.ventas)
+        this.vendidosReady = true
+      })
+    }
+  }
+
+  getMasConsultados() {
+    this.masConsultados = []
+    if (this.subCategoria === 'todos') {
+      this.categoriaService.getMasConsultadosCategoria(this.categoria).then(consultados => {
+        this.masConsultados = consultados
+        this.masConsultados.sort((a, b) => b.consultas - a.consultas)
+        this.consultadosReady = true
+      })
+    } else {
+      this.categoriaService.getMasConsultadosSubCategoria(this.categoria, this.subCategoria).then(consultados => {
+        this.masConsultados = consultados
+        this.masConsultados.sort((a, b) => b.consultas - a.consultas)
+        this.consultadosReady = true
+      })
+    }
+  }
+
   costoEnvio(negocios) {
     if (!this.costo_envio) this.costo_envio = this.uidService.getCostoEnvio()
     return new Promise(async (resolve, reject) => {
@@ -176,6 +250,15 @@ export class CategoriaPage implements OnInit, OnDestroy{
     })
   }
 
+  getCategorias() {
+    return new Promise((resolve, reject) => {
+      this.categoriaService.getCategorias().then(categorias => {
+        this.categorias = categorias
+        resolve()
+      })
+    })
+  }
+
   // Listeners
 
   listenCambios() {
@@ -192,7 +275,7 @@ export class CategoriaPage implements OnInit, OnDestroy{
     })
   }
   
-  // Ver negocio
+  // Acciones
 
   async verNegocio(negocio: Negocio) {
     const infoNeg: InfoGral = await this.ofertaService.getStatus(negocio.id)
@@ -223,6 +306,27 @@ export class CategoriaPage implements OnInit, OnDestroy{
     this.router.navigate(['/negocio', infoNeg.categoria, oferta.idNegocio, infoNeg.abierto], {state: {origen_categoria: true}})
   }
 
+  async verCategorias() {
+    const modal = await this.modalController.create({
+      component: CategoriasPage,
+      cssClass: 'modal-categorias',
+      enterAnimation: enterAnimationCategoria,
+      leaveAnimation: leaveAnimationCategoria,
+      componentProps: {categorias: this.categorias}
+    })
+
+    modal.onWillDismiss().then(resp => {
+      if (resp.data) this.irACategoria(resp.data)
+    })
+
+    return await modal.present()
+  }
+
+  irACategoria(categoria: string) {
+    if (this.uid) this.categoriaService.setVisitaCategoria(this.uid, categoria)
+    this.router.navigate(['/categoria', categoria])
+  }
+
   // Filtra por categoria
 
   async getNegociosSub(subCategoria) {
@@ -234,7 +338,7 @@ export class CategoriaPage implements OnInit, OnDestroy{
     this.noMore = false
     this.status = 'abiertos'
     this.infiniteScroll.disabled = false
-    this.getNegocios()
+    this.getTodo()
   }
 
   // Infinite Scroll

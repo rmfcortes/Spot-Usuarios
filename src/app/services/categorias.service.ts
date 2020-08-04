@@ -56,7 +56,31 @@ export class CategoriasService {
   getMasVendidos(): Promise<MasVendido[]> {
     return new Promise((resolve, reject) => {      
       const region = this.uidService.getRegion()
-      const venSub =  this.db.list(`vendidos/${region}`, data => data.orderByChild('ventas').limitToLast(15))
+      const venSub =  this.db.list(`vendidos/${region}/todos`, data => data.orderByChild('ventas').limitToLast(15))
+        .valueChanges().subscribe((vendidos: MasVendido[]) => {
+          venSub.unsubscribe()
+          resolve(vendidos)
+        })
+
+    })
+  }
+
+  getMasVendidosCategoria(categoria: string): Promise<MasVendido[]> {
+    return new Promise((resolve, reject) => {      
+      const region = this.uidService.getRegion()
+      const venSub =  this.db.list(`vendidos/${region}/categorias/${categoria}`, data => data.orderByChild('ventas').limitToLast(15))
+        .valueChanges().subscribe((vendidos: MasVendido[]) => {
+          venSub.unsubscribe()
+          resolve(vendidos)
+        })
+
+    })
+  }
+
+  getMasVendidosSubCategoria(categoria: string, subCategoria: string): Promise<MasVendido[]> {
+    return new Promise((resolve, reject) => {      
+      const region = this.uidService.getRegion()
+      const venSub =  this.db.list(`vendidos/${region}/subCategorias/${categoria}/${subCategoria}`, data => data.orderByChild('ventas').limitToLast(15))
         .valueChanges().subscribe((vendidos: MasVendido[]) => {
           venSub.unsubscribe()
           resolve(vendidos)
@@ -68,10 +92,34 @@ export class CategoriasService {
   getMasConsultados(): Promise<MasConsultado[]> {
     return new Promise((resolve, reject) => {      
       const region = this.uidService.getRegion()
-      const venSub =  this.db.list(`vendidos-servicios/${region}`, data => data.orderByChild('consultas').limitToLast(15))
+      const venSub =  this.db.list(`vendidos-servicios/${region}/todos`, data => data.orderByChild('consultas').limitToLast(15))
         .valueChanges().subscribe((consultados: MasConsultado[]) => {
           venSub.unsubscribe()
           resolve(consultados)
+        })
+
+    })
+  }
+
+  getMasConsultadosCategoria(categoria: string): Promise<MasConsultado[]> {
+    return new Promise((resolve, reject) => {      
+      const region = this.uidService.getRegion()
+      const venSub =  this.db.list(`vendidos-servicios/${region}/categorias/${categoria}`, data => data.orderByChild('consultas').limitToLast(15))
+        .valueChanges().subscribe((consultados: MasConsultado[]) => {
+          venSub.unsubscribe()
+          resolve(consultados)
+        })
+
+    })
+  }
+
+  getMasConsultadosSubCategoria(categoria: string, subCategoria: string): Promise<MasVendido[]> {
+    return new Promise((resolve, reject) => {      
+      const region = this.uidService.getRegion()
+      const venSub =  this.db.list(`vendidos-servicios/${region}/subCategorias/${categoria}/${subCategoria}`, data => data.orderByChild('consultas').limitToLast(15))
+        .valueChanges().subscribe((vendidos: MasVendido[]) => {
+          venSub.unsubscribe()
+          resolve(vendidos)
         })
 
     })
@@ -151,6 +199,10 @@ export class CategoriasService {
         this.getNegociosEnvioGratis(status, categoria, subCategoria, batch, lastKey, lastValue)
         .then(negocios => resolve(negocios))
       }
+      else if (filtro === 'serv_domicilio') {
+        this.getNegociosServicioDomicilio(status, categoria, subCategoria, batch, lastKey, lastValue)
+        .then(negocios => resolve(negocios))
+      }
     })
   }
 
@@ -189,6 +241,31 @@ export class CategoriasService {
       } else {
         const negocioSub = this.db.list(`negocios/preview/${region}/${categoria}/${subCategoria}/${status}`, data =>
           data.orderByChild('envio_gratis_pedMin').limitToLast(batch)).valueChanges()
+            .subscribe((negocios: Negocio[]) => {
+              negocioSub.unsubscribe()
+              negocios = negocios.filter(n => n.repartidores_propios)
+              negocios = negocios.filter(n => n.envio_gratis_pedMin)
+              resolve(negocios)
+            })
+      }
+    })
+  }
+
+
+  getNegociosServicioDomicilio(status, categoria, subCategoria, batch, lastKey?, lastValue?): Promise<Negocio[]> {
+    return new Promise((resolve, reject) => {
+      const region = this.uidService.getRegion()
+      if (lastKey) {
+        const negocioSub = this.db.list(`negocios/preview/${region}/${categoria}/${subCategoria}/${status}`, data =>
+        data.orderByChild('tipo').equalTo('productos').limitToLast(batch).endAt(lastValue, lastKey)).valueChanges()
+          .subscribe((negocios: Negocio[]) => {
+            negocioSub.unsubscribe()
+            negocios = negocios.filter(n => n.repartidores_propios)
+            resolve(negocios)
+          })
+      } else {
+        const negocioSub = this.db.list(`negocios/preview/${region}/${categoria}/${subCategoria}/${status}`, data =>
+          data.orderByChild('tipo').equalTo('productos').limitToLast(batch)).valueChanges()
             .subscribe((negocios: Negocio[]) => {
               negocioSub.unsubscribe()
               negocios = negocios.filter(n => n.repartidores_propios)

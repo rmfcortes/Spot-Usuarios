@@ -2,17 +2,24 @@
     <ion-toolbar class="fondo-content">
         <ion-buttons slot="start">
             <ion-button routerLink="/home">
-                <ion-icon slot="start" name="chevron-back"></ion-icon>
+                <ion-icon slot="start" name="home"></ion-icon>
             </ion-button>
         </ion-buttons>
-        <ion-title style="font-size: large; font-weight: 700;">{{categoria | titlecase}}</ion-title>
+        <ion-item lines="none">
+            <h3 (click)="verCategorias()">
+                {{categoria | titlecase}} <ion-icon style="margin-bottom: 0;" slot="end" name="chevron-down"></ion-icon>
+            </h3>
+        </ion-item>
     </ion-toolbar>
     <ion-toolbar class="fondo-content" *ngIf="subCategorias.length > 1">
-        <ion-segment scrollable [value]="subCategoria">
-            <ion-segment-button [value]="item" *ngFor="let item of subCategorias" (click)="getNegociosSub(item)" class="ion-text-wrap">
-                <ion-label>{{item | titlecase}}</ion-label>
-            </ion-segment-button>
-        </ion-segment>
+        <div class="scrolling-wrapper">
+            <div class="card" *ngFor="let item of subCategorias">
+                <ion-chip mode="ios" [ngClass]="{'sel' : subCategoria === item}" (click)="getNegociosSub(item)">
+                    <ion-label color="light" *ngIf="subCategoria === item">{{item | titlecase}}</ion-label>
+                    <ion-label  *ngIf="subCategoria !== item">{{item | titlecase}}</ion-label>
+                </ion-chip>    
+            </div>
+        </div>
     </ion-toolbar>
 </ion-header>
 
@@ -23,7 +30,7 @@
         <ion-grid *ngIf="ofertas.length > 0" class="ion-no-padding">
             <ion-row>
                 <ion-col size="8">
-                    <h2 style="margin-left: 1rem">Promociones</h2>
+                    <h3 style="margin-left: 1rem">Promociones</h3>
                 </ion-col>
                 <ion-col size="4" *ngIf="hayMas" (click)="verOfertas()" class="ion-align-self-center">
                     <ion-label color="primary" style="font-size: smaller; float: right; ; margin-right: 1.2rem;">Ver todas</ion-label>
@@ -48,22 +55,99 @@
         </ion-list>
     </ng-template>
 
-    <!-- Filtros -->
-    <ion-item lines="none" *ngIf="promosReady">
-        <ion-chip mode="ios" [ngClass]="{'gradient--' : filtro === 'destacado'}" (click)="setFiltro('destacado')">
-            <ion-label color="light" *ngIf="filtro === 'destacado'">Destacados</ion-label>
-            <ion-label  *ngIf="filtro !== 'destacado'">Destacados</ion-label>
-        </ion-chip>
-        <ion-chip mode="ios" [ngClass]="{'gradient--' : filtro === 'envio_gratis'}" (click)="setFiltro('envio_gratis')">
-            <ion-label color="light" *ngIf="filtro === 'envio_gratis'">Envío gratis</ion-label>
-            <ion-label  *ngIf="filtro !== 'envio_gratis'">Envío gratis</ion-label>
-        </ion-chip>             
-    </ion-item>
+    <!-- + vendidos -->
+    <div *ngIf="promosReady && vendidosReady && masVendidos.length > 0">
+        <h3 style="margin-left: 1rem">Productos más vendidos</h3>
+        <ion-slides [options]="slideVendidos">
+            <ion-slide *ngFor="let item of masVendidos" (click)="irAOferta(item)">
+                <ion-card>                    
+                    <ion-grid fixed>
+                        <ion-row>
+                            <ion-col size="12">
+                                <preload-image [ratio]="{w: 1, h: 0.75}" [src]="item.url" style="border-radius: 10px;"></preload-image>
+                            </ion-col>
+                            <ion-col size="12">
+                                <ion-item lines="none">
+                                    <ion-label class="ion-text-wrap">
+                                        <!-- <h2>{{(item.nombre.length > 15) ? (item.nombre | slice:0:15) + '...' : item.nombre}}</h2> -->
+                                        <div class="nombreProducto">
+                                            <strong>{{item.nombre}}</strong>
+                                        </div>
+                                        <div style="height: 0.5rem"></div>
+                                        <div class="nombreNegocio">
+                                            {{item.nombreNegocio}}
+                                        </div>
+                                        <div style="height: 0.5rem"></div>
+                                        <h2 *ngIf="item.precio" style="color: var(--ion-color-primary)">{{item.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}</h2>
+                                    </ion-label>
+                                </ion-item>
+                            </ion-col>
+                        </ion-row>
+                    </ion-grid>
+                </ion-card>
+            </ion-slide>
+        </ion-slides>
+    </div>
 
+
+        <!-- + consultados -->
+    <div *ngIf="promosReady && vendidosReady && masConsultados && masConsultados.length > 0">
+        <h3 style="margin-left: 1rem">Servicios más consultados</h3>
+        <ion-slides [options]="slideVendidos">
+            <ion-slide *ngFor="let item of masConsultados" (click)="irAOferta(item)">
+                <ion-card>                    
+                    <ion-grid fixed>
+                        <ion-row>
+                            <ion-col size="12">
+                                <preload-image [ratio]="{w: 1, h: 0.75}" [src]="item.url" style="border-radius: 10px;"></preload-image>
+                            </ion-col>
+                            <ion-col size="12">
+                                <ion-item lines="none">
+                                    <ion-label class="ion-text-wrap">
+                                        <!-- <h2>{{(item.nombre.length > 15) ? (item.nombre | slice:0:15) + '...' : item.nombre}}</h2> -->
+                                        <div class="nombreProducto">
+                                            <strong>{{item.nombre}}</strong>
+                                        </div>
+                                        <div style="height: 0.5rem"></div>
+                                        <div class="nombreNegocio">
+                                            {{item.nombreNegocio}}
+                                        </div>
+                                        <div style="height: 0.5rem"></div>
+                                        <h2 *ngIf="item.precio" style="color: var(--ion-color-primary)">{{item.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}</h2>
+                                    </ion-label>
+                                </ion-item>
+                            </ion-col>
+                        </ion-row>
+                    </ion-grid>
+                </ion-card>
+            </ion-slide>
+        </ion-slides>
+    </div>
+
+    <!-- Filtros -->
+    <div class="scrolling-wrapper"  *ngIf="promosReady && vendidosReady && consultadosReady">
+        <div class="card">
+            <ion-chip mode="ios" [ngClass]="{'sel' : filtro === 'destacado'}" (click)="setFiltro('destacado')">
+                <ion-label color="light" *ngIf="filtro === 'destacado'">Destacados</ion-label>
+                <ion-label  *ngIf="filtro !== 'destacado'">Destacados</ion-label>
+            </ion-chip>
+        </div>
+        <div class="card">
+            <ion-chip mode="ios" [ngClass]="{'sel' : filtro === 'serv_domicilio'}" (click)="setFiltro('serv_domicilio')">
+                <ion-label color="light" *ngIf="filtro === 'serv_domicilio'">Servicio a domicilio</ion-label>
+                <ion-label  *ngIf="filtro !== 'serv_domicilio'">Servicio a domicilio</ion-label>
+            </ion-chip>   
+        </div>
+        <div class="card">
+            <ion-chip mode="ios" [ngClass]="{'sel' : filtro === 'envio_gratis'}" (click)="setFiltro('envio_gratis')">
+                <ion-label color="light" *ngIf="filtro === 'envio_gratis'">Envío gratis</ion-label>
+                <ion-label  *ngIf="filtro !== 'envio_gratis'">Envío gratis</ion-label>
+            </ion-chip>     
+        </div>
+    </div>
 
     <!-- Lista negocios -->
-
-    <ng-container *ngIf="promosReady && negociosReady; else negTemplate">
+    <ng-container *ngIf="promosReady && negociosReady && vendidosReady && consultadosReady; else negTemplate">
         <ng-container *ngIf="negocios.length > 0; else hayNegTemplate">
             <ion-card>
                 <app-negocio [negocios]="negocios" [direccion]="direccion" (verNeg)="verNegocio($event)"></app-negocio>

@@ -18,7 +18,7 @@ export class OfertasService {
     getOfertas(batch, categoria): Promise<Oferta[]> {
       return new Promise((resolve, reject) => {
         const region = this.uidService.getRegion()
-        const oferSub = this.db.list(`ofertas/${region}/${categoria}`, data => data.orderByKey().limitToLast(batch)).valueChanges()
+        const oferSub = this.db.list(`ofertas/${region}/${categoria}`, data => data.orderByChild('ventas').limitToLast(batch)).valueChanges()
           .subscribe((ofertas: Oferta[]) => {
             oferSub.unsubscribe()
             resolve(ofertas)
