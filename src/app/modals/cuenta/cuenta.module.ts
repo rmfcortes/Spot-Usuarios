@@ -8,6 +8,7 @@ import { CuentaPage } from './cuenta.page';
 
 import { DireccionesPageModule } from '../direcciones/direcciones.module';
 import { FormasPagoPageModule } from '../formas-pago/formas-pago.module';
+import { ProdsCartModule } from 'src/app/shared/prods-cart.module';
 import { SharedModule } from 'src/app/shared/shared.module';
 
 @NgModule({
@@ -16,6 +17,7 @@ import { SharedModule } from 'src/app/shared/shared.module';
     FormsModule,
     IonicModule,
     SharedModule,
+    ProdsCartModule,
     FormasPagoPageModule,
     DireccionesPageModule,
   ],

@@ -79,6 +79,7 @@ export interface InfoPasillos {
 export interface Pasillo {
     nombre: string;
     prioridad: number;
+    cantidad: number;
 }
 
 export interface InfoGral {

@@ -6,6 +6,12 @@
                 <ng-container *ngIf="!prod.agotado; else agotadoTemp">
                     <preload-image [ratio]="{w: 1, h: .75}" [src]="prod.url" class="shadow" (click)="presentProduct(prod)" style="background: white;">
                     </preload-image>
+                    <div class="promo-box" *ngIf="prod.descuento && !prod.agotado">
+                        {{prod.descuento}}%
+                    </div>                        
+                    <div class="promo-box" *ngIf="prod.dosxuno  && !prod.agotado">
+                        2x1
+                    </div>
                     <div class="triangle-topleft" *ngIf="prod.agregados"></div>
                     <div class="badge">{{prod.agregados}}</div>
                 </ng-container>

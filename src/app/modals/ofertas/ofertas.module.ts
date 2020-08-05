@@ -6,6 +6,7 @@ import { IonicModule } from '@ionic/angular';
 
 import { OfertasPage } from './ofertas.page';
 import { SharedModule } from 'src/app/shared/shared.module';
+import { CategoriasPageModule } from '../categorias/categorias.module';
 
 @NgModule({
   imports: [
@@ -13,6 +14,7 @@ import { SharedModule } from 'src/app/shared/shared.module';
     FormsModule,
     IonicModule,
     SharedModule,
+    CategoriasPageModule,
   ],
   declarations: [OfertasPage],
   entryComponents: [OfertasPage]

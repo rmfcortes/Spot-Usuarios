@@ -15,6 +15,8 @@ export interface Producto {
     complementos?: ListaComplementosElegidos[];
     observaciones?: string;
     total?: number;
+    descuento?: number;
+    dosxuno?: boolean;
 }
 
 export interface ListaComplementos {
@@ -46,21 +48,12 @@ export interface MasVendido {
     idNegocio: string;
     nombre: string;
     nombreNegocio: string;
+    pasillo: string;
     precio: number;
     url: string;
     ventas?: number;
-}
-
-export interface MasConsultado {
-    categoria: string;
-    descripcion: string;
-    id: string;
-    idNegocio: string;
-    nombre: string;
-    nombreNegocio: string;
-    precio: number;
-    url: string;
-    consultas?: number;
+    descuento?: number;
+    dosxuno?: boolean;
 }
 
 export interface Cart{

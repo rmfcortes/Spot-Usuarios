@@ -85,6 +85,7 @@ export class CuentaPage implements OnInit {
 
   propina_sel = 2
   propina = 0
+  descuento = 0
 
   costo_envio: CostoEnvio
 
@@ -133,7 +134,13 @@ export class CuentaPage implements OnInit {
     this.cartService.getCart(this.datos.idNegocio).then((cart: Producto[]) => {
       this.cart = cart
       this.getInfo()
+      this.getDescuentos()
     })
+  }
+
+  getDescuentos() {
+    this.descuento = 0
+    this.cart.forEach(p => this.descuento += p.descuento ? ((p.descuento/100) * p.precio) * p.cantidad : 0)
   }
 
   getInfo() {
@@ -220,6 +227,7 @@ export class CuentaPage implements OnInit {
         await this.cartService.editProduct(this.datos.idNegocio, producto)
         this.cuenta = await this.negocioService.getCart(uid, this.datos.idNegocio)
         producto.cantidad = resp.data
+        this.getDescuentos()
         this.datosNegocio.envio = await this.costoEnvio()
         this.calculaPropina(this.propina_sel)
       }
@@ -257,6 +265,7 @@ export class CuentaPage implements OnInit {
         if (this.cuenta === 0) this.closeCart()
         this.datosNegocio.envio = await this.costoEnvio()
         this.calculaPropina(this.propina_sel)
+        this.getDescuentos()
       }
     })
   }
@@ -353,11 +362,12 @@ export class CuentaPage implements OnInit {
         propina: this.propina,
         negocio: this.datosNegocio,
         productos: this.cart,
-        total: this.cuenta + this.datosNegocio.envio + this.comision + this.propina,
+        total: this.cuenta + this.datosNegocio.envio + this.comision + this.propina - this.descuento,
         entrega: this.datosNegocio.entrega || 'indefinido',
         avances: [],
         formaPago: this.formaPago,
-        region: this.uidService.getRegion()
+        region: this.uidService.getRegion(),
+        descuento: this.descuento ? this.descuento : 0,
       }
       pedido.total = Math.round((pedido.total + Number.EPSILON) * 100) / 100
       if (this.formaPago.tipo !== 'efectivo') pedido.idOrder =  await this.pagoService.cobrar(pedido)
@@ -413,10 +423,6 @@ export class CuentaPage implements OnInit {
     await actionSheet.present()
   }
 
-  ionImgWillLoad(image) {
-    this.animationService.enterAnimation(image.target)
-  }
-
   comisionInfo() {
     this.alertSerivce.presentToastconBoton('Cargo realizado por pago con tarjeta')
   }
@@ -431,20 +437,6 @@ export class CuentaPage implements OnInit {
         resolve()
       }, 1000)
     })
-  }
-
-  // Track by
-
-  trackCart(index:number, el: Producto): string {
-    return el.id
-  }
-
-  trackProdComplementos(index:number, el: ListaComplementosElegidos): number {
-    return index
-  }
-
-  trackComplementos(index:number, el: Complemento): number {
-    return index
   }
 
 }

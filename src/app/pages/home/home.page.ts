@@ -19,7 +19,6 @@ import { Oferta, InfoGral, NegocioBusqueda } from 'src/app/interfaces/negocio';
 import { Categoria } from 'src/app/interfaces/categoria.interface';
 import { UnreadMsg } from 'src/app/interfaces/chat.interface';
 import { CostoEnvio } from '../../interfaces/envio.interface';
-import { MasConsultado } from '../../interfaces/producto';
 import { Direccion } from '../../interfaces/direcciones';
 import { MasVendido } from 'src/app/interfaces/producto';
 import { Pedido } from 'src/app/interfaces/pedido';
@@ -40,15 +39,7 @@ export class HomePage implements OnInit, OnDestroy {
   ofertas: Oferta[] =  [ ]
   batch = 10
   hayMas = false
-
-  slideOpts = {
-    centeredSlides: false,
-    initialSlide: 0,
-    slidesPerView: 1.2,
-    speed: 400,
-    freeMode: true
-  }
-
+  
   slideCategorias = {
     centeredSlides: false,
     initialSlide: 0,
@@ -60,19 +51,6 @@ export class HomePage implements OnInit, OnDestroy {
       380: { slidesPerView: 4.6, spaceBetween: 8 },
       640: { slidesPerView: 4.6, spaceBetween: 10 },
       900: { slidesPerView: 7.5}
-    }
-  }
-
-  slideVendidos = {
-    centeredSlides: false,
-    initialSlide: 0,
-    freeMode: true,
-    breakpoints: {
-      // when window width is =< 200px
-      200: { slidesPerView: 1.3 },
-      380: { slidesPerView: 2.3 },
-      640: { slidesPerView: 2.3 },
-      900: { slidesPerView: 3.5}
     }
   }
 
@@ -91,7 +69,7 @@ export class HomePage implements OnInit, OnDestroy {
   negociosBusqueda: NegocioBusqueda[] = []
   negMatch: NegocioBusqueda[] = []
 
-  masConsultados: MasConsultado[] = []
+  masConsultados: MasVendido[] = []
   negociosVisitados: InfoGral[] = []
   negociosPopulares: InfoGral[] = []
   masVendidos: MasVendido[] = []
@@ -268,7 +246,7 @@ export class HomePage implements OnInit, OnDestroy {
   getMasConsultados() {
     this.categoriaService.getMasConsultados().then(consultados => {
       this.masConsultados = consultados
-      this.masConsultados.sort((a, b) => b.consultas - a.consultas)
+      this.masConsultados.sort((a, b) => b.ventas - a.ventas)
       this.consultadosReady = true
     })
   }
@@ -416,7 +394,7 @@ export class HomePage implements OnInit, OnDestroy {
   async verOfertas() {
     const modal = await this.modalController.create({
       component: OfertasPage,
-      componentProps: {categoria: 'todas', batch: this.batch}
+      componentProps: {categoria: 'todas', categorias: this.categorias, subCategoria: 'todos', batch: this.batch}
     })
 
     return modal.present()

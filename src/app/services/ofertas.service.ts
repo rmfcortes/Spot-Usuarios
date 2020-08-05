@@ -15,10 +15,22 @@ export class OfertasService {
 
     // Para home page
 
-    getOfertas(batch, categoria): Promise<Oferta[]> {
+    getOfertas(batch: number, categoria: string): Promise<Oferta[]> {
       return new Promise((resolve, reject) => {
         const region = this.uidService.getRegion()
         const oferSub = this.db.list(`ofertas/${region}/${categoria}`, data => data.orderByChild('ventas').limitToLast(batch)).valueChanges()
+          .subscribe((ofertas: Oferta[]) => {
+            oferSub.unsubscribe()
+            resolve(ofertas)
+          })
+      })
+    }
+
+    getOfertasSubCategoria(batch: number, categoria: string, subCategoria: string): Promise<Oferta[]> {
+      return new Promise((resolve, reject) => {
+        const region = this.uidService.getRegion()
+        const oferSub = this.db.list(`ofertas/${region}/subCategorias/${categoria}/${subCategoria}`, 
+        data => data.orderByChild('ventas').limitToLast(batch)).valueChanges()
           .subscribe((ofertas: Oferta[]) => {
             oferSub.unsubscribe()
             resolve(ofertas)
@@ -38,21 +50,37 @@ export class OfertasService {
     }
 
     // Para ofertas Modal
-    getOfertasModal(categoria, batch, lastKey): Promise<Oferta[]> {
+    getOfertasModal(categoria: string, batch: number, lastKey: string, subCategoria: string): Promise<Oferta[]> {
       return new Promise((resolve, reject) => {
         const region = this.uidService.getRegion()
-        if (lastKey || lastKey === 0) {
-          const x = this.db.list(`ofertas/${region}/${categoria}`, data =>
-            data.orderByKey().limitToLast(batch).endAt(lastKey.toString())).valueChanges().subscribe(async (ofertas: Oferta[]) => {
-              x.unsubscribe()
-              resolve(ofertas)
-            })
+        if (subCategoria === 'todos') {
+          if (lastKey) {
+            const x = this.db.list(`ofertas/${region}/${categoria}`, data =>
+              data.orderByKey().limitToLast(batch).endAt(lastKey.toString())).valueChanges().subscribe(async (ofertas: Oferta[]) => {
+                x.unsubscribe()
+                resolve(ofertas)
+              })
+          } else {
+            const x = this.db.list(`ofertas/${region}/${categoria}`, data =>
+              data.orderByKey().limitToLast(batch)).valueChanges().subscribe(async (ofertas: Oferta[]) => {
+                x.unsubscribe()
+                resolve(ofertas)
+              })
+          }
         } else {
-          const x = this.db.list(`ofertas/${region}/${categoria}`, data =>
-            data.orderByKey().limitToLast(batch)).valueChanges().subscribe(async (ofertas: Oferta[]) => {
-              x.unsubscribe()
-              resolve(ofertas)
-            })
+          if (lastKey) {
+            const x = this.db.list(`ofertas/${region}/subCategorias/${categoria}/${subCategoria}`, data =>
+              data.orderByKey().limitToLast(batch).endAt(lastKey.toString())).valueChanges().subscribe(async (ofertas: Oferta[]) => {
+                x.unsubscribe()
+                resolve(ofertas)
+              })
+          } else {
+            const x = this.db.list(`ofertas/${region}/subCategorias/${categoria}/${subCategoria}`, data =>
+              data.orderByKey().limitToLast(batch)).valueChanges().subscribe(async (ofertas: Oferta[]) => {
+                x.unsubscribe()
+                resolve(ofertas)
+              })
+          }
         }
       })
     }

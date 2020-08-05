@@ -136,6 +136,7 @@ export class NegocioPage {
 
   async getPasillos() {
     const detalles: InfoPasillos = await this.negocioService.getPasillos(this.categoria, this.negocio.id)
+    detalles.pasillos = detalles.pasillos.filter(p => p.cantidad)
     this.portada = detalles.portada
     this.vista = detalles.vista || 'lista'
     this.pasillos.pasillos = detalles.pasillos
@@ -155,7 +156,7 @@ export class NegocioPage {
         this.hasOfertas = false
         this.cargandoProds = false
       }
-      if (!this.pasilloFiltro) {
+      if (!this.pasilloFiltro && this.pasillos.pasillos.length > 0) {
         this.getInfoProdsLista()
       }
     })

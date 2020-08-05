@@ -11,11 +11,11 @@ import { CategoriasService } from 'src/app/services/categorias.service';
 import { OfertasService } from 'src/app/services/ofertas.service';
 import { UidService } from 'src/app/services/uid.service';
 
-import { MasConsultado, MasVendido } from 'src/app/interfaces/producto';
+import { Categoria, SubCategoria } from 'src/app/interfaces/categoria.interface';
 import { Negocio, Oferta, InfoGral } from 'src/app/interfaces/negocio';
-import { Categoria } from 'src/app/interfaces/categoria.interface';
 import { CostoEnvio } from 'src/app/interfaces/envio.interface';
 import { Direccion } from 'src/app/interfaces/direcciones';
+import { MasVendido } from 'src/app/interfaces/producto';
 
 import { enterAnimationCategoria } from 'src/app/animations/enterCat';
 import { leaveAnimationCategoria } from 'src/app/animations/leaveCat';
@@ -31,12 +31,12 @@ export class CategoriaPage implements OnInit, OnDestroy{
 
   categoria: string
   categorias: Categoria[] = []
-  subCategorias: string[] = []
+  subCategorias: SubCategoria[] = []
   ofertas: Oferta[] = []
   negocios: Negocio[] = []
   status = 'abiertos'
 
-  masConsultados: MasConsultado[] = []
+  masConsultados: MasVendido[] = []
   masVendidos: MasVendido[] = []
   vendidosReady = false
   consultadosReady = false
@@ -51,33 +51,12 @@ export class CategoriaPage implements OnInit, OnDestroy{
 
   subCategoria = 'todos'
 
-  slideOpts = {
-    centeredSlides: false,
-    initialSlide: 0,
-    slidesPerView: 1.2,
-    speed: 400,
-    freeMode: true
-  }
-
   slideCategorias = {
     centeredSlides: false,
     initialSlide: 0,
     slidesPerView: 4.5,
     speed: 400,
     freeMode: true
-  }
-
-  slideVendidos = {
-    centeredSlides: false,
-    initialSlide: 0,
-    freeMode: true,
-    breakpoints: {
-      // when window width is =< 200px
-      200: { slidesPerView: 1.3 },
-      380: { slidesPerView: 2.3 },
-      640: { slidesPerView: 2.3 },
-      900: { slidesPerView: 3.5}
-    }
   }
 
   promosReady = false
@@ -110,7 +89,6 @@ export class CategoriaPage implements OnInit, OnDestroy{
     this.categoria = this.activatedRoute.snapshot.paramMap.get('cat')
     this.direccion = this.uidService.getDireccion()
     this.getTodo()
-    this.getOfertas()
     this.listenCambios()
     this.getCategorias()
     this.getSubCategorias()
@@ -136,34 +114,56 @@ export class CategoriaPage implements OnInit, OnDestroy{
   }
 
   getSubCategorias() {
-    this.categoriaService.getSubCategorias(this.categoria)
+    this.categoriaService.getSubCategorias(this.categoria, 'cantidad')
     .then(subcategorias => {
       this.subCategorias = subcategorias
-      this.subCategorias.unshift('todos')
+      const todos: SubCategoria = {
+        cantidad: 1,
+        subCategoria: 'todos',
+        alias: 'todos'
+      }
+      this.subCategorias.unshift(todos)
     })
     .catch((err) => console.log(err))
   }
 
   getTodo() {
+    this.promosReady = false
     this.negociosReady = false
     this.vendidosReady = false
     this.consultadosReady = false
+    this.getOfertas()
     this.getNegocios()
     this.getMasVendidos()
     this.getMasConsultados()
   }
 
   async getOfertas() {
-    this.ofertaService.getOfertas(this.batchOfertas + 1, this.categoria)
-    .then((ofertas: Oferta[]) => {
-      if (ofertas.length === this.batchOfertas + 1) {
-        this.hayMas = true
-        ofertas.shift()
-      }
-      this.ofertas = ofertas.reverse()
-      this.promosReady = true
-    })
-    .catch((err) => console.log(err))
+    this.ofertas = []
+    if (this.subCategoria === 'todos') {
+      this.ofertaService.getOfertas(this.batchOfertas + 1, this.categoria)
+      .then((ofertas: Oferta[]) => {
+        if (ofertas.length === this.batchOfertas + 1) {
+          this.hayMas = true
+          ofertas.shift()
+        }
+        this.ofertas = ofertas.reverse()
+        this.promosReady = true
+      })
+      .catch((err) => console.log(err))      
+    } else {
+      this.ofertaService.getOfertasSubCategoria(this.batchOfertas + 1, this.categoria, this.subCategoria)
+      .then((ofertas: Oferta[]) => {
+        if (ofertas.length === this.batchOfertas + 1) {
+          this.hayMas = true
+          ofertas.shift()
+        }
+        this.ofertas = ofertas.reverse()
+        this.promosReady = true
+      })
+      .catch((err) => console.log(err))
+
+    }
   }
 
   async getNegocios(event?) {
@@ -218,13 +218,13 @@ export class CategoriaPage implements OnInit, OnDestroy{
     if (this.subCategoria === 'todos') {
       this.categoriaService.getMasConsultadosCategoria(this.categoria).then(consultados => {
         this.masConsultados = consultados
-        this.masConsultados.sort((a, b) => b.consultas - a.consultas)
+        this.masConsultados.sort((a, b) => b.ventas - a.ventas)
         this.consultadosReady = true
       })
     } else {
       this.categoriaService.getMasConsultadosSubCategoria(this.categoria, this.subCategoria).then(consultados => {
         this.masConsultados = consultados
-        this.masConsultados.sort((a, b) => b.consultas - a.consultas)
+        this.masConsultados.sort((a, b) => b.ventas - a.ventas)
         this.consultadosReady = true
       })
     }
@@ -292,7 +292,8 @@ export class CategoriaPage implements OnInit, OnDestroy{
   async verOfertas() {
     const modal = await this.modalController.create({
       component: OfertasPage,
-      componentProps: {categoria: this.categoria, batch: this.batchOfertas}
+      componentProps: {categoria: this.categoria, categorias: this.categorias,
+                    subCategoria: this.subCategoria, batch: this.batchOfertas, subCategorias: this.subCategorias}
     })
 
     return modal.present()

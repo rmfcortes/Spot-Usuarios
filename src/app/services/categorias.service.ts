@@ -4,8 +4,8 @@ import { AngularFireDatabase } from '@angular/fire/database';
 import { UidService } from './uid.service';
 
 import { Negocio, Oferta, visistasNegocio, InfoGral } from '../interfaces/negocio';
-import { Categoria } from '../interfaces/categoria.interface';
-import { MasVendido, MasConsultado } from '../interfaces/producto';
+import { Categoria, SubCategoria } from '../interfaces/categoria.interface';
+import { MasVendido } from '../interfaces/producto';
 
 
 @Injectable({
@@ -89,11 +89,11 @@ export class CategoriasService {
     })
   }
 
-  getMasConsultados(): Promise<MasConsultado[]> {
+  getMasConsultados(): Promise<MasVendido[]> {
     return new Promise((resolve, reject) => {      
       const region = this.uidService.getRegion()
-      const venSub =  this.db.list(`vendidos-servicios/${region}/todos`, data => data.orderByChild('consultas').limitToLast(15))
-        .valueChanges().subscribe((consultados: MasConsultado[]) => {
+      const venSub =  this.db.list(`vendidos-servicios/${region}/todos`, data => data.orderByChild('ventas').limitToLast(15))
+        .valueChanges().subscribe((consultados: MasVendido[]) => {
           venSub.unsubscribe()
           resolve(consultados)
         })
@@ -101,11 +101,11 @@ export class CategoriasService {
     })
   }
 
-  getMasConsultadosCategoria(categoria: string): Promise<MasConsultado[]> {
+  getMasConsultadosCategoria(categoria: string): Promise<MasVendido[]> {
     return new Promise((resolve, reject) => {      
       const region = this.uidService.getRegion()
-      const venSub =  this.db.list(`vendidos-servicios/${region}/categorias/${categoria}`, data => data.orderByChild('consultas').limitToLast(15))
-        .valueChanges().subscribe((consultados: MasConsultado[]) => {
+      const venSub =  this.db.list(`vendidos-servicios/${region}/categorias/${categoria}`, data => data.orderByChild('ventas').limitToLast(15))
+        .valueChanges().subscribe((consultados: MasVendido[]) => {
           venSub.unsubscribe()
           resolve(consultados)
         })
@@ -116,7 +116,7 @@ export class CategoriasService {
   getMasConsultadosSubCategoria(categoria: string, subCategoria: string): Promise<MasVendido[]> {
     return new Promise((resolve, reject) => {      
       const region = this.uidService.getRegion()
-      const venSub =  this.db.list(`vendidos-servicios/${region}/subCategorias/${categoria}/${subCategoria}`, data => data.orderByChild('consultas').limitToLast(15))
+      const venSub =  this.db.list(`vendidos-servicios/${region}/subCategorias/${categoria}/${subCategoria}`, data => data.orderByChild('ventas').limitToLast(15))
         .valueChanges().subscribe((vendidos: MasVendido[]) => {
           venSub.unsubscribe()
           resolve(vendidos)
@@ -165,11 +165,12 @@ export class CategoriasService {
     }
   }
 
-  getSubCategorias(categoria): Promise<string[]> {
+  getSubCategorias(categoria: string, filtro: string): Promise<SubCategoria[]> {
     return new Promise((resolve, reject) => {
       const region = this.uidService.getRegion()
-      const subCat = this.db.list(`categoriaSub/${region}/${categoria}`).valueChanges()
-        .subscribe((subcategorias: string[]) => {
+      const subCat = this.db.list(`categoriaSub/${region}/${categoria}`, 
+      data => data.orderByChild(filtro).startAt(1).endAt(10000000)).valueChanges()
+        .subscribe((subcategorias: SubCategoria[]) => {
           subCat.unsubscribe()
           resolve(subcategorias)
         },
@@ -181,11 +182,11 @@ export class CategoriasService {
     const region = this.uidService.getRegion();
     return new Promise((resolve, reject) => {
       const oferSub = this.db.list(`ofertas/${region}/${categoria}`).valueChanges()
-        .subscribe((ofertas: Oferta[]) => {
-          oferSub.unsubscribe()
-          resolve(ofertas)
-        }
-        ,err => console.log(err))
+      .subscribe((ofertas: Oferta[]) => {
+        oferSub.unsubscribe()
+        resolve(ofertas)
+      }
+      ,err => console.log(err))
     })
   }
 

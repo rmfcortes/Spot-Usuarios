@@ -25,6 +25,7 @@ export interface Pedido {
     cancelado_by_negocio?: number;
     razon_cancelacion?: string;
     idOrder?: string;
+    descuento?: number;
 }
 
 export interface Avance {

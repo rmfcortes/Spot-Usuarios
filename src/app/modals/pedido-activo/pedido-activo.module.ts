@@ -7,6 +7,7 @@ import { IonicModule } from '@ionic/angular';
 import { PedidoActivoPage } from './pedido-activo.page';
 
 import { CalificarPageModule } from '../calificar/calificar.module';
+import { ProdsCartModule } from 'src/app/shared/prods-cart.module';
 import { StarsModule } from 'src/app/shared/stars.module';
 
 
@@ -16,6 +17,7 @@ import { StarsModule } from 'src/app/shared/stars.module';
     FormsModule,
     IonicModule,
     StarsModule,
+    ProdsCartModule,
     CalificarPageModule,
   ],
   declarations: [PedidoActivoPage],

@@ -87,6 +87,14 @@
 
 <ion-footer class="ion-no-border">
     <app-no-network></app-no-network>
+    <ion-toolbar *ngIf="producto.descuento">
+        <ion-item lines="none" style="text-align: center;">
+            <h2 class="ion-text-wrap">{{producto.descuento}}% de descuento sobre el precio publicado</h2>
+        </ion-item>
+    </ion-toolbar>    
+    <ion-toolbar *ngIf="producto.dosxuno" style="text-align: center;">
+        <h2 class="ion-text-wrap">Paga {{producto.precio |currency :'CAD':'symbol-narrow':'1.0-0'}} y llévate 2</h2>
+    </ion-toolbar>
     <ion-toolbar class="fondo-content">
         <ng-container *ngIf="modifica; else modTemplate">
             <ion-button class="boton-cart ion-text-wrap gradient--" expand="block" (click)="agregarProducto()" [disabled]="!canContinue || recalculando" shape="round">

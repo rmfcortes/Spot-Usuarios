@@ -140,24 +140,7 @@
 
     <!-- Ofertas -->
     <ng-container *ngIf="pedidosReady && catsReady && promosReady; else promoTemplate">
-        <ion-grid *ngIf="ofertas.length > 0" class="ion-no-padding">
-            <ion-row>
-                <ion-col size="8">
-                    <h3 style="margin-left: 1rem">Promociones</h3>
-                </ion-col>
-                <ion-col size="4" (click)="verOfertas()" class="ion-align-self-center" *ngIf="hayMas">
-                    <ion-label color="primary" style="font-size: smaller; float: right; ; margin-right: 1.2rem;">Ver todas</ion-label>
-                </ion-col>
-            </ion-row>
-        </ion-grid>
-        <ion-slides [options]="slideOpts" *ngIf="ofertas.length > 0" style="margin-bottom: 1.1rem;">
-            <ion-slide *ngFor="let item of ofertas" (click)="irAOferta(item)" style="padding: 0 0.5rem;">
-                <preload-image [ratio]="{w: 1, h: 0.45}" [src]="item.foto" style="border-radius: 15px;"></preload-image>
-            </ion-slide>
-            <ion-slide (click)="verOfertas()" *ngIf="hayMas" style="padding: 0 0.5rem;">
-                <ion-img style="width: 30%;" src="../../../assets/img/botones/verTodas.png"></ion-img>
-            </ion-slide>
-        </ion-slides>
+        <app-oferta-estrella [hayMas]="hayMas" [ofertas]="ofertas" (verOfs)="verOfertas()" (verNeg)="irAOferta($event)"></app-oferta-estrella>
     </ng-container>
     <ng-template #promoTemplate>
         <ion-list>
@@ -171,71 +154,13 @@
 
     <!-- + vendidos -->
     <div *ngIf="pedidosReady && catsReady && promosReady && vendidosReady && masVendidos.length > 0">
-        <h3 style="margin-left: 1rem">Productos más vendidos</h3>
-        <ion-slides [options]="slideVendidos">
-            <ion-slide *ngFor="let item of masVendidos" (click)="irAOferta(item)">
-                <ion-card>                    
-                    <ion-grid fixed>
-                        <ion-row>
-                            <ion-col size="12">
-                                <preload-image [ratio]="{w: 1, h: 0.75}" [src]="item.url" style="border-radius: 10px;"></preload-image>
-                            </ion-col>
-                            <ion-col size="12">
-                                <ion-item lines="none">
-                                    <ion-label class="ion-text-wrap">
-                                        <!-- <h2>{{(item.nombre.length > 15) ? (item.nombre | slice:0:15) + '...' : item.nombre}}</h2> -->
-                                        <div class="nombreProducto">
-                                            <strong>{{item.nombre}}</strong>
-                                        </div>
-                                        <div style="height: 0.5rem"></div>
-                                        <div class="nombreNegocio">
-                                            {{item.nombreNegocio}}
-                                        </div>
-                                        <div style="height: 0.5rem"></div>
-                                        <h2 *ngIf="item.precio" style="color: var(--ion-color-primary)">{{item.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}</h2>
-                                    </ion-label>
-                                </ion-item>
-                            </ion-col>
-                        </ion-row>
-                    </ion-grid>
-                </ion-card>
-            </ion-slide>
-        </ion-slides>
+        <app-producto-estrella [titulo]="'Productos más vendidos'" [masVendidos]="masVendidos" (verProd)="irAOferta($event)"></app-producto-estrella>
     </div>
 
 
         <!-- + consultados -->
     <div *ngIf="pedidosReady && catsReady && promosReady && vendidosReady && masConsultados && masConsultados.length > 0">
-        <h3 style="margin-left: 1rem">Servicios más consultados</h3>
-        <ion-slides [options]="slideVendidos">
-            <ion-slide *ngFor="let item of masConsultados" (click)="irAOferta(item)">
-                <ion-card>                    
-                    <ion-grid fixed>
-                        <ion-row>
-                            <ion-col size="12">
-                                <preload-image [ratio]="{w: 1, h: 0.75}" [src]="item.url" style="border-radius: 10px;"></preload-image>
-                            </ion-col>
-                            <ion-col size="12">
-                                <ion-item lines="none">
-                                    <ion-label class="ion-text-wrap">
-                                        <!-- <h2>{{(item.nombre.length > 15) ? (item.nombre | slice:0:15) + '...' : item.nombre}}</h2> -->
-                                        <div class="nombreProducto">
-                                            <strong>{{item.nombre}}</strong>
-                                        </div>
-                                        <div style="height: 0.5rem"></div>
-                                        <div class="nombreNegocio">
-                                            {{item.nombreNegocio}}
-                                        </div>
-                                        <div style="height: 0.5rem"></div>
-                                        <h2 *ngIf="item.precio" style="color: var(--ion-color-primary)">{{item.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}</h2>
-                                    </ion-label>
-                                </ion-item>
-                            </ion-col>
-                        </ion-row>
-                    </ion-grid>
-                </ion-card>
-            </ion-slide>
-        </ion-slides>
+        <app-producto-estrella [titulo]="'Servicios más consultados'" [masVendidos]="masConsultados" (verProd)="irAOferta($event)"></app-producto-estrella>
     </div>
 
 

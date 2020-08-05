@@ -12,6 +12,7 @@ import { LoginPageModule } from 'src/app/modals/login/login.module';
 import { CategoriasPageModule } from 'src/app/modals/categorias/categorias.module';
 
 import { TarjetaPageModule } from 'src/app/modals/tarjeta/tarjeta.module';
+import { ProdsOfertasModule } from 'src/app/shared/prodsofertas.module';
 import { StarsModule } from 'src/app/shared/stars.module';
 
 @NgModule({
@@ -24,6 +25,7 @@ import { StarsModule } from 'src/app/shared/stars.module';
     LoginPageModule,
     OfertasPageModule,
     TarjetaPageModule,
+    ProdsOfertasModule,
     CategoriasPageModule,
     RouterModule.forChild([
       {

@@ -3,10 +3,9 @@ import { AngularFireDatabase } from '@angular/fire/database';
 
 import { UidService } from './uid.service';
 
-import { Negocio, DetallesNegocio, NegocioBusqueda } from '../interfaces/negocio';
+import { Negocio, DetallesNegocio, NegocioBusqueda, InfoPasillos } from '../interfaces/negocio';
 import { Producto, Cart } from '../interfaces/producto';
 import { Dia } from '../interfaces/horario.interface';
-import { Direccion } from '../interfaces/direcciones';
 
 
 @Injectable({
@@ -56,10 +55,10 @@ export class NegocioService {
     })
   }
 
-  getPasillos(categoria, id): Promise<any> {
+  getPasillos(categoria, id): Promise<InfoPasillos> {
     return new Promise((resolve, reject) => {
       const detSub = this.db.object(`negocios/pasillos/${categoria}/${id}`).valueChanges()
-        .subscribe((pasillos: {}) => {
+        .subscribe((pasillos: InfoPasillos) => {
           detSub.unsubscribe()
           resolve(pasillos)
         })

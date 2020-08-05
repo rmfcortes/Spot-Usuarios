@@ -3,3 +3,9 @@ export interface Categoria {
     foto: string;
     visitas: number;
 }
+
+export interface SubCategoria {
+    subCategoria: string;
+    cantidad: number;
+    alias: string;
+}

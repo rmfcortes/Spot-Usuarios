@@ -91,27 +91,7 @@
         <ion-item lines="full">
             <h2>Productos</h2>
         </ion-item>
-        <ion-item style="--padding-start: 0; padding-top: 1rem;" *ngFor="let prod of pedido.productos" lines="none">
-            <ion-grid class="ion-no-padding">
-                <ion-row>
-                    <ion-col size="4">
-                        <ion-img [src]="prod.url" style="height: 100%; width: 100%; max-height: 7rem; object-fit: cover;" (ionImgWillLoad)="ionImgWillLoad($event)"></ion-img>
-                    </ion-col>
-                    <ion-col size="8">
-                        <ion-item lines="none">
-                            <ion-label class="ion-text-wrap">
-                                <h2 style="margin-left: 0;">{{(prod.nombre.length > 25) ? (prod.nombre | slice:0:25) + '...' : prod.nombre}}</h2>
-                                <h2 *ngIf="prod.precio" class="primario" style="margin-left: 0;">{{prod.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}</h2>
-                                <div *ngFor="let complemento of prod.complementos">
-                                    <p style="color: var(--ion-color-medium)" *ngFor="let item of complemento.complementos">+ {{item.precio | currency:'CAD':'symbol-narrow':'1.0-2'}} / {{item.nombre}}</p>
-                                </div>
-                            </ion-label>
-                            <ion-badge class="gradient--" mode="ios">{{prod.cantidad}}</ion-badge>
-                        </ion-item>
-                    </ion-col>
-                </ion-row>
-            </ion-grid>
-        </ion-item>
+        <app-prod-cart [cart]="pedido.productos"></app-prod-cart>
         <ion-item style="text-align: center;" lines="none">
             <ion-label style="font-weight: 700;" color="primary">Total: {{pedido.total | currency:'CAD':'symbol-narrow':'1.0-2'}}</ion-label>
         </ion-item>

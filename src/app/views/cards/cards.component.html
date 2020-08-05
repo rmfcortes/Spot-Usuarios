@@ -3,6 +3,12 @@
     <ion-card *ngFor="let serv of item.productos; let y = index; trackBy: trackProducts" style="margin-bottom: 1rem" (click)="presentProduct(serv)">
         <ng-container *ngIf="!serv.agotado; else agotadoTemp">            
             <preload-image [ratio]="{w: 1, h: 0.75}" [src]="serv.url"></preload-image>
+            <div class="promo-box" *ngIf="serv.descuento">
+                {{serv.descuento}}% descuento
+            </div>                        
+            <div class="promo-box" *ngIf="serv.dosxuno">
+                2x1
+            </div>
             <div class="triangle-topleft" *ngIf="serv.agregados"></div>
             <div class="badge">{{serv.agregados}}</div>
             <ion-card-header class="ion-no-padding">

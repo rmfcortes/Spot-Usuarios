@@ -1,20 +1,39 @@
-<ion-header>
-    <ion-toolbar>
-        <ion-buttons slot="start">
+<ion-header class="ion-no-border">
+    <ion-toolbar class="fondo-content">
+        <ion-buttons slot="end">
             <ion-button (click)="regresar()">
-                <ion-icon slot="icon-only" name="chevron-back"></ion-icon>
+                <ion-icon slot="icon-only" name="close"></ion-icon>
             </ion-button>
         </ion-buttons>
-        <ion-title style="font-size: large; font-weight: 700;">Ofertas</ion-title>
+        <ion-item lines="none">
+            <h3 (click)="verCategorias()">
+                {{categoria | titlecase}} <ion-icon style="margin-bottom: 0;" slot="end" name="chevron-down"></ion-icon>
+            </h3>
+        </ion-item>
+    </ion-toolbar>
+    <ion-toolbar *ngIf="categoria !== 'todas' && subCategoriaReady">
+        <ion-toolbar class="fondo-content" *ngIf="subCategorias && subCategorias.length > 1">
+            <div class="scrolling-wrapper">
+                <div class="card" *ngFor="let item of subCategorias">
+                    <ion-chip mode="ios" [ngClass]="{'sel' : subCategoria === item.subCategoria}" (click)="subcategoriaChange(item.subCategoria)">
+                        <ion-label color="light" *ngIf="subCategoria === item.subCategoria">{{item.alias | titlecase}}</ion-label>
+                        <ion-label  *ngIf="subCategoria !== item.subCategoria">{{item.alias | titlecase}}</ion-label>
+                    </ion-chip>    
+                </div>
+            </div>
+        </ion-toolbar>
     </ion-toolbar>
 </ion-header>
 
 <ion-content>
-    <div *ngIf="ofertas.length > 0; else loading" style="margin-right: 0; width: 100% !important">
+    <div *ngIf="ofertasReady; else loading" style="margin-right: 0; width: 100% !important">
         <div *ngFor="let oferta of ofertas; let i = index;" (click)="verOferta(oferta)">
             <ion-img [src]="oferta.foto" alt=""></ion-img>
             <hr>
         </div>
+        <ion-item lines="none" style="text-align: center;" *ngIf="ofertas.length === 0 && ofertasReady">
+            <ion-label color="medium">No hay ofertas en esta categoría</ion-label>
+        </ion-item>
     </div>
 
     <ng-template #loading>

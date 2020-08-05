@@ -9,6 +9,12 @@
                     <div class="price-box" *ngIf="prod.precio">
                         {{prod.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}
                     </div>
+                    <div class="promo-box" *ngIf="prod.descuento">
+                        {{prod.descuento}}%
+                    </div>                        
+                    <div class="promo-box" *ngIf="prod.dosxuno">
+                        2x1
+                    </div>
                     <h6 class="ion-text-wrap" style="margin: 0 0.5rem 1rem 0.5rem">{{prod.nombre}}</h6>
                     <div class="triangle-topleft" *ngIf="prod.agregados"></div>
                     <div class="badge">{{prod.agregados}}</div>

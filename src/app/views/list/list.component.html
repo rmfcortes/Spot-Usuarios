@@ -5,7 +5,11 @@
         </ion-item>
         <ion-item lines="none" *ngFor="let serv of item.productos; let y = index; trackBy: trackProducts; let odd = odd" lines="none" [ngClass]="{'contraste': odd}" detail (click)="presentProduct(serv)">
             <ng-container *ngIf="!serv.agotado; else agotadoTemp">                
-                <h6 class="ion-text-wrap">{{serv.nombre}}</h6>
+                <h6 class="ion-text-wrap">
+                    <ion-text color="primary" style="font-weight: 700;" *ngIf="serv.descuento">{{serv.descuento}}%</ion-text>
+                    <ion-text color="primary" style="font-weight: 700;" *ngIf="serv.dosxuno">2x1</ion-text>
+                    {{serv.nombre}}
+                </h6>
                 <ion-badge slot="end" color="primary" mode="ios" *ngIf="serv.agregados">{{serv.agregados}}</ion-badge>              
             </ng-container>
             <ng-template #agotadoTemp>

@@ -168,7 +168,6 @@ export class ProductoPage implements OnInit {
   }
 
   minusProduct() {
-    console.log(this.producto);
     if (this.producto.cantidad === 1) return
     const ele = this.inputCant.nativeElement
     this.animationService.animBrinca(ele)
