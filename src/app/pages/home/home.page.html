@@ -18,7 +18,7 @@
     </div>
     <div class="cuadro-opciones">
         <ion-item style="text-align: center;">
-            <ion-input #inputSearch [disabled]="!catsReady" (keyup.enter)="buscar($event)" [(ngModel)]="busqueda" type="text" placeholder="Hamburguesa, blusa, celulares, limpieza dental, etc"></ion-input>
+            <ion-input #inputSearch [disabled]="!catsReady" (ionFocus)="onBusqueda()" (keyup.enter)="buscar($event)" [(ngModel)]="busqueda" type="text" placeholder="Hamburguesa, blusa, celulares, limpieza dental, etc"></ion-input>
             <ng-container *ngIf="buscando; else buscandoTemplate">
                 <ion-spinner color="primary" name="dots"></ion-spinner>
             </ng-container>

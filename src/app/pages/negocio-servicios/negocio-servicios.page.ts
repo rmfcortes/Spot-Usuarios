@@ -102,6 +102,7 @@ export class NegocioServiciosPage{
 
   async getPasillos() {
     const detalles: InfoPasillos = await this.negServicios.getPasillos(this.categoria, this.negocio.id)
+    detalles.pasillos = detalles.pasillos.filter(p => p.cantidad)
     this.portada = detalles.portada
     this.telefono = detalles.telefono
     this.pasillos.pasillos = detalles.pasillos
@@ -114,26 +115,25 @@ export class NegocioServiciosPage{
   // Get Servicios
 
   getOfertas() {
-    this.cargandoProds = true;
+    this.cargandoProds = true
     this.negServicios.getOfertas(this.categoria, this.negocio.id).then(async (ofertas: Producto[]) => {
       if (ofertas && ofertas.length > 0) {
-        this.hasOfertas = true;
+        this.hasOfertas = true
         this.agregaServicios(ofertas, 'Ofertas')
       } else {
         this.cargandoProds = false
         this.hasOfertas = false
       }
-      if (!this.pasilloFiltro) {
-        this.cargandoProds = false
+      if (!this.pasilloFiltro && this.pasillos.pasillos.length > 0) {
         this.getInfoServicios()
-      }
-    });
+      } else this.noMore = true
+    })
   }
 
   async getInfoServicios() {
     this.infiniteCall = 1
-    this.serviciosCargados = 0
     this.cargandoProds = true
+    this.serviciosCargados = 0
     this.getServices()
   }
 

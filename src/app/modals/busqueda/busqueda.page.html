@@ -1,0 +1,24 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="regresar()">
+        <ion-icon slot="start" name="chevron-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <div class="container_busqueda shadow" slot="end">
+      <ion-item lines="none">
+        <ion-input id="inputSearch" [autofocus]="true" (keyup.enter)="buscar($event)" [(ngModel)]="busqueda.texto" type="text" placeholder="Hamburguesa, blusa, celulares, limpieza dental, etc"></ion-input>
+        <ng-container *ngIf="buscando; else buscandoTemplate">
+            <ion-spinner color="primary" name="dots"></ion-spinner>
+        </ng-container>
+        <ng-template #buscandoTemplate>
+            <ion-icon slot="end" name="search" color="primary" (click)="buscar()"></ion-icon>
+        </ng-template>
+    </ion-item>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+</ion-content>

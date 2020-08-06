@@ -158,7 +158,7 @@ export class NegocioPage {
       }
       if (!this.pasilloFiltro && this.pasillos.pasillos.length > 0) {
         this.getInfoProdsLista()
-      }
+      } else this.noMore = true
     })
   }
 

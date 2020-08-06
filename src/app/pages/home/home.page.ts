@@ -26,6 +26,7 @@ import { Pedido } from 'src/app/interfaces/pedido';
 import { enterAnimationCategoria } from 'src/app/animations/enterCat';
 import { leaveAnimationCategoria } from 'src/app/animations/leaveCat';
 import { AnimationsService } from 'src/app/services/animations.service';
+import { BusquedaPage } from 'src/app/modals/busqueda/busqueda.page';
 
 
 
@@ -339,6 +340,14 @@ export class HomePage implements OnInit, OnDestroy {
     const modal = await this.modalController.create({
       cssClass: 'my-custom-modal-css',
       component: LoginPage,
+    })
+
+    return await modal.present()
+  }
+
+  async onBusqueda() {
+    const modal = await this.modalController.create({
+      component: BusquedaPage,
     })
 
     return await modal.present()

@@ -14,6 +14,7 @@ import { CategoriasPageModule } from 'src/app/modals/categorias/categorias.modul
 import { TarjetaPageModule } from 'src/app/modals/tarjeta/tarjeta.module';
 import { ProdsOfertasModule } from 'src/app/shared/prodsofertas.module';
 import { StarsModule } from 'src/app/shared/stars.module';
+import { BusquedaPageModule } from 'src/app/modals/busqueda/busqueda.module';
 
 @NgModule({
   imports: [
@@ -25,6 +26,7 @@ import { StarsModule } from 'src/app/shared/stars.module';
     LoginPageModule,
     OfertasPageModule,
     TarjetaPageModule,
+    BusquedaPageModule,
     ProdsOfertasModule,
     CategoriasPageModule,
     RouterModule.forChild([
