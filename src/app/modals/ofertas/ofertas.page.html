@@ -28,8 +28,8 @@
 <ion-content>
     <div *ngIf="ofertasReady; else loading" style="margin-right: 0; width: 100% !important">
         <div *ngFor="let oferta of ofertas; let i = index;" (click)="verOferta(oferta)">
-            <ion-img [src]="oferta.foto" alt=""></ion-img>
-            <hr>
+            <ion-img *ngIf="oferta.foto" (ionImgWillLoad)="ionImgWillLoad($event, i)" [src]="oferta.foto" alt=""></ion-img>
+            <hr *ngIf="oferta.foto && oferta.loaded">
         </div>
         <ion-item lines="none" style="text-align: center;" *ngIf="ofertas.length === 0 && ofertasReady">
             <ion-label color="medium">No hay ofertas en esta categoría</ion-label>

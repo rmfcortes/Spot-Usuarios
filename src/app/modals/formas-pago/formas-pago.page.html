@@ -16,6 +16,14 @@
             <ion-label class="ion-text-wrap">Agregar tarjeta de crédito/débito</ion-label>
         </ion-item>
     </ion-card>
+    <ion-card (click)="selFormaPago('terminal', 'terminal', 'terminal')">
+        <ion-item lines="none" *ngIf="formas_pago_aceptadas && formas_pago_aceptadas.terminal" detail>
+            <ion-thumbnail style="max-width: 1.5rem;" slot="start">
+                <img style="object-fit: contain;" src="../../../assets/img/iconos/terminal.png" />
+            </ion-thumbnail>
+            <ion-label class="ion-text-wrap" style="margin-left: 1.7rem;">Pago con tarjeta física (solicitar terminal)</ion-label>
+        </ion-item>
+    </ion-card>    
     <ion-card (click)="selFormaPago('efectivo', 'efectivo', 'efectivo')">
         <ion-item lines="none" *ngIf="formas_pago_aceptadas && formas_pago_aceptadas.efectivo" detail>
             <ion-icon slot="start" name="cash" color="success"></ion-icon>

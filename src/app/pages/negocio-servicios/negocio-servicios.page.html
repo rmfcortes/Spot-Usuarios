@@ -1,40 +1,45 @@
 <ng-container *ngIf="!error; else errorTemplate">
-    <ng-container *ngIf="infoReady; else infoTemplate">
+    <ng-container *ngIf="portada; else infoTemplate">
         <ion-content>
-            <div *ngIf="portada" style="background: white;">
-                <div class="portada_box"> 
-                    <img style="width: 100%;" [src]="portada" alt="">
-                </div>
-                <div class="header">
-                    <ion-item lines="none">
-                        <ion-icon slot="start" color="primary" name="chevron-back" style="font-size: medium;" (click)="regresar()"></ion-icon>
-                        <ion-label (click)="regresar()">
-                            <h2>{{negocio.nombre}}</h2>
-                        </ion-label>
-                        <ion-button slot="end" (click)="verInfo()" fill="clear" color="dark">
-                            Ver más
-                        </ion-button>
-                    </ion-item>
-                </div>
-                <ng-container *ngIf="pasillos.pasillos.length > 1; else segmentTemplate">
-                    <div style="background: white; z-index: 150; position: sticky !important; position: -webkit-sticky; top: 2rem">
-                        <ion-segment scrollable [value]="pasilloFiltro ? pasilloFiltro : 'todos'">
-                            <ion-segment-button (click)="resetProds()" value="todos">
-                                Todos
-                            </ion-segment-button>
-                            <ion-segment-button (click)="resetProds('Ofertas')" *ngIf="hasOfertas" value="ofertas">
-                                Ofertas
-                            </ion-segment-button>
-                            <ion-segment-button (click)="resetProds(item.nombre)" *ngFor="let item of pasillos.pasillos" [value]="item">
-                                {{item.nombre}}
-                            </ion-segment-button>
-                        </ion-segment>
-                    </div>
-                </ng-container>
-                <ng-template #segmentTemplate>
-                    <div style="height: 1rem; background: white; z-index: 150; position: sticky !important; top: 2rem"></div>
-                </ng-template>
+            <div class="portada_box"> 
+                <img style="width: 100%;" [src]="portada" alt="">
             </div>
+            <div class="header">
+                <ion-item lines="none">
+                    <ion-icon slot="start" color="primary" name="chevron-back" style="font-size: medium;" (click)="regresar()"></ion-icon>
+                    <ion-label (click)="regresar()">
+                        <h2>{{negocio.nombre}}</h2>
+                    </ion-label>
+                    <ion-icon slot="end" name="eye" (click)="cambiarVista()"></ion-icon>
+                </ion-item>
+            </div>
+            <ng-container *ngIf="pasillos.pasillos.length > 1; else segmentTemplate">
+                <div style="background: white; z-index: 150; position: sticky; top: 2.5rem; height: 2.5rem;">
+                    <div class="scrolling-wrapper">
+                        <div class="card">
+                            <ion-chip mode="ios" [ngClass]="{'sel' : pasilloFiltro === ''}" (click)="resetProds()">
+                                <ion-label color="light" *ngIf="pasilloFiltro === ''">Todos</ion-label>
+                                <ion-label  *ngIf="pasilloFiltro !== ''">Todos</ion-label>
+                            </ion-chip>
+                        </div>
+                        <div class="card">
+                            <ion-chip mode="ios" [ngClass]="{'sel' : pasilloFiltro === 'Ofertas'}" (click)="resetProds('Ofertas')" *ngIf="hasOfertas">
+                                <ion-label color="light" *ngIf="pasilloFiltro === 'Ofertas'">Ofertas</ion-label>
+                                <ion-label  *ngIf="pasilloFiltro !== 'Ofertas'">Ofertas</ion-label>
+                            </ion-chip>   
+                        </div>
+                        <div class="card" *ngFor="let item of pasillos.pasillos">
+                            <ion-chip mode="ios" [ngClass]="{'sel' : pasilloFiltro === item.nombre}" (click)="resetProds(item.nombre)">
+                                <ion-label color="light" *ngIf="pasilloFiltro === item.nombre">{{item.nombre}}</ion-label>
+                                <ion-label  *ngIf="pasilloFiltro !== item.nombre">{{item.nombre}}</ion-label>
+                            </ion-chip>     
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+            <ng-template #segmentTemplate>
+                <div style="height: 1rem; background: white; z-index: 150; position: sticky !important; top: 2rem"></div>
+            </ng-template>
 
             <ng-container *ngIf="cargandoProds; else cargandoTemp">
                 <ion-item lines="none">
@@ -42,26 +47,24 @@
                 </ion-item>
             </ng-container>
             <ng-template #cargandoTemp>
-                <div *ngIf="servicios.length > 0" style="margin-bottom: 135px;">
-                    <div [ngSwitch]="vista">
-                        <div *ngSwitchCase="'list-img'">
-                            <app-list-img [sections]="servicios" (showProduct)="verServicio($event)"></app-list-img>
-                        </div>
-                        <div *ngSwitchCase="'block'">
-                            <app-block [sections]="servicios" (showProduct)="verServicio($event)"></app-block>
-                        </div>
-                        <div *ngSwitchCase="'cards'">
-                            <app-cards [sections]="servicios" (showProduct)="verServicio($event)"></app-cards>
-                        </div>
-                        <div *ngSwitchCase="'list'">
-                            <app-list [sections]="servicios" (showProduct)="verServicio($event)"></app-list>
-                        </div>
-                        <div *ngSwitchCase="'gallery'">
-                            <app-gallery [sections]="servicios" (showProduct)="verServicio($event)"></app-gallery>
-                        </div>
-                        <div *ngSwitchDefault>
-                            <app-list-img [sections]="servicios" (showProduct)="verServicio($event)"></app-list-img>
-                        </div>
+                <div [ngSwitch]="vista">
+                    <div *ngSwitchCase="'list-img'">
+                        <app-list-img [sections]="servicios" (showProduct)="verServicio($event)"></app-list-img>
+                    </div>
+                    <div *ngSwitchCase="'block'">
+                        <app-block [sections]="servicios" (showProduct)="verServicio($event)"></app-block>
+                    </div>
+                    <div *ngSwitchCase="'cards'">
+                        <app-cards [sections]="servicios" (showProduct)="verServicio($event)"></app-cards>
+                    </div>
+                    <div *ngSwitchCase="'list'">
+                        <app-list [sections]="servicios" (showProduct)="verServicio($event)"></app-list>
+                    </div>
+                    <div *ngSwitchCase="'gallery'">
+                        <app-gallery [sections]="servicios" (showProduct)="verServicio($event)"></app-gallery>
+                    </div>
+                    <div *ngSwitchDefault>
+                        <app-list-img [sections]="servicios" (showProduct)="verServicio($event)"></app-list-img>
                     </div>
                 </div>
                 <ion-item lines="none" style="text-align: center;">

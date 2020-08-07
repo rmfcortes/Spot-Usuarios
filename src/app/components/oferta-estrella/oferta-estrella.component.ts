@@ -24,7 +24,9 @@ export class OfertaEstrellaComponent implements OnInit {
 
   constructor() { }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.ofertas = this.ofertas.filter(o => o.foto)
+  }
 
   verOfertas() {
     this.verOfs.emit(true)

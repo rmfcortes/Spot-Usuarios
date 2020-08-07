@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { AlertController, ToastController, LoadingController } from '@ionic/angular';
+import { AlertController, ToastController, LoadingController, ActionSheetController } from '@ionic/angular';
+import { StorageService } from './storage.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,9 +11,62 @@ export class DisparadoresService {
 
   constructor(
     private loadingCtrl: LoadingController,
-    private alertController: AlertController,
     private toastController: ToastController,
+    private alertController: AlertController,
+    private actionSheetCtrl: ActionSheetController,
+    private storageService: StorageService,
   ) { }
+
+  async presentOpcionesVista(): Promise<string> {
+    return new Promise(async (resolve, reject) => {      
+      const actionSheet = await this.actionSheetCtrl.create({
+        header: 'Mostrar productos como',
+        buttons: [
+          {
+            text: 'Lista con imágenes',
+            icon: 'list',
+            handler: () => {
+              this.storageService.guardaString('vista', 'list-img')
+              resolve('list-img')
+            }
+          },     
+          {
+            text: 'Mosaico',
+            icon: 'grid',
+            handler: () => {
+              this.storageService.guardaString('vista', 'block')
+              resolve('block')
+            }
+          },        
+          {
+            text: 'Tarjetas',
+            icon: 'browsers',
+            handler: () => {
+              this.storageService.guardaString('vista', 'cards')
+              resolve('cards')
+            }
+          },        
+          {
+            text: 'Galería sin texto',
+            icon: 'images',
+            handler: () => {
+              this.storageService.guardaString('vista', 'gallery')
+              resolve('gallery')
+            }
+          },
+          {
+            text: 'Lista sólo texto',
+            icon: 'reorder-four',
+            handler: () => {
+              this.storageService.guardaString('vista', 'list')
+              resolve('list')
+            }
+          },   
+        ]
+      })
+      await actionSheet.present()
+    })
+  }
 
   async presentToast(mensaje) {
     const toast = await this.toastController.create({

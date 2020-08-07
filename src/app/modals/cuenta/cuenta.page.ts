@@ -45,7 +45,6 @@ export class CuentaPage implements OnInit {
 
   direccion: Direccion
   formaPago: FormaPago
-  tarjetas: FormaPago[] = []
 
   pago_en_efectivo: FormaPago = {
     forma: 'efectivo',
@@ -101,6 +100,8 @@ export class CuentaPage implements OnInit {
   cuadroAyuda: HTMLElement
   claseAyuda: HTMLElement
 
+  infopagos = ''
+
   constructor(
     private router: Router,
     private platform: Platform,
@@ -146,6 +147,22 @@ export class CuentaPage implements OnInit {
   getInfo() {
     this.cartService.getInfoNegocio(this.datos.categoria, this.datos.idNegocio).then(async (neg) => {
       this.datosNegocio = neg
+      if (this.datosNegocio.formas_pago.efectivo && !this.datosNegocio.formas_pago.tarjeta && !this.datosNegocio.formas_pago.terminal)
+        this.infopagos = 'Este negocio sólo recibe pagos en efectivo'
+      if (!this.datosNegocio.formas_pago.efectivo && this.datosNegocio.formas_pago.tarjeta && !this.datosNegocio.formas_pago.terminal)
+        this.infopagos = 'Este negocio sólo recibe pagos en línea con tarjeta'
+      if (!this.datosNegocio.formas_pago.efectivo && !this.datosNegocio.formas_pago.tarjeta && this.datosNegocio.formas_pago.terminal)
+        this.infopagos = 'Este negocio sólo recibe pagos con tarjeta en físico (terminal)'
+        
+      if (!this.datosNegocio.formas_pago.efectivo && this.datosNegocio.formas_pago.tarjeta && this.datosNegocio.formas_pago.terminal)
+        this.infopagos = 'Este negocio no recibe pagos en efectivo'
+      if (this.datosNegocio.formas_pago.efectivo && !this.datosNegocio.formas_pago.tarjeta && this.datosNegocio.formas_pago.terminal)
+        this.infopagos = 'Este negocio no recibe pagos con tarjeta en línea'  
+      if (this.datosNegocio.formas_pago.efectivo && this.datosNegocio.formas_pago.tarjeta && !this.datosNegocio.formas_pago.terminal)
+        this.infopagos = 'Este negocio no cuenta con terminal para pagos con tarjeta en físico'      
+      if (this.datosNegocio.formas_pago.efectivo && this.datosNegocio.formas_pago.tarjeta && this.datosNegocio.formas_pago.terminal)
+        this.infopagos = ''
+
       this.getFormaPago()
       Object.assign(this.datosNegocio, this.datos)
       this.datosNegocio.envio = await this.costoEnvio()
@@ -175,16 +192,14 @@ export class CuentaPage implements OnInit {
   }
 
   async getFormaPago() {
-    if (this.datosNegocio.formas_pago.tarjeta) await this.getTarjetas()
     this.cartService.getUltimaFormaPago().then(forma => {
       if (forma) {
         if (forma.tipo === 'efectivo') {
           this.comision = 0
           if (this.datosNegocio.formas_pago.efectivo) this.formaPago = forma
         } else {
-          if (this.datosNegocio.formas_pago.tarjeta) {
+          if (this.datosNegocio.formas_pago.tarjeta || this.datosNegocio.formas_pago.terminal) {
             this.formaPago = forma
-            this.tarjetas = this.tarjetas.filter(t => t.id !== forma.id)
             this.comision = ((this.cuenta * 0.04) + 3) * 1.16
           } else {
             this.comision = 0
@@ -195,21 +210,6 @@ export class CuentaPage implements OnInit {
       this.infoReady = true
     })
   }
-
-  getTarjetas(): Promise<boolean> {
-    return new Promise((resolve, reject) => {      
-      this.pagoService.getTarjetas()
-      .then(tarjetas => {
-        this.tarjetas = tarjetas
-        resolve()
-      })
-      .catch(err => {
-        this.err = err
-        resolve()
-      })
-    })
-  }
-
 
   // Acciones
 

@@ -6,6 +6,7 @@ import { ModalController, Platform } from '@ionic/angular';
 import { CategoriasPage } from '../categorias/categorias.page';
 
 import { CategoriasService } from 'src/app/services/categorias.service';
+import { AnimationsService } from 'src/app/services/animations.service';
 import { OfertasService } from 'src/app/services/ofertas.service';
 
 import { Oferta, InfoGral } from 'src/app/interfaces/negocio';
@@ -41,6 +42,7 @@ export class OfertasPage implements OnInit {
     private router: Router,
     private platform: Platform,
     private modalCtrl: ModalController,
+    private animationService: AnimationsService,
     private categoriaService: CategoriasService,
     private ofertaService: OfertasService,
   ) { }
@@ -79,8 +81,8 @@ export class OfertasPage implements OnInit {
       ofertas.shift()
     } else this.noMore = true
     this.ofertas = this.ofertas.concat(ofertas.reverse())
-    if (event) event.target.complete()
     this.ofertasReady = true
+    if (event) event.target.complete()
   }
 
   async loadData(event) {
@@ -137,6 +139,11 @@ export class OfertasPage implements OnInit {
       this.subCategoriaReady = true
     })
     .catch((err) => console.log(err))
+  }
+
+  ionImgWillLoad(image, i: number) {
+    this.animationService.enterAnimation(image.target)
+    this.ofertas[i].loaded = true
   }
 
   regresar() {

@@ -18,6 +18,7 @@ import { Producto } from 'src/app/interfaces/producto';
 
 import { enterAnimation } from 'src/app/animations/enter';
 import { leaveAnimation } from 'src/app/animations/leave';
+import { StorageService } from 'src/app/services/storage.service';
 
 
 @Component({
@@ -56,7 +57,6 @@ export class NegocioServiciosPage{
   cambiandoPasillo = false
 
   hasOfertas = false
-  infoReady = false
   error = false
 
   cargandoProds = true
@@ -74,6 +74,7 @@ export class NegocioServiciosPage{
     private modalController: ModalController,
     private negServicios: NegocioServiciosService,
     private alertService: DisparadoresService,
+    private storageService: StorageService,
   ) { }
 
   ionViewWillEnter() {
@@ -93,7 +94,6 @@ export class NegocioServiciosPage{
     else status = 'cerrados'
     this.negocio = await this.negServicios.getNegocioPreview(id, this.categoria, status)
     if (!this.negocio) {
-      this.infoReady = true
       this.error = true
       return
     }
@@ -106,7 +106,8 @@ export class NegocioServiciosPage{
     this.portada = detalles.portada
     this.telefono = detalles.telefono
     this.pasillos.pasillos = detalles.pasillos
-    this.vista = detalles.vista || 'list-img'
+    const vista = await this.storageService.getString('vista')
+    this.vista = vista ? vista : 'list'
     this.whats = detalles.whats
     this.pasillos.pasillos = this.pasillos.pasillos.sort((a, b) => a.prioridad - b.prioridad)
     this.getInfoServicios()
@@ -152,7 +153,6 @@ export class NegocioServiciosPage{
           this.getServices()
         }
       } else {
-        this.infoReady = true
         this.cargandoProds = false
         this.noMore = true
         if (event) event.target.complete()
@@ -205,7 +205,6 @@ export class NegocioServiciosPage{
         this.servicios.push(prodArray)
       }
       if (event) event.target.complete()
-      this.infoReady = true
       this.cargandoProds = false
       resolve()
     });
@@ -333,6 +332,11 @@ export class NegocioServiciosPage{
     return await modal.present()
   }
 
+  cambiarVista() {
+    this.alertService.presentOpcionesVista()
+    .then(vista => this.vista = vista)
+  }
+
   // Salida
 
   regresar() {
@@ -341,10 +345,10 @@ export class NegocioServiciosPage{
     else this.router.navigate(['/home'])
   }
 
-    // Auxiliares
+  // Auxiliares
 
-    reintentar() {
-      location.reload()
-    }
+  reintentar() {
+    location.reload()
+  }
 
 }

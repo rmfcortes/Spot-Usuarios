@@ -106,22 +106,24 @@
                 </ion-col>
             </ion-row>
         </ion-grid>
-        <ion-slides [options]="slideCategorias" *ngIf="categorias.length > 0">
-            <ion-slide *ngFor="let item of categorias" (click)="irACategoria(item.categoria)" style="padding: 0.5rem;">
-                <ion-grid fixed class="ion-no-padding">
-                    <ion-row class="ion-no-padding"> 
-                        <ion-col size="12">
-                            <div class="ovalo">
-                                <preload-image [ratio]="{w: 1, h: 0.8125}" [src]="item.foto"></preload-image>
-                            </div>
-                        </ion-col>
-                        <ion-col size="12">
-                            <ion-label class="cat_color">{{item.categoria | titlecase}}</ion-label>
-                        </ion-col>
-                    </ion-row>
-                </ion-grid>
-            </ion-slide>
-        </ion-slides>
+        <div class="categorias fondo-content-div">
+            <ion-slides [options]="slideCategorias" *ngIf="categorias.length > 0">
+                <ion-slide *ngFor="let item of categorias" (click)="irACategoria(item.categoria)" style="padding: 0.5rem;">
+                    <ion-grid fixed class="ion-no-padding">
+                        <ion-row class="ion-no-padding"> 
+                            <ion-col size="12">
+                                <div class="ovalo">
+                                    <preload-image [ratio]="{w: 1, h: 0.8125}" [src]="item.foto"></preload-image>
+                                </div>
+                            </ion-col>
+                            <ion-col size="12">
+                                <ion-label class="cat_color">{{item.categoria | titlecase}}</ion-label>
+                            </ion-col>
+                        </ion-row>
+                    </ion-grid>
+                </ion-slide>
+            </ion-slides>
+        </div>
     </ng-container>
     <ng-template #catsTemplate>
         <ion-list style="margin-top: 1rem;">

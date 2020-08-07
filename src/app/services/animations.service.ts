@@ -18,15 +18,33 @@ export class AnimationsService {
   ) { }
 
   enterAnimation(element) {
-    createAnimation()
+    return new Promise((resolve, reject) => {      
+      const anim: Animation = createAnimation()
+        .addElement(element)
+        .duration(500)
+        .iterations(1)
+        .keyframes([
+          { offset: 0, opacity: '0' },
+          { offset: 1, opacity: '0.99' }
+        ])
+        anim.play()
+        anim.onFinish(() => resolve())
+    })
+  }
+
+  salida(element) {
+    return new Promise((resolve, reject) => {
+      const anim: Animation = createAnimation()
       .addElement(element)
-      .easing('ease-out')
-      .duration(500)
+      .duration(250)
+      .iterations(1)
       .keyframes([
-        { offset: 0, opacity: '0', transform: 'scale(0)' },
-        { offset: 1, opacity: '0.99', transform: 'scale(1)' }
+        { offset: 0, transform: 'scale(1)', opacity: '0.99' },
+        { offset: 1, transform: 'scale(0)', opacity: '0' }
       ])
-      .play();
+      anim.play()
+      anim.onFinish(() => resolve())
+    })
   }
 
   animBrincaDelay(element, inicial, final, delay) {
@@ -120,22 +138,6 @@ export class AnimationsService {
         { offset: 1, transform: 'scale(1)', opacity: '1' }
       ])
       .play()
-  }
-
-  salida(element) {
-    return new Promise((resolve, reject) => {
-      const anim: Animation = createAnimation()
-      .addElement(element)
-      .duration(500)
-      .iterations(1)
-      .keyframes([
-        { offset: 0, transform: 'scale(1)', opacity: '0.99' },
-        { offset: 1, transform: 'scale(0)', opacity: '0' }
-      ])
-      anim.play()
-      anim.onFinish(() => resolve())
-    })
-    
   }
 
 }

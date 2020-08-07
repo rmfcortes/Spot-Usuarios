@@ -22,7 +22,7 @@
                                 <ion-item lines="none" style="text-align: center;">
                                     <ion-label>
                                         <h6 class="ion-text-wrap" style="font-size: xx-small;">Pedido mínimo</h6>
-                                        <h6 *ngIf="negocio.envio_gratis_pedMin && negocio.repartidores_propios" class="primario">{{negocio.envio_gratis_pedMin | currency:'CAD':'symbol-narrow':'1.0-2'}}</h6>
+                                        <h6 *ngIf="negocio.envio_gratis_pedMin && negocio.repartidores_propios">{{negocio.envio_gratis_pedMin | currency:'CAD':'symbol-narrow':'1.0-2'}}</h6>
                                         <h3 *ngIf="!negocio.envio_gratis_pedMin || !negocio.repartidores_propios">--</h3>
                                     </ion-label>
                                 </ion-item>
@@ -41,27 +41,37 @@
             </div>
             <!-- Header, nombre de Negocio -->
             <div class="header">
-                <ion-item lines="none" (click)="regresar()">
-                    <ion-icon slot="start" color="primary" name="chevron-back" style="font-size: medium;"></ion-icon>
-                    <ion-label>
+                <ion-item lines="none">
+                    <ion-icon slot="start" color="primary" name="chevron-back" style="font-size: medium;" (click)="regresar()"></ion-icon>
+                    <ion-label (click)="regresar()">
                         <h2>{{negocio.nombre}}</h2>
                     </ion-label>
+                    <ion-icon slot="end" name="eye" (click)="cambiarVista()"></ion-icon>
                 </ion-item>
             </div>
             <!-- Segment -->
             <ng-container *ngIf="pasillos.pasillos.length > 1; else segmentTemplate">
-                <div style="background: white; z-index: 150; position: sticky; top: 2rem">
-                    <ion-segment scrollable [value]="pasilloFiltro ? pasilloFiltro : 'todos'">
-                        <ion-segment-button (click)="resetProds()" [value]="'todos'">
-                            Todos
-                        </ion-segment-button>
-                        <ion-segment-button (click)="resetProds('Ofertas')" *ngIf="hasOfertas" [value]="'ofertas'">
-                            Ofertas
-                        </ion-segment-button>
-                        <ion-segment-button (click)="resetProds(item.nombre)" *ngFor="let item of pasillos.pasillos" [value]="item">
-                            {{item.nombre}}
-                        </ion-segment-button>
-                    </ion-segment>
+                <div style="background: white; z-index: 150; position: sticky; top: 2.5rem">
+                    <div class="scrolling-wrapper">
+                        <div class="card">
+                            <ion-chip mode="ios" [ngClass]="{'sel' : pasilloFiltro === ''}" (click)="resetProds()">
+                                <ion-label color="light" *ngIf="pasilloFiltro === ''">Todos</ion-label>
+                                <ion-label  *ngIf="pasilloFiltro !== ''">Todos</ion-label>
+                            </ion-chip>
+                        </div>
+                        <div class="card">
+                            <ion-chip mode="ios" [ngClass]="{'sel' : pasilloFiltro === 'Ofertas'}" (click)="resetProds('Ofertas')" *ngIf="hasOfertas">
+                                <ion-label color="light" *ngIf="pasilloFiltro === 'Ofertas'">Ofertas</ion-label>
+                                <ion-label  *ngIf="pasilloFiltro !== 'Ofertas'">Ofertas</ion-label>
+                            </ion-chip>   
+                        </div>
+                        <div class="card" *ngFor="let item of pasillos.pasillos">
+                            <ion-chip mode="ios" [ngClass]="{'sel' : pasilloFiltro === item.nombre}" (click)="resetProds(item.nombre)">
+                                <ion-label color="light" *ngIf="pasilloFiltro === item.nombre">{{item.nombre}}</ion-label>
+                                <ion-label  *ngIf="pasilloFiltro !== item.nombre">{{item.nombre}}</ion-label>
+                            </ion-chip>     
+                        </div>
+                    </div>
                 </div>
             </ng-container>
             <ng-template #segmentTemplate>
@@ -95,7 +105,7 @@
                         <app-list-img [sections]="productos" (showProduct)="muestraProducto($event)"></app-list-img>
                     </div>
                 </div>
-                <ion-item lines="none" style="text-align: center;">
+                <ion-item lines="none" style="text-align: center; padding-bottom: 20rem;">
                     <ion-label color="medium">No hay más resultados</ion-label>
                 </ion-item>
             </ng-template>

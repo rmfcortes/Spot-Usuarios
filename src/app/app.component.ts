@@ -53,7 +53,7 @@ export class AppComponent implements OnDestroy{
       })
       this.getUser()
       this.splashScreen.hide()
-      this.statusBar.styleDefault()
+      this.statusBar.styleBlackTranslucent()
       this.netService.checkNetStatus()
       this.versionService.checkUpdates()
     })

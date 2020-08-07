@@ -15,6 +15,8 @@ import { TarjetaPageModule } from 'src/app/modals/tarjeta/tarjeta.module';
 import { ProdsOfertasModule } from 'src/app/shared/prodsofertas.module';
 import { StarsModule } from 'src/app/shared/stars.module';
 import { BusquedaPageModule } from 'src/app/modals/busqueda/busqueda.module';
+import { ProductoPageModule } from 'src/app/modals/producto/producto.module';
+import { ServicioPageModule } from 'src/app/modals/servicio/servicio.module';
 
 @NgModule({
   imports: [
@@ -28,6 +30,8 @@ import { BusquedaPageModule } from 'src/app/modals/busqueda/busqueda.module';
     TarjetaPageModule,
     BusquedaPageModule,
     ProdsOfertasModule,
+    ProductoPageModule,
+    ServicioPageModule,
     CategoriasPageModule,
     RouterModule.forChild([
       {

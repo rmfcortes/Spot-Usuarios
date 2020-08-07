@@ -19,6 +19,7 @@ import { MasVendido } from 'src/app/interfaces/producto';
 
 import { enterAnimationCategoria } from 'src/app/animations/enterCat';
 import { leaveAnimationCategoria } from 'src/app/animations/leaveCat';
+import { AnimationsService } from 'src/app/services/animations.service';
 
 @Component({
   selector: 'app-categoria',
@@ -71,6 +72,15 @@ export class CategoriaPage implements OnInit, OnDestroy{
 
   uid: string
 
+  filtrosAnimated = false
+  ofertasAnimated = false
+  vendidosAnimated = false
+  productosAnimated = false
+  consultadosAnimated = false
+
+  hayNegocios = false
+  primer_vez = true
+
   constructor(
     private ngZone: NgZone,
     private router: Router,
@@ -78,6 +88,7 @@ export class CategoriaPage implements OnInit, OnDestroy{
     private activatedRoute: ActivatedRoute,
     private modalController: ModalController,
     private categoriaService: CategoriasService,
+    private animationService: AnimationsService,
     private alertService: DisparadoresService,
     private ofertaService: OfertasService,
     private uidService: UidService,
@@ -101,7 +112,10 @@ export class CategoriaPage implements OnInit, OnDestroy{
     this.uid = this.uidService.getUid()
   }
 
-  setFiltro(filtro: string) {
+  async setFiltro(filtro: string) {
+    const el = document.getElementById('productos')
+    await this.animationService.salida(el)
+    this.productosAnimated = false
     this.negociosReady = false
     this.negocios = []
     this.lastValue = null
@@ -110,7 +124,7 @@ export class CategoriaPage implements OnInit, OnDestroy{
     this.status = 'abiertos'
     this.infiniteScroll.disabled = false
     this.filtro = filtro
-    this.getNegocios()
+    this.getNegocios(null, false)
   }
 
   getSubCategorias() {
@@ -133,7 +147,7 @@ export class CategoriaPage implements OnInit, OnDestroy{
     this.vendidosReady = false
     this.consultadosReady = false
     this.getOfertas()
-    this.getNegocios()
+    this.getNegocios(null, true)
     this.getMasVendidos()
     this.getMasConsultados()
   }
@@ -142,31 +156,33 @@ export class CategoriaPage implements OnInit, OnDestroy{
     this.ofertas = []
     if (this.subCategoria === 'todos') {
       this.ofertaService.getOfertas(this.batchOfertas + 1, this.categoria)
-      .then((ofertas: Oferta[]) => {
+      .then(async (ofertas: Oferta[]) => {
         if (ofertas.length === this.batchOfertas + 1) {
           this.hayMas = true
           ofertas.shift()
         }
         this.ofertas = ofertas.reverse()
         this.promosReady = true
+        this.animacionEntrada('ofertas')
       })
       .catch((err) => console.log(err))      
     } else {
       this.ofertaService.getOfertasSubCategoria(this.batchOfertas + 1, this.categoria, this.subCategoria)
-      .then((ofertas: Oferta[]) => {
+      .then(async (ofertas: Oferta[]) => {
         if (ofertas.length === this.batchOfertas + 1) {
           this.hayMas = true
           ofertas.shift()
         }
         this.ofertas = ofertas.reverse()
         this.promosReady = true
+        this.animacionEntrada('ofertas')
       })
       .catch((err) => console.log(err))
 
     }
   }
 
-  async getNegocios(event?) {
+  async getNegocios(event?, animarFiltros?: boolean) {
     this.categoriaService
       .getNegocios(this.filtro, this.status, this.categoria, this.subCategoria, this.batch + 1, this.lastKey, this.lastValue)
       .then(async (negocios) => {
@@ -181,15 +197,18 @@ export class CategoriaPage implements OnInit, OnDestroy{
           await this.costoEnvio(negocios)
           this.negocios = this.negocios.concat(negocios.reverse())
           if (event) event.target.complete()
-          this.getNegocios(event)
+          this.getNegocios(event, animarFiltros)
           return
         } else {
           this.noMore = true
         }
         await this.costoEnvio(negocios)
         this.negocios = this.negocios.concat(negocios.reverse())
-        if (event) event.target.complete()
+        if (this.negocios.length && this.primer_vez) this.hayNegocios = true
+        if (event) event.target.complete()  
         this.negociosReady = true
+        if (animarFiltros && !event) this.animacionEntrada('filtros')
+        if (!event) this.animacionEntrada('productos')
       })
       .catch((err) => console.log(err))
   }
@@ -202,6 +221,8 @@ export class CategoriaPage implements OnInit, OnDestroy{
         this.masVendidos = this.masVendidos.filter(v => !v.agotado)
         this.masVendidos.sort((a, b) => b.ventas - a.ventas)
         this.vendidosReady = true
+        this.animacionEntrada('vendidos')
+
       })
     } else {
       this.categoriaService.getMasVendidosSubCategoria(this.categoria, this.subCategoria).then(vendidos => {
@@ -209,8 +230,21 @@ export class CategoriaPage implements OnInit, OnDestroy{
         this.masVendidos = this.masVendidos.filter(v => !v.agotado)
         this.masVendidos.sort((a, b) => b.ventas - a.ventas)
         this.vendidosReady = true
+        this.animacionEntrada('vendidos')
       })
     }
+  }
+
+  animacionEntrada(id: string) {
+    setTimeout(async () => {
+      const el = document.getElementById(id)
+      if (id === 'filtros') this.filtrosAnimated = true
+      if (id === 'ofertas') this.ofertasAnimated = true
+      if (id === 'vendidos') this.vendidosAnimated = true
+      if (id === 'productos') this.productosAnimated = true
+      if (id === 'consultados') this.consultadosAnimated = true
+      this.animationService.enterAnimation(el)
+    }, 350)
   }
 
   getMasConsultados() {
@@ -220,12 +254,14 @@ export class CategoriaPage implements OnInit, OnDestroy{
         this.masConsultados = consultados
         this.masConsultados.sort((a, b) => b.ventas - a.ventas)
         this.consultadosReady = true
+        this.animacionEntrada('consultados')
       })
     } else {
       this.categoriaService.getMasConsultadosSubCategoria(this.categoria, this.subCategoria).then(consultados => {
         this.masConsultados = consultados
         this.masConsultados.sort((a, b) => b.ventas - a.ventas)
         this.consultadosReady = true
+        this.animacionEntrada('consultados')
       })
     }
   }
@@ -331,6 +367,13 @@ export class CategoriaPage implements OnInit, OnDestroy{
   // Filtra por categoria
 
   async getNegociosSub(subCategoria) {
+    const el = document.getElementsByClassName('salida')
+    await this.animationService.salida(el)
+    this.ofertasAnimated = false
+    this.filtrosAnimated = false
+    this.vendidosAnimated = false
+    this.productosAnimated = false
+    this.consultadosAnimated = false
     this.negociosReady = false
     this.subCategoria = subCategoria
     this.negocios = []

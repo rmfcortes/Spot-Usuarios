@@ -20,6 +20,7 @@ import { Producto } from 'src/app/interfaces/producto';
 
 import { enterAnimation } from 'src/app/animations/enter';
 import { leaveAnimation } from 'src/app/animations/leave';
+import { StorageService } from 'src/app/services/storage.service';
 
 
 @Component({
@@ -60,7 +61,6 @@ export class NegocioPage {
 
   cargandoProds = true
   hasOfertas = false
-  infoReady = false
   error = false
 
   back: Subscription
@@ -77,6 +77,7 @@ export class NegocioPage {
     private alertController: AlertController,
     private commonService: DisparadoresService,
     private negocioService: NegocioService,
+    private storageService: StorageService,
     private cartService: CartService,
     private uidService: UidService,
   ) { }
@@ -108,7 +109,6 @@ export class NegocioPage {
     this.negocio = await this.negocioService.getNegocioPreview(id, this.categoria, status)
     this.costoEnvio()
     if (!this.negocio) {
-      this.infoReady = true
       this.error = true
       return
     }
@@ -138,7 +138,8 @@ export class NegocioPage {
     const detalles: InfoPasillos = await this.negocioService.getPasillos(this.categoria, this.negocio.id)
     detalles.pasillos = detalles.pasillos.filter(p => p.cantidad)
     this.portada = detalles.portada
-    this.vista = detalles.vista || 'lista'
+    const vista = await this.storageService.getString('vista')
+    this.vista = vista ? vista : 'list'
     this.pasillos.pasillos = detalles.pasillos
     this.pasillos.pasillos = this.pasillos.pasillos.sort((a, b) => a.prioridad - b.prioridad)
     this.getOfertas()
@@ -185,7 +186,6 @@ export class NegocioPage {
         }
       } else {
         this.noMore = true
-        this.infoReady = true
         this.cargandoProds = false
         if (this.productos.length === 0) {
 
@@ -241,7 +241,6 @@ export class NegocioPage {
       }
       if (event) event.target.complete()
       resolve()
-      this.infoReady = true
       this.cargandoProds = false
     })
   }
@@ -326,7 +325,6 @@ export class NegocioPage {
       this.cargaFiltrados(productos, event)
     } else {
       this.noMore = true
-      this.infoReady = true
       this.cargandoProds = false
     }
   }
@@ -405,6 +403,12 @@ export class NegocioPage {
     return await modal.present()
   }
 
+  cambiarVista() {
+    this.commonService.presentOpcionesVista()
+    .then(vista => this.vista = vista)
+  }
+
+
   // Login
   async presentLogin() {
     const modal = await this.modalController.create({
@@ -451,5 +455,7 @@ export class NegocioPage {
   reintentar() {
     location.reload()
   }
+
+
 
 }

@@ -89,4 +89,5 @@ export interface DatosNegocioParaPedido {
 export interface FormaPagoPermitida {
     efectivo: boolean;
     tarjeta: boolean;
+    terminal: boolean;
 }

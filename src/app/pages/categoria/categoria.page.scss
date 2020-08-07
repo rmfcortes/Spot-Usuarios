@@ -24,3 +24,9 @@ h2, h3 {
     color: var(--ion-color-medium);
     height:2rem /* fallback */
  }
+
+ .categorias {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+}
