@@ -158,11 +158,9 @@ export class CategoriasService {
     this.db.object(`usuarios/${uid}/visitasNegocio/${region}/${idNegocio}/visitas`).query.ref.transaction(cantidad => cantidad ? cantidad + 1 : 1)
   }
 
-  setVisita(info: InfoGral) {
-    if (info.plan && info.plan !== 'basico') {
-      const region = this.uidService.getRegion()
-      this.db.object(`functions/${region}/${info.idNegocio}/visitas`).query.ref.transaction(cantidad => cantidad ? cantidad + 1 : 1)
-    }
+  setVisita(idNegocio: string) {
+    const region = this.uidService.getRegion()
+    this.db.object(`functions/${region}/${idNegocio}/visitas`).query.ref.transaction(cantidad => cantidad ? cantidad + 1 : 1)
   }
 
   getSubCategorias(categoria: string, filtro: string): Promise<SubCategoria[]> {

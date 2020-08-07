@@ -67,6 +67,7 @@ export interface Oferta {
     idNegocio: string;
     abierto: boolean;
     loaded?: boolean;
+    tipo: string;
 }
 
 export interface InfoPasillos {

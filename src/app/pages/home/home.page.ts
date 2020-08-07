@@ -9,13 +9,12 @@ import { LoginPage } from 'src/app/modals/login/login.page';
 
 import { DisparadoresService } from 'src/app/services/disparadores.service';
 import { CategoriasService } from 'src/app/services/categorias.service';
-import { NegocioService } from 'src/app/services/negocio.service';
 import { OfertasService } from 'src/app/services/ofertas.service';
 import { PedidoService } from 'src/app/services/pedido.service';
 import { ChatService } from 'src/app/services/chat.service';
 import { UidService } from 'src/app/services/uid.service';
 
-import { Oferta, InfoGral, NegocioBusqueda } from 'src/app/interfaces/negocio';
+import { Oferta, InfoGral } from 'src/app/interfaces/negocio';
 import { Categoria } from 'src/app/interfaces/categoria.interface';
 import { UnreadMsg } from 'src/app/interfaces/chat.interface';
 import { CostoEnvio } from '../../interfaces/envio.interface';
@@ -25,7 +24,6 @@ import { Pedido } from 'src/app/interfaces/pedido';
 
 import { enterAnimationCategoria } from 'src/app/animations/enterCat';
 import { leaveAnimationCategoria } from 'src/app/animations/leaveCat';
-import { AnimationsService } from 'src/app/services/animations.service';
 import { BusquedaPage } from 'src/app/modals/busqueda/busqueda.page';
 
 
@@ -66,10 +64,6 @@ export class HomePage implements OnInit, OnDestroy {
 
   verPedidos = false;
 
-  busqueda = ''
-  negociosBusqueda: NegocioBusqueda[] = []
-  negMatch: NegocioBusqueda[] = []
-
   masConsultados: MasVendido[] = []
   negociosVisitados: InfoGral[] = []
   negociosPopulares: InfoGral[] = []
@@ -97,9 +91,7 @@ export class HomePage implements OnInit, OnDestroy {
     private platform: Platform,
     private modalController: ModalController,
     private categoriaService: CategoriasService,
-    private animationService: AnimationsService,
     private alertService: DisparadoresService,
-    private negocioService: NegocioService,
     private ofertaService: OfertasService,
     private pedidoService: PedidoService,
     private chatService: ChatService,
@@ -298,10 +290,6 @@ export class HomePage implements OnInit, OnDestroy {
           const y = this.negociosPopulares.findIndex(n => n.idNegocio === status.idNegocio)
           if (y >= 0) this.negociosPopulares[y].abierto = status.abierto
         }
-        if (this.negMatch.length > 0) {
-          const x = this.negMatch.findIndex(n => n.idNegocio = status.idNegocio)
-          if (x >= 0) this.negMatch[x].abierto = status.abierto
-        }
       })
     })
   }
@@ -353,53 +341,6 @@ export class HomePage implements OnInit, OnDestroy {
     return await modal.present()
   }
 
-  async buscar(event?) {
-    if (event) event.target.blur()
-    if (this.busqueda.length === 0) return
-    this.negMatch = []
-    this.buscando = true
-    if (this.negociosBusqueda.length === 0) {
-      this.negociosBusqueda = await this.negocioService.getPalabrasClave()
-    }
-    for (let i = 0; i < this.negociosBusqueda.length; i++) {
-      const busquedaArray = this.busqueda.toLocaleLowerCase().split(' ')
-      if (busquedaArray.length > 0) {
-        let incluir = false
-        for (let index = 0; index < busquedaArray.length; index++) {
-          const element = busquedaArray[index]
-          const includes = this.negociosBusqueda[i].palabras.toLocaleLowerCase().includes(element)
-          if (includes) {
-            incluir = true
-          } else {
-            incluir = false
-            break
-          }
-        }
-        if (incluir) {
-          this.negMatch.push(this.negociosBusqueda[i])
-          setTimeout(async () => {      
-            const el = document.getElementById(this.negociosBusqueda[i].idNegocio)
-            this.animationService.animBrincaDelay(el, 'scale(.7)', 'scale(1.2)', i)
-            if (this.negMatch.length === 1) {
-              const tit = document.getElementById('tituloBusqueda')
-              this.animationService.animEntradaCrescent(tit)
-            }
-          }, 50)
-        }
-      }
-    }
-    if (this.negMatch.length === 0) this.alertService.presentAlert('No hay resultados', 'No se encontraron coincidencias con ' + this.busqueda)
-    await this.costoEnvio(this.negMatch)
-    this.buscando = false
-  }
-
-  resetBusqueda() {
-    this.busqueda = ''
-    const tit = document.getElementById('cardBusqueda')
-    this.animationService.salida(tit)
-    .then(() => this.negMatch = [])
-  }
-
   async verOfertas() {
     const modal = await this.modalController.create({
       component: OfertasPage,
@@ -431,49 +372,37 @@ export class HomePage implements OnInit, OnDestroy {
     this.router.navigate(['/avances', pedido.id])
   }
 
-  async verProducto(prod: MasVendido) {
-    const infoNeg: InfoGral = await this.ofertaService.getStatus(prod.idNegocio)
-    const uid = this.uidService.getUid()
-    if (uid) {
-      this.categoriaService.setVisitaNegocio(uid, infoNeg.idNegocio)
-      this.categoriaService.setVisitaCategoria(this.uid, infoNeg.categoria)
+  async verProducto(oferta: Oferta, tipo: string) {
+    if (tipo === 'oferta') tipo = oferta.tipo
+    if (tipo === 'productos') {
+      this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`])
+    } else {
+      this.router.navigate([`negocio-servicios/${oferta.categoria}/${oferta.idNegocio}`])
     }
-    this.categoriaService.setVisita(infoNeg)
-    if (infoNeg.tipo === 'productos') this.router.navigate([`negocio/${prod.categoria}/${prod.idNegocio}/${infoNeg.abierto}`])
-    else this.router.navigate([`negocio-servicios/${prod.categoria}/${prod.idNegocio}/${infoNeg.abierto}`])
+    if (this.uid) {
+      this.categoriaService.setVisitaCategoria(this.uid, oferta.categoria)
+      this.categoriaService.setVisitaNegocio(this.uid, oferta.idNegocio)
+    }
+    this.categoriaService.setVisita(oferta.idNegocio)
   }
 
-  async verProductoConInfo(prod: InfoGral) {
+  async verNegocio(prod: InfoGral) {
     const uid = this.uidService.getUid()
     if (uid) {
       this.categoriaService.setVisitaNegocio(uid, prod.idNegocio)
       this.categoriaService.setVisitaCategoria(this.uid, prod.categoria)
     }
-    this.categoriaService.setVisita(prod)
+    this.categoriaService.setVisita(prod.idNegocio)
     if (prod.tipo === 'productos') {
-      this.router.navigate([`negocio/${prod.categoria}/${prod.idNegocio}/${prod.abierto}`])
+      this.router.navigate([`negocio/${prod.categoria}/${prod.idNegocio}`])
     } else {
-      this.router.navigate([`negocio-servicios/${prod.categoria}/${prod.idNegocio}/${prod.abierto}`])
+      this.router.navigate([`negocio-servicios/${prod.categoria}/${prod.idNegocio}`])
     }
   }
 
   irACategoria(categoria: string) {
-    if (this.uid) this.categoriaService.setVisitaCategoria(this.uid, categoria)
     this.router.navigate(['/categoria', categoria])
-  }
-
-  async irAOferta(oferta: Oferta) {
-    const infoNeg: InfoGral = await this.ofertaService.getStatus(oferta.idNegocio)
-    if (this.uid) {
-      this.categoriaService.setVisitaCategoria(this.uid, infoNeg.categoria)
-      this.categoriaService.setVisitaNegocio(this.uid, infoNeg.idNegocio)
-    }
-    this.categoriaService.setVisita(infoNeg)
-    if (infoNeg.tipo === 'productos') {
-      this.router.navigate([`negocio/${infoNeg.categoria}/${oferta.idNegocio}/${infoNeg.abierto}`])
-    } else {
-      this.router.navigate([`negocio-servicios/${infoNeg.categoria}/${oferta.idNegocio}/${infoNeg.abierto}`])
-    }
+    if (this.uid) this.categoriaService.setVisitaCategoria(this.uid, categoria)
   }
 
   ionViewWillLeave() {
@@ -486,11 +415,6 @@ export class HomePage implements OnInit, OnDestroy {
     if (this.msgSub) this.msgSub.unsubscribe()
     this.pedidoService.listenEntregados().query.ref.off('child_removed')
     this.categoriaService.listenCambios().query.ref.off('child_changed')
-  }
-
-  // Animation
-  ionImgWillLoad(image) {
-    this.animationService.enterAnimation(image.target)
   }
 
 }

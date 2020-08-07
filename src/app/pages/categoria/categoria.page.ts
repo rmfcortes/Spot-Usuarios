@@ -113,8 +113,10 @@ export class CategoriaPage implements OnInit, OnDestroy{
   }
 
   async setFiltro(filtro: string) {
-    const el = document.getElementById('productos')
-    await this.animationService.salida(el)
+    if (this.negocios.length > 0) {
+      const el = document.getElementById('productos')
+      if (el) await this.animationService.salida(el)
+    }
     this.productosAnimated = false
     this.negociosReady = false
     this.negocios = []
@@ -314,14 +316,13 @@ export class CategoriaPage implements OnInit, OnDestroy{
   // Acciones
 
   async verNegocio(negocio: Negocio) {
-    const infoNeg: InfoGral = await this.ofertaService.getStatus(negocio.id)
     const uid = this.uidService.getUid()
-    if (uid) this.categoriaService.setVisitaNegocio(uid, infoNeg.idNegocio)
-    this.categoriaService.setVisita(infoNeg)
+    if (uid) this.categoriaService.setVisitaNegocio(uid, negocio.id)
+    this.categoriaService.setVisita(negocio.id)
     if (negocio.tipo === 'productos') {
-      this.router.navigate([`/negocio/${this.categoria}/${negocio.id}/${infoNeg.abierto}`], {state: {origen_categoria: true}})
+      this.router.navigate([`/negocio/${this.categoria}/${negocio.id}`], {state: {origen_categoria: true}})
     } else {
-      this.router.navigate([`/negocio-servicios/${this.categoria}/${negocio.id}/${infoNeg.abierto}`], {state: {origen_categoria: true}})
+      this.router.navigate([`/negocio-servicios/${this.categoria}/${negocio.id}`], {state: {origen_categoria: true}})
     }
   }
 
@@ -337,10 +338,23 @@ export class CategoriaPage implements OnInit, OnDestroy{
 
   async irAOferta(oferta: Oferta) {
     const uid = this.uidService.getUid()
-    const infoNeg: InfoGral = await this.ofertaService.getStatus(oferta.idNegocio)
     if (uid) this.categoriaService.setVisitaNegocio(uid, oferta.idNegocio)
-    this.categoriaService.setVisita(infoNeg)
-    this.router.navigate(['/negocio', infoNeg.categoria, oferta.idNegocio, infoNeg.abierto], {state: {origen_categoria: true}})
+    this.categoriaService.setVisita(oferta.idNegocio)
+    this.router.navigate(['/negocio', oferta.categoria, oferta.idNegocio], {state: {origen_categoria: true}})
+  }
+
+  async verProducto(oferta: Oferta, tipo: string) {
+    if (tipo === 'oferta') tipo = oferta.tipo
+    if (tipo === 'productos') {
+      this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`])
+    } else {
+      this.router.navigate([`negocio-servicios/${oferta.categoria}/${oferta.idNegocio}`])
+    }
+    if (this.uid) {
+      this.categoriaService.setVisitaCategoria(this.uid, oferta.categoria)
+      this.categoriaService.setVisitaNegocio(this.uid, oferta.idNegocio)
+    }
+    this.categoriaService.setVisita(oferta.idNegocio)
   }
 
   async verCategorias() {

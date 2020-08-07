@@ -13,11 +13,11 @@ const routes: Routes = [
     loadChildren: () => import('./pages/categoria/categoria.module').then( m => m.CategoriaPageModule), canActivate: [RegionGuard]
   },
   {
-    path: 'negocio/:cat/:id/:status',
+    path: 'negocio/:cat/:id',
     loadChildren: () => import('./pages/negocio/negocio.module').then( m => m.NegocioPageModule), canActivate: [RegionGuard]
   },
   {
-    path: 'negocio-servicios/:cat/:id/:status',
+    path: 'negocio-servicios/:cat/:id',
     loadChildren: () => import('./pages/negocio-servicios/negocio-servicios.module').then( m => m.NegocioServiciosPageModule), canActivate: [RegionGuard]
   },
   {

@@ -56,9 +56,25 @@ export class PagosService {
       if (this.platform.is ('cordova')) {
         this.http.post('https://us-central1-revistaojo-9a8d3.cloudfunctions.net/request', body, {Authorization: 'secret-key-test'})
         .then(res => resolve(res),
-         err => reject(err.error.text)
+         err => {
+           const region = this.uidService.getRegion()
+           const error = {
+             fecha: Date.now(),
+             error: err
+           }
+           this.db.list(`errores_tarjetas/${region}/${cliente.idCliente}`).push(error)
+           reject(err.error.text)
+         }
         )
-        .catch(err => reject(err.error))
+        .catch(err => {
+          const region = this.uidService.getRegion()
+          const error = {
+            fecha: Date.now(),
+            error: err
+          }
+          this.db.list(`errores_tarjetas/${region}/${cliente.idCliente}`).push(error)
+          reject(err.error)
+        })
       } else {
         const httpOptions = {
           headers: new HttpHeaders({
@@ -76,6 +92,12 @@ export class PagosService {
             if (err.status === 200) {
               resolve()
             } else {
+              const region = this.uidService.getRegion()
+              const error = {
+                fecha: Date.now(),
+                error: err
+              }
+              this.db.list(`errores_tarjetas/${region}/${cliente.idCliente}`).push(error)
               reject(err.error)
             }
           })

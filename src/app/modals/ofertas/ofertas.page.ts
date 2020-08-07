@@ -105,6 +105,7 @@ export class OfertasPage implements OnInit {
   }
 
   async verCategorias() {
+    if (this.back) this.back.unsubscribe()
     const modal = await this.modalCtrl.create({
       component: CategoriasPage,
       cssClass: 'modal-categorias',
@@ -121,6 +122,7 @@ export class OfertasPage implements OnInit {
         this.getSubCategorias()
         this.resetOfertas()
       }
+      this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
     })
 
     return await modal.present()

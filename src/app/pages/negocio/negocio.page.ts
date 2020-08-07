@@ -13,7 +13,7 @@ import { NegocioService } from 'src/app/services/negocio.service';
 import { CartService } from 'src/app/services/cart.service';
 import { UidService } from 'src/app/services/uid.service';
 
-import { Negocio, DatosParaCuenta, InfoPasillos, ProductoPasillo } from 'src/app/interfaces/negocio';
+import { Negocio, DatosParaCuenta, InfoPasillos, ProductoPasillo, InfoGral } from 'src/app/interfaces/negocio';
 import { CostoEnvio } from '../../interfaces/envio.interface';
 import { Direccion } from '../../interfaces/direcciones';
 import { Producto } from 'src/app/interfaces/producto';
@@ -30,7 +30,7 @@ import { StorageService } from 'src/app/services/storage.service';
 })
 export class NegocioPage {
 
-  @ViewChild(IonInfiniteScroll, {static: false}) infiniteScroll: IonInfiniteScroll;
+  @ViewChild(IonInfiniteScroll, {static: false}) infiniteScroll: IonInfiniteScroll
 
   uid: string
   direccion: Direccion
@@ -101,10 +101,10 @@ export class NegocioPage {
   }
 
   async getNegocio() {
-    const id = this.activatedRoute.snapshot.paramMap.get('id');
-    const abierto = this.activatedRoute.snapshot.paramMap.get('status')
+    const id = this.activatedRoute.snapshot.paramMap.get('id')
+    const abierto = await this.negocioService.isOpen(id)
     let status
-    if (abierto === 'true')status = 'abiertos'
+    if (abierto) status = 'abiertos'
     else status = 'cerrados'
     this.negocio = await this.negocioService.getNegocioPreview(id, this.categoria, status)
     this.costoEnvio()
@@ -139,7 +139,7 @@ export class NegocioPage {
     detalles.pasillos = detalles.pasillos.filter(p => p.cantidad)
     this.portada = detalles.portada
     const vista = await this.storageService.getString('vista')
-    this.vista = vista ? vista : 'list'
+    this.vista = vista ? vista : 'list-img'
     this.pasillos.pasillos = detalles.pasillos
     this.pasillos.pasillos = this.pasillos.pasillos.sort((a, b) => a.prioridad - b.prioridad)
     this.getOfertas()

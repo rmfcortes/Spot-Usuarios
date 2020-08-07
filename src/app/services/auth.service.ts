@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 
 import { auth } from 'firebase/app';
 import { AngularFireAuth } from '@angular/fire/auth';
@@ -17,6 +17,7 @@ export class AuthService {
 
   constructor(
     private fb: Facebook,
+    private ngZone: NgZone,
     public authFirebase: AngularFireAuth,
     private alertService: DisparadoresService,
     private storageService: StorageService,
@@ -86,15 +87,17 @@ export class AuthService {
 
   facebookLogin() {
     return new Promise((resolve, reject) => {
-      this.fb.login(['public_profile', 'email'])
+      return this.fb.login(['public_profile', 'email'])
       .then(res => {
-        const credential = auth.FacebookAuthProvider.credential(res.authResponse.accessToken);
+        const credential = auth.FacebookAuthProvider.credential(res.authResponse.accessToken)
         return this.authFirebase.auth.signInWithCredential(credential)
       })
-      .then(async (response) => {
-        await this.setUser(response.user.uid, response.user.displayName, response.user.photoURL)
-        this.alertService.presentToast('Bienvenido ' + response.user.displayName)
-        resolve()
+      .then(response => {
+        this.ngZone.run(async () => {
+          await this.setUser(response.user.uid, response.user.displayName, response.user.photoURL)
+          this.alertService.presentToast('Bienvenido ' + response.user.displayName)
+          return resolve()
+        })
       })
       .catch(e => {
         reject(e)

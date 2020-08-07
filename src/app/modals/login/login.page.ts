@@ -50,8 +50,8 @@ export class LoginPage implements OnInit {
 
   ionViewWillEnter() {
     this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-      this.salir();
-    });
+      this.salir()
+    })
   }
 
   ionViewDidEnter() {
@@ -65,6 +65,7 @@ export class LoginPage implements OnInit {
       this.loader.dismiss()
       this.salir(true)
     } catch (error) {
+      this.loader.dismiss()
       this.commonService.presentAlert('Error', 'Algo salió mal, por favor intenta de nuevo' + error)
     }
   }
@@ -88,7 +89,7 @@ export class LoginPage implements OnInit {
   async generarCuenta() {
     if (this.usuario.pass !== this.usuario.passConfirm) {
       this.commonService.presentAlert('Error', 'La contraseña de confirmación debe ser igual a la contraseña');
-      return;
+      return
     }
     await this.commonService.presentLoading()
     try {

@@ -1,17 +1,18 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { ModalController } from '@ionic/angular';
+import { ModalController, Platform } from '@ionic/angular';
+import { Subscription } from 'rxjs';
 
 import { TarjetaPage } from 'src/app/modals/tarjeta/tarjeta.page';
 
 import { DisparadoresService } from 'src/app/services/disparadores.service';
 import { PagosService } from 'src/app/services/pagos.service';
+import { UidService } from 'src/app/services/uid.service';
 
 import { FormaPago } from 'src/app/interfaces/forma-pago.interface';
 import { FormaPagoPermitida } from 'src/app/interfaces/pedido';
 
 import { enterAnimationDerecha } from 'src/app/animations/enterDerecha';
 import { leaveAnimationDerecha } from 'src/app/animations/leaveDerecha';
-import { UidService } from 'src/app/services/uid.service';
 
 @Component({
   selector: 'app-formas-pago',
@@ -26,7 +27,10 @@ export class FormasPagoPage implements OnInit {
   tarjetas: FormaPago[] = [ ]
   script: HTMLScriptElement
 
+  back: Subscription
+
   constructor(
+    private platform: Platform,
     private modalCtrl: ModalController,
     private alertService: DisparadoresService,
     private pagoService: PagosService,
@@ -35,6 +39,7 @@ export class FormasPagoPage implements OnInit {
 
   ngOnInit() {
     this.getTarjetas()
+    this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
   }
 
   loadConekta() {
@@ -59,6 +64,7 @@ export class FormasPagoPage implements OnInit {
   async nuevaTarjeta() {
     const conekta = this.uidService.getConekta()
     if (!conekta) await this.loadConekta()
+    if (this.back) this.back.unsubscribe()
     const modal = await this.modalCtrl.create({
       component: TarjetaPage,
       enterAnimation: enterAnimationDerecha,
@@ -66,7 +72,10 @@ export class FormasPagoPage implements OnInit {
       componentProps: {script: this.script}
     })
 
-    modal.onWillDismiss().then(resp => resp.data ? this.tarjetas.push(resp.data) : null)
+    modal.onWillDismiss().then(resp => {
+      if (resp.data) this.tarjetas.push(resp.data)
+      this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
+    })
 
     return await modal.present()
   }
@@ -88,6 +97,7 @@ export class FormasPagoPage implements OnInit {
   }
 
   regresar() {
+    if (this.back) this.back.unsubscribe()
     this.modalCtrl.dismiss()
   }
 

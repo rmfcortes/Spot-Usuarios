@@ -1,5 +1,5 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { ModalController } from '@ionic/angular';
+import { Component, OnInit } from '@angular/core';
+import { ModalController, Platform } from '@ionic/angular';
 
 import { DisparadoresService } from 'src/app/services/disparadores.service';
 import { AnimationsService } from 'src/app/services/animations.service';
@@ -7,6 +7,9 @@ import { PagosService } from 'src/app/services/pagos.service';
 
 import { FormaPago } from 'src/app/interfaces/forma-pago.interface';
 import { Tarjeta } from 'src/app/interfaces/tarjeta.interface';
+
+import { environment } from 'src/environments/environment.prod'
+import { Subscription } from 'rxjs';
 
 declare var Conekta: any;
 
@@ -37,7 +40,10 @@ export class TarjetaPage implements OnInit {
 
   loading = false
 
+  back: Subscription
+
   constructor(
+    private platform: Platform,
     private modalCtrl: ModalController,
     private animationService: AnimationsService,
     private commonService: DisparadoresService,
@@ -45,8 +51,9 @@ export class TarjetaPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    Conekta.setPublicKey('key_D9tzmzTnFqz2xbkTdeqQ9ZA') //key_D9tzmzTnFqz2xbkTdeqQ9ZA
+    Conekta.setPublicKey(environment.conektaKey) 
     Conekta.setLanguage('es')
+    this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
   }
 
   async ayuda(titulo: string, mensaje: string, imagen: string) {
@@ -144,6 +151,7 @@ export class TarjetaPage implements OnInit {
   }
 
   async regresar() {
+    if (this.back) this.back.unsubscribe()
     this.modalCtrl.dismiss()
   }
 

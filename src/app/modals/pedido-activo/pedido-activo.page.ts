@@ -34,6 +34,7 @@ export class PedidoActivoPage implements OnInit {
   }
 
   async verCalificar() {
+    if (this.back) this.back.unsubscribe()
     const modal = await this.modalCtrl.create({
      cssClass: 'my-custom-modal-css',
      enterAnimation,
@@ -41,6 +42,9 @@ export class PedidoActivoPage implements OnInit {
      component: CalificarPage,
      componentProps: { pedido: this.pedido }
     })
+      
+    modal.onWillDismiss().then(() => this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar()))
+
     return await modal.present()
   }
 

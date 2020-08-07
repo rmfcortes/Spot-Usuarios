@@ -28,20 +28,20 @@
 <ion-content>
     <div *ngIf="promosReady">
         <app-oferta-estrella class="salida" id="ofertas" [style.visibility]="ofertasAnimated ? 'visible': 'hidden'"
-            [ofertas]="ofertas" [hayMas]="hayMas" (verNeg)="irAOferta($event)" (verOfs)="verOfertas()">
+            [ofertas]="ofertas" [hayMas]="hayMas" (verNeg)="verProducto($event, 'oferta')" (verOfs)="verOfertas()">
         </app-oferta-estrella>
     </div>
 
     <!-- + vendidos -->
     <div *ngIf="promosReady && vendidosReady && masVendidos.length > 0">
         <app-producto-estrella class="salida" id="vendidos" [style.visibility]="vendidosAnimated ? 'visible': 'hidden'" 
-        [titulo]="'Productos más vendidos'" [masVendidos]="masVendidos" (verProd)="irAOferta($event)"></app-producto-estrella>
+        [titulo]="'Productos más vendidos'" [masVendidos]="masVendidos" (verProd)="verProducto($event, 'productos')"></app-producto-estrella>
     </div>
 
 
         <!-- + consultados -->
     <div *ngIf="promosReady && vendidosReady && masConsultados && masConsultados.length > 0">
-        <app-producto-estrella class="salida" id="consultados" [titulo]="'Servicios más consultados'" [masVendidos]="masConsultados" (verProd)="irAOferta($event)"></app-producto-estrella>
+        <app-producto-estrella class="salida" id="consultados" [titulo]="'Servicios más consultados'" [masVendidos]="masConsultados" (verProd)="verProducto($event, 'servicios')"></app-producto-estrella>
     </div>
 
     <!-- Filtros -->

@@ -88,9 +88,9 @@ export class NegocioServiciosPage{
 
   async getNegocio() {
     const id = this.activatedRoute.snapshot.paramMap.get('id')
-    const abierto = this.activatedRoute.snapshot.paramMap.get('status')
+    const abierto = await this.negServicios.isOpen(id)
     let status
-    if (abierto === 'true') status = 'abiertos'
+    if (abierto) status = 'abiertos'
     else status = 'cerrados'
     this.negocio = await this.negServicios.getNegocioPreview(id, this.categoria, status)
     if (!this.negocio) {
@@ -107,7 +107,7 @@ export class NegocioServiciosPage{
     this.telefono = detalles.telefono
     this.pasillos.pasillos = detalles.pasillos
     const vista = await this.storageService.getString('vista')
-    this.vista = vista ? vista : 'list'
+    this.vista = vista ? vista : 'list-img'
     this.whats = detalles.whats
     this.pasillos.pasillos = this.pasillos.pasillos.sort((a, b) => a.prioridad - b.prioridad)
     this.getInfoServicios()

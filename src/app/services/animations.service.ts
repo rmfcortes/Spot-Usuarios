@@ -21,7 +21,7 @@ export class AnimationsService {
     return new Promise((resolve, reject) => {      
       const anim: Animation = createAnimation()
         .addElement(element)
-        .duration(500)
+        .duration(250)
         .iterations(1)
         .keyframes([
           { offset: 0, opacity: '0' },

@@ -16,18 +16,17 @@ import { PagosService } from 'src/app/services/pagos.service';
 import { CartService } from 'src/app/services/cart.service';
 import { UidService } from 'src/app/services/uid.service';
 
-import { Producto, ListaComplementosElegidos, Complemento } from 'src/app/interfaces/producto';
 import { Pedido, DatosNegocioParaPedido, Cliente } from 'src/app/interfaces/pedido';
 import { DatosParaCuenta, ProductoPasillo } from 'src/app/interfaces/negocio';
 import { FormaPago } from 'src/app/interfaces/forma-pago.interface';
 import { CostoEnvio } from 'src/app/interfaces/envio.interface';
 import { Direccion } from 'src/app/interfaces/direcciones';
+import { Producto } from 'src/app/interfaces/producto';
 
 import { enterAnimationDerecha } from 'src/app/animations/enterDerecha';
 import { leaveAnimationDerecha } from 'src/app/animations/leaveDerecha';
 import { enterAnimation } from 'src/app/animations/enter';
 import { leaveAnimation } from 'src/app/animations/leave';
-import { async } from '@angular/core/testing';
 
 @Component({
   selector: 'app-cuenta',
@@ -215,6 +214,7 @@ export class CuentaPage implements OnInit {
 
   async muestraProducto(producto: Producto) {
     producto.total = producto.precio
+    if (this.back) this.back.unsubscribe()
     const modal = await this.modalCtrl.create({
       component: ProductoPage,
       enterAnimation,
@@ -231,11 +231,13 @@ export class CuentaPage implements OnInit {
         this.datosNegocio.envio = await this.costoEnvio()
         this.calculaPropina(this.propina_sel)
       }
+      this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.closeCart())
     })
     return await modal.present()
   }
 
   async mostrarDirecciones() {
+    if (this.back) this.back.unsubscribe()
     const modal = await this.modalCtrl.create({
       component: DireccionesPage,
       enterAnimation,
@@ -245,6 +247,7 @@ export class CuentaPage implements OnInit {
         this.direccion = resp.data
         this.datosNegocio.envio = await this.costoEnvio()
       }
+      this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.closeCart())
     })
     return await modal.present()
   }
@@ -271,6 +274,7 @@ export class CuentaPage implements OnInit {
   }
 
   async formasPago() {
+    if (this.back) this.back.unsubscribe()
     const modal = await this.modalCtrl.create({
       component: FormasPagoPage,
       enterAnimation: enterAnimationDerecha,
@@ -283,6 +287,7 @@ export class CuentaPage implements OnInit {
         if (this.formaPago.forma === 'efectivo') this.comision = 0
         else this.comision = ((this.cuenta * 0.04) + 3) * 1.16
       }
+      this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.closeCart())
     })
 
     return await modal.present()
