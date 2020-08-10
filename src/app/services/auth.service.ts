@@ -93,7 +93,7 @@ export class AuthService {
         return this.authFirebase.auth.signInWithCredential(credential)
       })
       .then(response => {
-        this.ngZone.run(async () => {
+        return this.ngZone.run(async () => {
           await this.setUser(response.user.uid, response.user.displayName, response.user.photoURL)
           this.alertService.presentToast('Bienvenido ' + response.user.displayName)
           return resolve()

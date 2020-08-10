@@ -85,7 +85,7 @@
     </div>
 
     <ion-item lines="none">
-        <ion-spinner *ngIf="!promosReady || !negociosReady || !vendidosReady || !consultadosReady" name="bubbles" color="primary" style="margin: auto"></ion-spinner>
+        <ion-spinner *ngIf="!promosReady || !negociosReady || !vendidosReady || !consultadosReady" name="bubbles" style="margin: auto"></ion-spinner>
     </ion-item>    
     <ion-item lines="none" style="text-align: center;">
         <ion-label *ngIf="promosReady && negociosReady && vendidosReady && consultadosReady && negocios.length > 0" color="medium">
