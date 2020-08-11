@@ -29,12 +29,12 @@ export class BusquedaPage implements OnInit {
   buscar(event) {
     if (event) event.target.blur()
     // this.buscando = true
-    this.busquedaService.buscar(this.busqueda.texto)
-    // this.busquedaService.esperaResultados(this.busqueda.id)
-    // .then(resultados => {
-    //   this.buscando = false
-    //   console.log(resultados);
-    // })
+    this.busquedaService.buscar(this.busqueda)
+    this.busquedaService.esperaResultados(this.busqueda.id)
+    .then(resultados => {
+      this.buscando = false
+      console.log(resultados);
+    })
   }
 
   regresar() {

@@ -34,16 +34,16 @@
                 <ion-card style="margin-top: 4.5rem; padding-bottom: 1rem; padding-top: 1rem;">
                     <form #formaCuenta="ngForm" (submit)="generarCuenta()">
                         <ion-item lines="none">
-                            <ion-input (keyup.enter)="$event.target.blur();" class="input-registra" [(ngModel)]="usuario.nombre" placeholder="Nombre" type="text" name="nombre" required></ion-input>
+                            <ion-input (keyup.enter)="$event.target.blur()" class="input-registra" [(ngModel)]="usuario.nombre" placeholder="Nombre" type="text" name="nombre" required></ion-input>
                         </ion-item>
                         <ion-item lines="none">
-                            <ion-input (keyup.enter)="$event.target.blur();" class="input-registra" [(ngModel)]="usuario.correo" placeholder="Correo electrónico" type="email" name="email" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$"></ion-input>
+                            <ion-input (keyup.enter)="$event.target.blur()" class="input-registra" [(ngModel)]="usuario.correo" placeholder="Correo electrónico" type="email" name="email" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$"></ion-input>
                         </ion-item>
                         <ion-item lines="none">
-                            <ion-input (keyup.enter)="$event.target.blur();" type="password" class="input-registra" required placeholder="Contraseña (mínimo 6 caracteres)" [(ngModel)]="usuario.pass" name="pass" minlength="6"></ion-input>
+                            <ion-input (keyup.enter)="$event.target.blur()" type="password" class="input-registra" required placeholder="Contraseña (mínimo 6 caracteres)" [(ngModel)]="usuario.pass" name="pass" minlength="6"></ion-input>
                         </ion-item>
                         <ion-item lines="none">
-                            <ion-input (keyup.enter)="$event.target.blur();" type="password" class="input-registra" required  placeholder="Confirmar contraseña" [(ngModel)]="usuario.passConfirm" name="passConfirm" minlength="6"></ion-input>
+                            <ion-input (keyup.enter)="$event.target.blur()" type="password" class="input-registra" required  placeholder="Confirmar contraseña" [(ngModel)]="usuario.passConfirm" name="passConfirm" minlength="6"></ion-input>
                         </ion-item>
                         <ion-button style="margin-top: 2rem" [disabled]="!formaCuenta.valid" expand="block" shape="round" type="submit" class="botones gradient--">
                             Crear cuenta
