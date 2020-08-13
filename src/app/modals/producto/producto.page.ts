@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs';
 
 import { AnimationsService } from 'src/app/services/animations.service';
 import { ProductoService } from 'src/app/services/producto.service';
+import { UidService } from 'src/app/services/uid.service';
 
 import { Producto, ListaComplementos, ListaComplementosElegidos, Complemento } from 'src/app/interfaces/producto';
 
@@ -18,10 +19,11 @@ export class ProductoPage implements OnInit {
   @Input() producto: Producto
   @Input() idNegocio: string
   @Input() modifica: boolean
+  @Input() busqueda: boolean
 
+  elegidos: ListaComplementosElegidos[] = []
   variables: ListaComplementos[]
   obligatoriosPendientes = []
-  elegidos: ListaComplementosElegidos[] = []
   back: Subscription
 
   canContinue = false
@@ -34,6 +36,7 @@ export class ProductoPage implements OnInit {
     private modalCtrl: ModalController,
     private animationService: AnimationsService,
     private productoService: ProductoService,
+    private uidService: UidService,
   ) { }
 
   // Info entrada
@@ -45,7 +48,34 @@ export class ProductoPage implements OnInit {
     })
   }
 
-  ionViewWillEnter() {
+  async getVariables() {
+    this.variables = await this.productoService.getVariables(this.idNegocio, this.producto.id)
+    if (this.variables.length > 0) {
+      this.variables.forEach(v => this.obligatoriosPendientes.push(v.obligatorio))
+      this.checkObligatorios()
+      if (this.producto.complementos && this.producto.complementos.length > 0) this.setComplementos()
+      else this.recalculando = false
+    } else {
+      this.canContinue = true
+      this.hazCalculos()
+    }
+  }
+
+  setComplementos() {
+    this.producto.complementos.forEach(c=> {
+      const i = this.variables.findIndex(v => v.titulo === c.titulo)
+      this.variables[i].radioSelected = c.radioSelected
+      if (this.variables[i].limite && this.variables[i].limite > 1) {
+        c.complementos.forEach(cFinal => {
+          const y = this.variables[i].productos.findIndex(vf => vf.nombre === cFinal.nombre)
+          this.variables[i].productos[y].isChecked = true
+        })
+      }
+    })
+    setTimeout(() => this.hazCalculos(), 350)
+  }
+
+  hazCalculos() {
     if (!this.producto.cantidad) {
       this.producto.total = this.producto.precio
       this.producto.cantidad = 1
@@ -57,48 +87,19 @@ export class ProductoPage implements OnInit {
     }
   }
 
-  recalculaTotal() {
-    return new Promise((resolve, reject) => {      
-      this.recalculando = true
-      setTimeout(() => {
-        this.producto.total = this.producto.precio
-        this.producto.complementos.forEach(c => {
-          c.complementos.forEach(cc => {
-            this.producto.total += cc.precio
-          })
-        })
-        this.producto.total = this.producto.total * this.producto.cantidad
-        this.recalculando = false
-        resolve()
-      }, 1500)
+  recalculaTotal() {   
+    this.recalculando = true
+    this.producto.total = this.producto.precio
+    this.producto.complementos.forEach(c => {
+      c.complementos.forEach(cc => {
+        this.producto.total += cc.precio
+      })
     })
-  }
-
-  async getVariables() {
-    this.variables = await this.productoService.getVariables(this.idNegocio, this.producto.id)
-    if (this.variables.length > 0) {
-      this.variables.forEach(v => this.obligatoriosPendientes.push(v.obligatorio))
-      this.checkObligatorios()
-      if (this.producto.complementos && this.producto.complementos.length > 0) this.setComplementos()
-    } else this.canContinue = true
+    this.producto.total = this.producto.total * this.producto.cantidad
+    this.recalculando = false
   }
 
   // Acciones
-
-  setComplementos() {
-    setTimeout(() => {      
-      this.producto.complementos.forEach(c=> {
-        const i = this.variables.findIndex(v => v.titulo === c.titulo)
-        this.variables[i].radioSelected = c.radioSelected
-        if (this.variables[i].limite && this.variables[i].limite > 1) {
-          c.complementos.forEach(cFinal => {
-            const y = this.variables[i].productos.findIndex(vf => vf.nombre === cFinal.nombre)
-            this.variables[i].productos[y].isChecked = true
-          })
-        }
-      })
-    }, 500)
-  }
 
   radioSelected(event, i) {
     const y = event.detail.value

@@ -1,17 +1,15 @@
-import { Component, OnInit } from '@angular/core';
 import { ModalController, Platform } from '@ionic/angular';
+import { Component, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 
 import { DisparadoresService } from 'src/app/services/disparadores.service';
 import { AnimationsService } from 'src/app/services/animations.service';
 import { PagosService } from 'src/app/services/pagos.service';
 
-import { FormaPago } from 'src/app/interfaces/forma-pago.interface';
-import { Tarjeta } from 'src/app/interfaces/tarjeta.interface';
-
 import { environment } from 'src/environments/environment.prod'
-import { Subscription } from 'rxjs';
 
-declare var Conekta: any;
+declare var Stripe: any
+
 
 @Component({
   selector: 'app-tarjeta',
@@ -26,6 +24,9 @@ export class TarjetaPage implements OnInit {
     cvv: '',
     nombre: '',
   }
+
+  nombre = ''
+  cp = null
 
   titulo: string
   mensaje: string
@@ -42,6 +43,30 @@ export class TarjetaPage implements OnInit {
 
   back: Subscription
 
+  secret: string
+  stripe: any
+  style = {
+    base: {
+      color: 'var(--ion-color-medium)',
+      fontFamily: 'Nunito, sans-serif',
+      fontSmoothing: "antialiased",
+      fontWeight: '700',
+      fontSize: "12px",
+      '::placeholder': {
+        color: "#989aa2",
+      }
+    },
+    invalid: {
+      fontFamily: 'Nunito, sans-serif',
+      color: "#fa755a",
+      iconColor: "#fa755a"
+    }
+  }
+
+  card: any
+  cardReady = false
+  cardInvalid = true
+
   constructor(
     private platform: Platform,
     private modalCtrl: ModalController,
@@ -51,9 +76,28 @@ export class TarjetaPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    Conekta.setPublicKey(environment.conektaKey) 
-    Conekta.setLanguage('es')
+    this.stripe = Stripe(environment.stripe, {locale: 'es'})
+    const elements = this.stripe.elements()
+    this.card = elements.create('card', {style: this.style})
+    this.card.mount('#card')
+    this.listenCard()
     this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
+    this.pagoService.newCard()
+    .then(res => this.secret = res)
+    .catch(err => console.log(err))
+  }
+
+  listenCard() {
+    const that = this
+    this.card.on('ready', ev => {
+      this.cardReady = true
+    })
+    this.card.on('change', function(event) {
+      document.querySelector("#card-error").textContent = event.error ? event.error.message : "";
+      that.cardInvalid = event.complete ? false : true
+      if (event.error) that.cardInvalid = true
+      if (event.complete) that.card.blur()
+    })
   }
 
   async ayuda(titulo: string, mensaje: string, imagen: string) {
@@ -71,77 +115,29 @@ export class TarjetaPage implements OnInit {
     this.animationService.salidaDebajo(this.cuadroAyuda)
   }
 
-  borraNum() {
-    if (this.tarjeta.numero.length === 5 ||
-        this.tarjeta.numero.length === 10 ||
-        this.tarjeta.numero.length === 15) this.tarjeta.numero = this.tarjeta.numero.substring(0, this.tarjeta.numero.length - 1)
-  }
-
-  numeroCambio() {
-    if (this.tarjeta.numero.length === 4 ||
-        this.tarjeta.numero.length === 9 || 
-        this.tarjeta.numero.length === 14) this.tarjeta.numero = this.tarjeta.numero + ' '
-  }
-
-  borraVigencia() {
-    if (this.tarjeta.expiracion.length === 3) this.tarjeta.expiracion = this.tarjeta.expiracion.substring(0, this.tarjeta.expiracion.length - 1)
-  }
-
-  vigenciaCambio() {
-    if (this.tarjeta.expiracion.length === 2) this.tarjeta.expiracion = this.tarjeta.expiracion + '/'
-  }
-
-  moveFocus(nextElement) {
-    nextElement.setFocus()
-  }
-
-  spaceKey(text: string) {
-    this.tarjeta[text] = this.tarjeta[text].trim() 
-    return
-  }
-
-  agregarTarjeta() {
+  async agregarTarjeta() {
     this.loading = true
-    const vencimiento = this.tarjeta.expiracion.split('/')
-    const newCard: Tarjeta = {
-      number: this.tarjeta.numero,
-      name: this.tarjeta.nombre,
-      exp_year: '20' + vencimiento[1],
-      exp_month: vencimiento[0],
-      cvc: this.tarjeta.cvv,
-      tipo: ''
-    }
-    if (!Conekta.card.validateNumber(newCard.number)) return this.tarjetaInvalida('Número de tarjeta inválido.')
-    if (!Conekta.card.validateExpirationDate(newCard.exp_month, newCard.exp_year)) return this.tarjetaInvalida('Fecha de vencimiento inválida')
-    if (!Conekta.card.validateCVC(newCard.cvc)) return this.tarjetaInvalida('Código de seguridad inválido')
-    newCard.tipo = Conekta.card.getBrand(newCard.number)
-    Conekta.card.validateNumber(newCard.number)
-    Conekta.Token.create({card: newCard}, (response: any) => {
-      if (response.id && response.object === 'token') {
-        const data: FormaPago = {
-          tipo: newCard.tipo,
-          forma: newCard.number.slice(newCard.number.length - 4),
+    const that = this
+    this.stripe.confirmCardPayment(this.secret, {
+      payment_method: {
+        card: this.card,
+        billing_details: {
+          name: this.nombre
         }
-        const cliente = {
-          idCliente: '',
-          token: response.id,
-          name: newCard.name
-        }
-        this.pagoService.newCard(cliente)
-        .then(() => this.pagoService.saveCard(data))
-        .then(async () => {
-          this.loading = false
-          this.modalCtrl.dismiss(data)
-        })
-        .catch(err => {
-          this.loading = false
-          this.commonService.presentAlert('Error', err)
-        })
-      } else {
-        this.tarjetaInvalida('Algo salió mal, por favor intenta de nuevo')
-      }
-    }, err => {
-      this.tarjetaInvalida(err.message_to_purchaser)
+      },
+      setup_future_usage: 'off_session'
+    })
+    .then(async (result) => {
+      if (result.error) return this.commonService.presentAlert('Error', result.error.message)
+      await this.pagoService.saveCard(result.paymentIntent.payment_method)
+      const nuevaCard = await this.pagoService.getLastCard(result.paymentIntent.payment_method)
+      this.loading = false
+      this.commonService.presentToast('Tarjeta agregada con éxito')
+      if (this.back) this.back.unsubscribe()
+      this.modalCtrl.dismiss(nuevaCard)
+    })
+    .catch(err => {
+      this.loading = false
     })
   }
 

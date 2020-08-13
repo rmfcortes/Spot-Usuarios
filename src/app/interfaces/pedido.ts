@@ -84,6 +84,9 @@ export interface DatosNegocioParaPedido {
     telefono: number;
     entrega: string;
     formas_pago: FormaPagoPermitida;
+    envio_gratis_pedMin: number;
+    repartidores_propios: boolean;
+    envio_costo_fijo: boolean;
 }
 
 export interface FormaPagoPermitida {

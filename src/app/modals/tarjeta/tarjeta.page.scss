@@ -16,3 +16,15 @@ ion-content {
     visibility: hidden;
     z-index: 100;
 }
+
+ion-thumbnail {
+    max-width: 1.5rem;
+}
+
+#card-error {
+    color: red;
+    text-align: center;
+    font-size: 13px;
+    line-height: 17px;
+    margin-top: 12px;
+}

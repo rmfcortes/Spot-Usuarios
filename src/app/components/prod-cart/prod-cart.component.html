@@ -15,7 +15,7 @@
                           <p style="color: var(--ion-color-medium)" *ngFor="let item of complemento.complementos; trackBy: trackComplementos ">+ {{item.precio | currency:'CAD':'symbol-narrow':'1.0-2'}} / {{item.nombre}}</p>
                       </div>
                   </ion-label>
-                  <ion-badge class="gradient--" mode="ios">{{prod.cantidad}}</ion-badge>
+                  <ion-badge class="gradient--" mode="ios" *ngIf="prod.cantidad">{{prod.cantidad}}</ion-badge>
               </ion-item>
           </ion-col>
       </ion-row>

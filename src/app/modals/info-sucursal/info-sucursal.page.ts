@@ -21,6 +21,7 @@ import { DisparadoresService } from 'src/app/services/disparadores.service';
 export class InfoSucursalPage implements OnInit {
 
   @Input() datos: DatosParaCuenta
+  @Input() verHorario: boolean
   @Input() abierto: boolean
 
   icon = '../../../assets/img/iconos/tienda.png';
@@ -46,6 +47,7 @@ export class InfoSucursalPage implements OnInit {
   ) { }
 
   ngOnInit() {
+    if (this.verHorario) this.despliegueHorario = true
     this.getInfo()
     this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
       this.regresar()

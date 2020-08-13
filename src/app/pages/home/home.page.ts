@@ -4,28 +4,35 @@ import { ModalController, Platform } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 
 import { CategoriasPage } from 'src/app/modals/categorias/categorias.page';
+import { BusquedaPage } from 'src/app/modals/busqueda/busqueda.page';
+import { ProductoPage } from 'src/app/modals/producto/producto.page';
+import { ServicioPage } from 'src/app/modals/servicio/servicio.page';
 import { OfertasPage } from 'src/app/modals/ofertas/ofertas.page';
+import { CuentaPage } from 'src/app/modals/cuenta/cuenta.page';
 import { LoginPage } from 'src/app/modals/login/login.page';
 
 import { DisparadoresService } from 'src/app/services/disparadores.service';
 import { CategoriasService } from 'src/app/services/categorias.service';
+import { ProductoService } from 'src/app/services/producto.service';
+import { NegocioService } from 'src/app/services/negocio.service';
 import { OfertasService } from 'src/app/services/ofertas.service';
 import { PedidoService } from 'src/app/services/pedido.service';
 import { ChatService } from 'src/app/services/chat.service';
+import { CartService } from 'src/app/services/cart.service';
 import { UidService } from 'src/app/services/uid.service';
 
-import { Oferta, InfoGral } from 'src/app/interfaces/negocio';
 import { Categoria } from 'src/app/interfaces/categoria.interface';
+import { MasVendido, Producto } from 'src/app/interfaces/producto';
+import { Oferta, InfoGral } from 'src/app/interfaces/negocio';
 import { UnreadMsg } from 'src/app/interfaces/chat.interface';
 import { CostoEnvio } from '../../interfaces/envio.interface';
 import { Direccion } from '../../interfaces/direcciones';
-import { MasVendido } from 'src/app/interfaces/producto';
 import { Pedido } from 'src/app/interfaces/pedido';
 
 import { enterAnimationCategoria } from 'src/app/animations/enterCat';
 import { leaveAnimationCategoria } from 'src/app/animations/leaveCat';
-import { BusquedaPage } from 'src/app/modals/busqueda/busqueda.page';
-
+import { enterAnimation } from 'src/app/animations/enter';
+import { leaveAnimation } from 'src/app/animations/leave';
 
 
 @Component({
@@ -92,9 +99,12 @@ export class HomePage implements OnInit, OnDestroy {
     private modalController: ModalController,
     private categoriaService: CategoriasService,
     private alertService: DisparadoresService,
+    private productoService: ProductoService,
+    private negocioService: NegocioService,
     private ofertaService: OfertasService,
     private pedidoService: PedidoService,
     private chatService: ChatService,
+    private cartService: CartService,
     private uidService: UidService,
   ) {}
 
@@ -126,6 +136,10 @@ export class HomePage implements OnInit, OnDestroy {
       navigator[nombre].exitApp()
     })
     if (this.uid) this.getPedidosActivos()
+    const modal = this.uidService.getModal()
+    if (modal) {
+      modal.setAttribute('style', 'display: initial !important')
+    }
   }
 
   getUid() {
@@ -372,20 +386,6 @@ export class HomePage implements OnInit, OnDestroy {
     this.router.navigate(['/avances', pedido.id])
   }
 
-  async verProducto(oferta: Oferta, tipo: string) {
-    if (tipo === 'oferta') tipo = oferta.tipo
-    if (tipo === 'productos') {
-      this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`])
-    } else {
-      this.router.navigate([`negocio-servicios/${oferta.categoria}/${oferta.idNegocio}`])
-    }
-    if (this.uid) {
-      this.categoriaService.setVisitaCategoria(this.uid, oferta.categoria)
-      this.categoriaService.setVisitaNegocio(this.uid, oferta.idNegocio)
-    }
-    this.categoriaService.setVisita(oferta.idNegocio)
-  }
-
   async verNegocio(prod: InfoGral) {
     const uid = this.uidService.getUid()
     if (uid) {
@@ -398,6 +398,98 @@ export class HomePage implements OnInit, OnDestroy {
     } else {
       this.router.navigate([`negocio-servicios/${prod.categoria}/${prod.idNegocio}`])
     }
+  }
+
+  async muestraProducto(oferta: Oferta) {
+    if (oferta.tipo === 'servicios') return
+    if (oferta.agotado) {
+      this.alertService.presentAlert('Producto agotado', 'Lo sentimos, este producto está temporalmente agotado')
+      return
+    }
+    if (!this.uid) return this.presentAlertNotLogin()
+    const abierto = await this.negocioService.isOpen(oferta.idNegocio)
+    if (!abierto) {
+      this.alertService.presentAlert('', 'Esta tienda esta cerrada, por favor vuelve más tarde')
+      return
+    }    
+    const producto = await this.productoService.getProducto(oferta.idNegocio, oferta.id, 'productos')
+    if (!producto) {
+      this.alertService.presentAlert('', 'La publicación de este producto ha sido pausada')
+      return
+    }
+    producto.cantidad = 1
+    producto.total = producto.precio
+    producto.complementos = []
+    const modal = await this.modalController.create({
+      component: ProductoPage,
+      enterAnimation,
+      leaveAnimation,
+      componentProps: {producto, idNegocio: oferta.idNegocio, busqueda: true}
+    })
+    modal.onWillDismiss().then(async (resp) => {
+      if (resp.data) {
+        producto.cantidad = resp.data
+        setTimeout(() => this.verCarrito(producto, oferta), 100)
+      }
+    })
+    if (this.uid) {
+      this.categoriaService.setVisitaCategoria(this.uid, oferta.categoria)
+      this.categoriaService.setVisitaNegocio(this.uid, oferta.idNegocio)
+    }
+    this.categoriaService.setVisita(oferta.idNegocio)
+    return await modal.present()
+  }
+
+  async muestraServicio(servicio: MasVendido) {
+    if (servicio.agotado) {
+      this.alertService.presentAlert('Servicio agotado', 'Lo sentimos, este servicio está temporalmente agotado')
+      return
+    }
+    if (!this.uid) return this.presentAlertNotLogin()
+    const abierto = await this.negocioService.isOpen(servicio.idNegocio)
+    if (!abierto) {
+      this.alertService.presentAlert('', 'Esta tienda esta cerrada, por favor vuelve más tarde')
+      return
+    }    
+    let producto = await this.productoService.getProducto(servicio.idNegocio, servicio.id, 'servicios')
+    if (!producto) {
+      this.alertService.presentAlert('', 'La publicación de este servicio ha sido pausada')
+      return
+    }
+    const modal = await this.modalController.create({
+      component: ServicioPage,
+      enterAnimation,
+      leaveAnimation,
+      componentProps: {producto, categoria: servicio.categoria, idNegocio: servicio.idNegocio}
+    })
+    this.categoriaService.setVisitaNegocio(this.uid, servicio.idNegocio)
+    this.categoriaService.setVisitaCategoria(this.uid, servicio.categoria)
+    return await modal.present()
+  }
+
+  async verCarrito(producto: Producto, oferta: Oferta) {
+    const idNegocio = oferta.idNegocio
+    producto = await this.cartService.updateCart(idNegocio, producto)
+
+    const modal = await this.modalController.create({
+      component: CuentaPage,
+      enterAnimation,
+      leaveAnimation,
+      componentProps: {idNegocio, categoria: oferta.categoria, busqueda: true}
+    })
+
+    modal.onWillDismiss().then(resp => {
+      if (resp.data && resp.data === 'add') {
+        this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`])
+      }
+    })
+
+    return await modal.present()
+  }
+
+  presentAlertNotLogin() {
+    this.alertService.presentAlertNotLogin()
+    .then(res => res ? this.login() : null)
   }
 
   irACategoria(categoria: string) {

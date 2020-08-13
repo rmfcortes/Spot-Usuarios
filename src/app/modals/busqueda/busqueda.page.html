@@ -1,5 +1,5 @@
-<ion-header>
-  <ion-toolbar>
+<ion-header class="ion-no-border">
+  <ion-toolbar class="fondo-content">
     <ion-buttons slot="start">
       <ion-button (click)="regresar()">
         <ion-icon slot="start" name="chevron-back"></ion-icon>
@@ -8,17 +8,158 @@
     <div class="container_busqueda shadow" slot="end">
       <ion-item lines="none">
         <ion-input id="inputSearch" [autofocus]="true" (keyup.enter)="buscar($event)" [(ngModel)]="busqueda.texto" type="text" placeholder="Hamburguesa, blusa, celulares, limpieza dental, etc"></ion-input>
-        <ng-container *ngIf="buscando; else buscandoTemplate">
-            <ion-spinner color="primary" name="dots"></ion-spinner>
-        </ng-container>
-        <ng-template #buscandoTemplate>
-            <ion-icon slot="end" name="search" color="primary" (click)="buscar(null)"></ion-icon>
-        </ng-template>
+        <ion-icon slot="end" name="search" color="primary" (click)="buscar(null)"></ion-icon>
     </ion-item>
     </div>
+  </ion-toolbar>
+  <ion-toolbar class="fondo-content">
+    <div class="scrolling-wrapper">
+      <div class="card">
+          <ion-chip mode="ios" [ngClass]="{'sel' : lista === 'productos'}" (click)="paginaChange('productos')">
+              <ion-label color="light" *ngIf="lista === 'productos'">Productos</ion-label>
+              <ion-label  *ngIf="lista !== 'productos'">Productos</ion-label>
+          </ion-chip>              
+          <ion-chip mode="ios" [ngClass]="{'sel' : lista === 'servicios'}" (click)="paginaChange('servicios')">
+              <ion-label color="light" *ngIf="lista === 'servicios'">Servicios</ion-label>
+              <ion-label  *ngIf="lista !== 'servicios'">Servicios</ion-label>
+          </ion-chip>              
+          <ion-chip mode="ios" [ngClass]="{'sel' : lista === 'negocios'}" (click)="paginaChange('negocios')">
+              <ion-label color="light" *ngIf="lista === 'negocios'">Negocios</ion-label>
+              <ion-label  *ngIf="lista !== 'negocios'">Negocios</ion-label>
+          </ion-chip>    
+      </div>
+  </div>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
 
+  <ion-card *ngIf="pristine">    
+    <ion-item lines="none" *ngFor="let item of ultimas_busquedas" (click)="buscarPrev(item)" detail>
+      <ion-icon slot="start" name="time-outline"></ion-icon>
+      <ion-label>{{item}}</ion-label>
+    </ion-item>
+  </ion-card>
+
+  <!-- Lista productos -->
+  <ion-card style="padding-bottom: 1rem;" *ngIf="productos.resultados.length > 0 && lista === 'productos'">
+    <ion-item *ngFor="let prod of productos.resultados; let y = index; trackBy: trackProducts" style="--padding-start: 0; margin-top: 1rem; cursor: pointer;" lines="none" detail (click)="muestraProducto(prod)">
+        <ion-grid class="ion-no-padding">
+            <ion-row>
+                <ion-col size="4">
+                    <ion-img [src]="prod.url" [ngClass]="{'agotado' : prod.agotado}" (ionImgWillLoad)="ionImgWillLoad($event)"></ion-img>
+                    <div class="promo-box" *ngIf="prod.descuento && !prod.agotado">
+                        {{prod.descuento}}%
+                    </div>                        
+                    <div class="promo-box" *ngIf="prod.dosxuno  && !prod.agotado">
+                        2x1
+                    </div>
+                    <ion-badge class="centrar ion-text-wrap" color="dark" mode="ios" *ngIf="prod.agotado">Agotado</ion-badge>
+                </ion-col>
+                <ion-col size="8">
+                    <ng-container *ngIf="!prod.agotado; else agotadoTemp">                            
+                        <ion-item lines="none">
+                            <ion-label class="ion-text-wrap">
+                                <h2>{{(prod.nombre.length > 25) ? (prod.nombre | slice:0:25) + '...' : prod.nombre}}</h2>
+                                <h2 style="font-weight: 400; color: var(--ion-color-medium);">{{prod.nombreNegocio}}</h2>
+                            </ion-label>
+                            <ion-badge *ngIf="prod.precio" color="primary" mode="ios">{{prod.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}</ion-badge>
+                        </ion-item>
+                    </ng-container>
+                    <ng-template #agotadoTemp>
+                        <ion-item lines="none">
+                            <ion-label class="ion-text-wrap">
+                                <h2 style="color: var(--ion-color-medium);">{{(prod.nombre.length > 25) ? (prod.nombre | slice:0:25) + '...' : prod.nombre}}</h2>
+                                <h2 style="font-weight: 400; color: var(--ion-color-medium);">{{prod.nombreNegocio}}</h2>
+                            </ion-label>
+                            <ion-badge *ngIf="prod.precio" color="medium" mode="ios">{{prod.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}</ion-badge>
+                        </ion-item>
+                    </ng-template>
+                </ion-col>
+            </ion-row>
+        </ion-grid>
+    </ion-item>
+    <ion-item lines="none" style="text-align: center;">
+      <ion-label color="medium">No hay más resultados</ion-label>
+    </ion-item>
+  </ion-card>
+
+
+    <!-- Lista servicios -->
+    <ion-card style="padding-bottom: 1rem;" *ngIf="servicios.resultados.length > 0 && lista === 'servicios'">
+      <ion-item *ngFor="let prod of servicios.resultados; let y = index; trackBy: trackProducts" style="--padding-start: 0; margin-top: 1rem; cursor: pointer;" lines="none" detail (click)="muestraProducto(prod)">
+          <ion-grid class="ion-no-padding">
+              <ion-row>
+                  <ion-col size="4">
+                      <ion-img [src]="prod.url" [ngClass]="{'agotado' : prod.agotado}" (ionImgWillLoad)="ionImgWillLoad($event)"></ion-img>
+                      <div class="promo-box" *ngIf="prod.descuento && !prod.agotado">
+                          {{prod.descuento}}%
+                      </div>                        
+                      <div class="promo-box" *ngIf="prod.dosxuno  && !prod.agotado">
+                          2x1
+                      </div>
+                      <ion-badge class="centrar ion-text-wrap" color="dark" mode="ios" *ngIf="prod.agotado">Agotado</ion-badge>
+                  </ion-col>
+                  <ion-col size="8">
+                      <ng-container *ngIf="!prod.agotado; else agotadoTemp">                            
+                          <ion-item lines="none">
+                              <ion-label class="ion-text-wrap">
+                                  <h2>{{(prod.nombre.length > 25) ? (prod.nombre | slice:0:25) + '...' : prod.nombre}}</h2>
+                                  <h2 style="font-weight: 400; color: var(--ion-color-medium);">{{prod.nombreNegocio}}</h2>
+                              </ion-label>
+                              <ion-badge *ngIf="prod.precio" color="primary" mode="ios">{{prod.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}</ion-badge>
+                          </ion-item>
+                      </ng-container>
+                      <ng-template #agotadoTemp>
+                          <ion-item lines="none">
+                              <ion-label class="ion-text-wrap">
+                                  <h2 style="color: var(--ion-color-medium);">{{(prod.nombre.length > 25) ? (prod.nombre | slice:0:25) + '...' : prod.nombre}}</h2>
+                                  <h2 style="font-weight: 400; color: var(--ion-color-medium);">{{prod.nombreNegocio}}</h2>
+                              </ion-label>
+                              <ion-badge *ngIf="prod.precio" color="medium" mode="ios">{{prod.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}</ion-badge>
+                          </ion-item>
+                      </ng-template>
+                  </ion-col>
+              </ion-row>
+          </ion-grid>
+      </ion-item>
+      <ion-item lines="none" style="text-align: center;">
+        <ion-label color="medium">No hay más resultados</ion-label>
+      </ion-item>
+    </ion-card>
+
+
+  <!-- Lista negocios -->
+  <ion-card style="padding-bottom: 1rem;" *ngIf="negocios.resultados.length > 0 && lista === 'negocios'">
+    <ion-item detail lines="none" (click)="verNegocio(item)" *ngFor="let item of negocios.resultados; trackBy:trackNegocios">
+      <ng-container *ngIf="item.abierto; else visitadosOpen">
+          <ion-thumbnail>
+            <ion-img [src]="item.logo" style="width: 100%" (ionImgWillLoad)="ionImgWillLoad($event)"></ion-img>
+          </ion-thumbnail>
+          <ion-label style="margin-left: 0.5rem;">
+            <h2 style="font-weight: 700;">{{item.nombre | titlecase}}</h2>
+            <p>{{item.categoria | titlecase}}</p>
+          </ion-label>
+      </ng-container>
+      <ng-template #visitadosOpen>
+          <ion-thumbnail>
+            <div style="opacity: 0.5;">
+              <ion-img [src]="item.logo" style="width: 100%;" (ionImgWillLoad)="ionImgWillLoad($event)"></ion-img>
+            </div>
+          </ion-thumbnail>
+          <ion-label style="margin-left: 0.5rem;" color="medium">
+            <h2>{{item.nombre | titlecase}}</h2>
+            <p>{{item.categoria | titlecase}}</p>
+          </ion-label>
+          <ion-badge class="gradient--" mode="ios">Cerrado</ion-badge>
+      </ng-template>
+    </ion-item>
+    <ion-item lines="none" style="text-align: center;">
+      <ion-label color="medium">No hay más resultados</ion-label>
+    </ion-item>
+  </ion-card>
+
+  <ion-item lines="none" *ngIf="buscando">
+    <ion-spinner name="crescent" color="medium" style="margin: auto;"></ion-spinner>
+  </ion-item>
 </ion-content>

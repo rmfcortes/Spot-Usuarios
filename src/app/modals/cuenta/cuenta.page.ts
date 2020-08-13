@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, NgZone } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { ModalController, ActionSheetController, Platform } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -17,7 +17,7 @@ import { CartService } from 'src/app/services/cart.service';
 import { UidService } from 'src/app/services/uid.service';
 
 import { Pedido, DatosNegocioParaPedido, Cliente } from 'src/app/interfaces/pedido';
-import { DatosParaCuenta, ProductoPasillo } from 'src/app/interfaces/negocio';
+import { ProductoPasillo } from 'src/app/interfaces/negocio';
 import { FormaPago } from 'src/app/interfaces/forma-pago.interface';
 import { CostoEnvio } from 'src/app/interfaces/envio.interface';
 import { Direccion } from 'src/app/interfaces/direcciones';
@@ -36,7 +36,9 @@ import { leaveAnimation } from 'src/app/animations/leave';
 export class CuentaPage implements OnInit {
 
   @Input() cuenta: number
-  @Input() datos: DatosParaCuenta
+  @Input() busqueda: boolean
+  @Input() idNegocio: string
+  @Input() categoria: string
   @Input() productos: ProductoPasillo[]
 
   datosNegocio: DatosNegocioParaPedido
@@ -116,9 +118,11 @@ export class CuentaPage implements OnInit {
     private uidService: UidService,
   ) { }
 
-  ngOnInit() {
-    this.getDireccion()
+  async ngOnInit() {
+    const uid = this.uidService.getUid()
+    if (!this.cuenta) this.cuenta = await this.negocioService.getCart(uid, this.idNegocio)
     this.getCart()
+    this.getDireccion()
     this.calculaPropina(this.propina_sel)
     this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
       this.closeCart()
@@ -131,7 +135,7 @@ export class CuentaPage implements OnInit {
   }
 
   getCart() {
-    this.cartService.getCart(this.datos.idNegocio).then((cart: Producto[]) => {
+    this.cartService.getCart(this.idNegocio).then((cart: Producto[]) => {
       this.cart = cart
       this.getInfo()
       this.getDescuentos()
@@ -144,7 +148,7 @@ export class CuentaPage implements OnInit {
   }
 
   getInfo() {
-    this.cartService.getInfoNegocio(this.datos.categoria, this.datos.idNegocio).then(async (neg) => {
+    this.cartService.getInfoNegocio(this.categoria, this.idNegocio).then(async (neg) => {
       this.datosNegocio = neg
       if (this.datosNegocio.formas_pago.efectivo && !this.datosNegocio.formas_pago.tarjeta && !this.datosNegocio.formas_pago.terminal)
         this.infopagos = 'Este negocio sólo recibe pagos en efectivo'
@@ -161,26 +165,24 @@ export class CuentaPage implements OnInit {
         this.infopagos = 'Este negocio no cuenta con terminal para pagos con tarjeta en físico'      
       if (this.datosNegocio.formas_pago.efectivo && this.datosNegocio.formas_pago.tarjeta && this.datosNegocio.formas_pago.terminal)
         this.infopagos = ''
-
-      this.getFormaPago()
-      Object.assign(this.datosNegocio, this.datos)
       this.datosNegocio.envio = await this.costoEnvio()
+      this.getFormaPago()
     })
   }
 
   costoEnvio(): Promise<number> {
     if (!this.costo_envio) this.costo_envio = this.uidService.getCostoEnvio()
     return new Promise(async (resolve, reject) => {
-      if (!this.datos.repartidores_propios) {
+      if (!this.datosNegocio.repartidores_propios) {
         const distancia: number = await this.alertSerivce.calculaDistancia(this.direccion.lat, this.direccion.lng, this.datosNegocio.direccion.lat, this.datosNegocio.direccion.lng)
         return resolve(Math.ceil(distancia * this.costo_envio.costo_km + this.costo_envio.banderazo_cliente))
       }
-      if (this.datos.envio_gratis_pedMin && this.cuenta > this.datos.envio_gratis_pedMin) return resolve(0)
-      if (!this.datos.envio_costo_fijo) {
+      if (this.datosNegocio.envio_gratis_pedMin && this.cuenta > this.datosNegocio.envio_gratis_pedMin) return resolve(0)
+      if (!this.datosNegocio.envio_costo_fijo) {
         const distancia: number = await this.alertSerivce.calculaDistancia(this.direccion.lat, this.direccion.lng, this.datosNegocio.direccion.lat, this.datosNegocio.direccion.lng)
         return resolve(Math.ceil(distancia * this.costo_envio.costo_km + this.costo_envio.banderazo_cliente))
       } else {
-        return resolve(this.datos.envio)
+        return resolve(this.datosNegocio.envio)
       }
     })
   }
@@ -199,7 +201,7 @@ export class CuentaPage implements OnInit {
         } else {
           if (this.datosNegocio.formas_pago.tarjeta || this.datosNegocio.formas_pago.terminal) {
             this.formaPago = forma
-            this.comision = ((this.cuenta * 0.04) + 3) * 1.16
+            this.comision = ((this.cuenta * 0.045) + 3.5) * 1.16
           } else {
             this.comision = 0
             this.formaPago = this.pago_en_efectivo
@@ -219,13 +221,13 @@ export class CuentaPage implements OnInit {
       component: ProductoPage,
       enterAnimation,
       leaveAnimation,
-      componentProps: {producto, idNegocio: this.datos.idNegocio, modifica: true}
+      componentProps: {producto, idNegocio: this.idNegocio, modifica: true}
     })
     modal.onWillDismiss().then(async (resp) => {
       if (resp.data) {
         const uid = this.uidService.getUid()
-        await this.cartService.editProduct(this.datos.idNegocio, producto)
-        this.cuenta = await this.negocioService.getCart(uid, this.datos.idNegocio)
+        await this.cartService.editProduct(this.idNegocio, producto)
+        this.cuenta = await this.negocioService.getCart(uid, this.idNegocio)
         producto.cantidad = resp.data
         this.getDescuentos()
         this.datosNegocio.envio = await this.costoEnvio()
@@ -260,10 +262,12 @@ export class CuentaPage implements OnInit {
         this.cuenta -= this.cart[i].total
         this.cart[i].cantidad = 0
         this.cart[i].total = 0
-        this.productos.forEach(p => {
-          const index = p.productos.findIndex(x => x.id === this.cart[i].id)
-          if (index >= 0) p.productos[index] = this.cart[i]
-        })
+        if (this.productos && this.productos.length > 0) {
+          this.productos.forEach(p => {
+            const index = p.productos.findIndex(x => x.id === this.cart[i].id)
+            if (index >= 0) p.productos[index] = this.cart[i]
+          })
+        }
         this.cart.splice(i, 1)
         if (this.cuenta === 0) this.closeCart()
         this.datosNegocio.envio = await this.costoEnvio()
@@ -285,7 +289,7 @@ export class CuentaPage implements OnInit {
       this.formaPago = resp.data ? resp.data : null
       if (this.formaPago) {
         if (this.formaPago.forma === 'efectivo') this.comision = 0
-        else this.comision = ((this.cuenta * 0.04) + 3) * 1.16
+        else this.comision = ((this.cuenta * 0.045) + 3.5) * 1.16
       }
       this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.closeCart())
     })
@@ -359,7 +363,7 @@ export class CuentaPage implements OnInit {
       }
       const pedido: Pedido = {
         aceptado: false,
-        categoria: this.datos.categoria,
+        categoria: this.categoria,
         cliente,
         comision: this.comision,
         createdAt: Date.now(),
@@ -375,7 +379,9 @@ export class CuentaPage implements OnInit {
         descuento: this.descuento ? this.descuento : 0,
       }
       pedido.total = Math.round((pedido.total + Number.EPSILON) * 100) / 100
-      if (this.formaPago.tipo !== 'efectivo') pedido.idOrder =  await this.pagoService.cobrar(pedido)
+      if (this.formaPago.tipo !== 'efectivo' && this.formaPago.tipo !== 'terminal') {
+        pedido.idOrder =  await this.pagoService.cobrar(pedido)
+      }
       await this.pedidoService.createPedido(pedido)
       this.alertSerivce.dismissLoading()
       this.router.navigate(['/avances', pedido.id])
@@ -385,7 +391,7 @@ export class CuentaPage implements OnInit {
       this.closeCart()
     } catch (error) {
       this.alertSerivce.dismissLoading()
-      this.alertSerivce.presentAlert('Error', 'Lo sentimos algo salió mal, por favor intenta de nuevo ' + error)
+      this.alertSerivce.presentAlert('Error', 'Lo sentimos algo salió mal, por favor intenta de nuevo. ' + error)
     }
   }
 
@@ -398,6 +404,11 @@ export class CuentaPage implements OnInit {
   closeCart() {
     if (this.back) this.back.unsubscribe()
     this.modalCtrl.dismiss(this.cuenta)
+  }
+
+  verMas() {
+    if (this.back) this.back.unsubscribe()
+    this.modalCtrl.dismiss('add')
   }
 
   async presentActionOpciones(producto: Producto, i: number) {
@@ -430,18 +441,6 @@ export class CuentaPage implements OnInit {
 
   comisionInfo() {
     this.alertSerivce.presentToastconBoton('Cargo realizado por pago con tarjeta')
-  }
-
-  loadConekta() {
-    return new Promise((resolve, reject) => {      
-      this.script = document.createElement('script')
-      this.script.src = 'https://cdn.conekta.io/js/latest/conekta.js'
-      this.script.async = true
-      document.body.appendChild(this.script)
-      setTimeout(() => {
-        resolve()
-      }, 1000)
-    })
   }
 
 }

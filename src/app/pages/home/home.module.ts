@@ -17,6 +17,7 @@ import { StarsModule } from 'src/app/shared/stars.module';
 import { BusquedaPageModule } from 'src/app/modals/busqueda/busqueda.module';
 import { ProductoPageModule } from 'src/app/modals/producto/producto.module';
 import { ServicioPageModule } from 'src/app/modals/servicio/servicio.module';
+import { CuentaPageModule } from 'src/app/modals/cuenta/cuenta.module';
 
 @NgModule({
   imports: [
@@ -26,6 +27,7 @@ import { ServicioPageModule } from 'src/app/modals/servicio/servicio.module';
     StarsModule,
     SharedModule,
     LoginPageModule,
+    CuentaPageModule,
     OfertasPageModule,
     TarjetaPageModule,
     BusquedaPageModule,

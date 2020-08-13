@@ -4,7 +4,7 @@
           <ion-img [src]="item.foto" style="width: 100%" (ionImgWillLoad)="ionImgWillLoad($event)"></ion-img>
         </ion-thumbnail>
         <ion-label style="margin-left: 0.5rem;">
-          <h2 style="font-weight: 700;">{{item.nombre}}</h2>
+          <h2 style="font-weight: 700;">{{item.nombre | titlecase}}</h2>
           <p>{{item.categoria | titlecase}}</p>
           <div *ngIf="item.tipo === 'productos'" class="medium">
             <p *ngIf="!item.envio_gratis_pedMin && direccion || !item.repartidores_propios">Envío: {{item.envio | currency:'CAD':'symbol-narrow':'1.0-2'}} </p>
@@ -20,7 +20,7 @@
           </div>
         </ion-thumbnail>
         <ion-label style="margin-left: 0.5rem;" color="medium">
-          <h2>{{item.nombre}}</h2>
+          <h2>{{item.nombre | titlecase}}</h2>
           <p *ngIf="!item.envio_gratis_pedMin && direccion">Envío: {{item.envio | currency:'CAD':'symbol-narrow':'1.0-2'}} </p>
           <p *ngIf="item.envio_gratis_pedMin" class="primario">Envío gratis</p>
           <app-stars *ngIf="item.promedio" [calificacion]="item.promedio" [readOnly]="true" [size]="'x-small'"></app-stars>

@@ -19,6 +19,16 @@ export interface Negocio {
     direccion: Direccion;
 }
 
+export interface NegocioAlgolia {
+    abierto: boolean;
+    categoria: string;
+    nombre: string;
+    productos: number;
+    subCategoria: string[];
+    objectID: string;
+    logo: string;
+}
+
 export interface DetallesNegocio {
     descripcion: string;
     telefono: string;
@@ -68,6 +78,7 @@ export interface Oferta {
     abierto: boolean;
     loaded?: boolean;
     tipo: string;
+    agotado: boolean;
 }
 
 export interface InfoPasillos {

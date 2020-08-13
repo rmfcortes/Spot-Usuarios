@@ -15,7 +15,7 @@ export class UidService {
   region: string
   direccion: Direccion
   costoEnvio: CostoEnvio
-  conektaLoaded = false
+  modalBusqueda: any
 
   public usuario = new BehaviorSubject(null)
   change = new BehaviorSubject<boolean>(false)
@@ -75,12 +75,12 @@ export class UidService {
     this.costoEnvio = costo
   }
 
-  setConekta() {
-    this.conektaLoaded = true
+  setModal(modal) {
+    this.modalBusqueda = modal
   }
 
-  getConekta() {
-    return this.conektaLoaded
+  getModal() {
+    return this.modalBusqueda
   }
 
 }

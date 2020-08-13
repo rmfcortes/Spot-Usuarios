@@ -19,6 +19,20 @@ export interface Producto {
     dosxuno?: boolean;
 }
 
+export interface ProductoAlgolia {
+    agotado: boolean;
+    url: string;
+    precio: number;
+    nombre: string;
+    objectID: string;
+    descripcion: string;
+    descuento: number;
+    dosxuno: boolean;
+    idNegocio: string;
+    categoria: string;
+    nombreNegocio: string;
+}
+
 export interface ListaComplementos {
     titulo: string;
     limite: number;

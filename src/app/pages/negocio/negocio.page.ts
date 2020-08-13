@@ -291,22 +291,11 @@ export class NegocioPage {
   }
   
   async verCuenta() {
-    const datos: DatosParaCuenta = {
-      logo: this.negocio.foto,
-      nombreNegocio: this.negocio.nombre,
-      direccion: this.negocio.direccion,
-      idNegocio: this.negocio.id,
-      categoria: this.categoria,
-      envio: this.negocio.envio,
-      repartidores_propios: this.negocio.repartidores_propios ? this.negocio.repartidores_propios : false,
-      envio_gratis_pedMin: this.negocio.envio_gratis_pedMin ? this.negocio.envio_gratis_pedMin : null,
-      envio_costo_fijo: this.negocio.envio_costo_fijo ? this.negocio.envio_costo_fijo : false
-    }
     const modal = await this.modalController.create({
       component: CuentaPage,
       enterAnimation,
       leaveAnimation,
-      componentProps: {cuenta: this.cuenta, datos, productos: this.productos}
+      componentProps: {cuenta: this.cuenta, productos: this.productos, idNegocio: this.negocio.id, categoria: this.categoria}
     })
     modal.onWillDismiss().then(async () => {
       this.cuenta = await this.negocioService.getCart(this.uid, this.negocio.id)
@@ -429,25 +418,9 @@ export class NegocioPage {
 
   // Mensajes
 
-  async presentAlertNotLogin() {
-    const alert = await this.alertController.create({
-      header: 'Inicia sesión',
-      message: `Para darte la mejor experiencia, por favor inicia sesión antes de continuar con tu pedido. <br> ¡Es muy sencillo!`,
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-          cssClass: 'tertiary',
-        },
-        {
-          text: 'Iniciar sesión',
-          cssClass: 'primary',
-          handler: () => this.presentLogin()
-        }
-      ]
-    })
-
-    await alert.present()
+  presentAlertNotLogin() {
+    this.commonService.presentAlertNotLogin()
+    .then(res => res ? this.presentLogin() : null)
   }
 
   // Auxiliares

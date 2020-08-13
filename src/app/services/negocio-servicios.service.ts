@@ -19,6 +19,16 @@ export class NegocioServiciosService {
     private uidService: UidService,
   ) { }
 
+  getWhats(categoria: string, id: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const detSub = this.db.object(`negocios/pasillos/${categoria}/${id}/whats`).valueChanges()
+        .subscribe((whats: string) => {
+          detSub.unsubscribe()
+          resolve(whats)
+        })
+    })
+  }
+
   isOpen(idNegocio: string): Promise<boolean> {
     return new Promise((resolve, reject) => {
       const region = this.uidService.getRegion()

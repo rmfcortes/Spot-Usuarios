@@ -10,8 +10,25 @@
 </ion-header>
 
 <ion-content>
-    <ion-card style="margin-top: 2rem;">
-        <form #forma="ngForm" (ngSubmit)="agregarTarjeta()" class="boton-margen" style="margin-top: 2rem;">
+    <ion-card style="margin-top: 2rem; padding: 1rem;">
+        <form id="payment-form" #forma="ngForm" (ngSubmit)="agregarTarjeta()">
+            <ion-card>
+                <ion-item lines="none">
+                    <ion-label position="floating">Nombre</ion-label>
+                    <ion-input (keyup.enter)="$event.target.blur()"  [(ngModel)]="nombre" type="text" placeholder="Juan Perez García" required name="nombre"></ion-input>
+                </ion-item>                
+            </ion-card>
+            <ion-card style="padding: 1rem;">
+                <div id="card"><!--Stripe.js injects the Card Element--></div>
+            </ion-card>
+            <p id="card-error" role="alert"></p>
+            <ion-button type="submit" id="button" expand="block" class="gradient--" [disabled]="loading || cardInvalid || !forma.valid || !secret || !cardReady" shape="round" style="margin-top: 2rem; font-weight: 700;">
+                Guardar tarjeta
+                <ion-spinner slot="end" *ngIf="loading" name="dots"></ion-spinner>
+            </ion-button>
+        </form>
+
+        <!-- <form #forma="ngForm" (ngSubmit)="agregarTarjeta()" class="boton-margen" style="margin-top: 2rem;">
             <ion-item>
                 <ion-label position="floating">Número de tarjeta</ion-label>
                 <ion-input [(ngModel)]="tarjeta.numero" placeholder="0000 0000 0000 0000" required name="email" type="tel" maxlength="19" minlength="18" tabindex="1" (keyup.enter)="moveFocus(b)" (keyup.space)="spaceKey('numero')" (ionChange)="numeroCambio()" (keydown.backspace)="borraNum()"></ion-input>
@@ -42,7 +59,7 @@
             <ion-item lines="none" style="text-align: center;">
                 <ion-label color="medium" style="font-size: x-small;" class="ion-text-wrap">Por seguridad, preautorizaremos un cargo menor a MXN$10.00 en tu tarjeta.</ion-label>
             </ion-item>
-        </form>
+        </form> -->
     </ion-card>
     <div class="cuadro-ayuda shadow-large" id="ayuda">
         <div>
@@ -62,4 +79,6 @@
             Entendido
         </ion-button>
     </div>
+    
+
 </ion-content>

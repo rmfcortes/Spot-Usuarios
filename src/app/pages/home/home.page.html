@@ -123,7 +123,7 @@
 
     <!-- Ofertas -->
     <ng-container *ngIf="pedidosReady && catsReady && promosReady; else promoTemplate">
-        <app-oferta-estrella [hayMas]="hayMas" [ofertas]="ofertas" (verOfs)="verOfertas()" (verNeg)="verProducto($event, 'oferta')"></app-oferta-estrella>
+        <app-oferta-estrella [hayMas]="hayMas" [ofertas]="ofertas" (verOfs)="verOfertas()" (verNeg)="muestraProducto($event)"></app-oferta-estrella>
     </ng-container>
     <ng-template #promoTemplate>
         <ion-list>
@@ -137,13 +137,13 @@
 
     <!-- + vendidos -->
     <div *ngIf="pedidosReady && catsReady && promosReady && vendidosReady && masVendidos.length > 0">
-        <app-producto-estrella [titulo]="'Productos más vendidos'" [masVendidos]="masVendidos" (verProd)="verProducto($event, 'productos')"></app-producto-estrella>
+        <app-producto-estrella [titulo]="'Productos más vendidos'" [masVendidos]="masVendidos" (verProd)="muestraProducto($event)"></app-producto-estrella>
     </div>
 
 
         <!-- + consultados -->
     <div *ngIf="pedidosReady && catsReady && promosReady && vendidosReady && masConsultados && masConsultados.length > 0">
-        <app-producto-estrella [titulo]="'Servicios más consultados'" [masVendidos]="masConsultados" (verProd)="verProducto($event, 'servicios')"></app-producto-estrella>
+        <app-producto-estrella [titulo]="'Servicios más consultados'" [masVendidos]="masConsultados" (verProd)="muestraProducto($event)"></app-producto-estrella>
     </div>
 
 

@@ -17,6 +17,30 @@ export class DisparadoresService {
     private storageService: StorageService,
   ) { }
 
+  presentAlertNotLogin() {
+    return new Promise(async (resolve, reject) => {      
+      const alert = await this.alertController.create({
+        header: 'Inicia sesión',
+        message: `Para darte la mejor experiencia, por favor inicia sesión antes de continuar con tu pedido. <br> ¡Es muy sencillo!`,
+        buttons: [
+          {
+            text: 'Cancelar',
+            role: 'cancel',
+            cssClass: 'tertiary',
+            handler: () => resolve(false)
+          },
+          {
+            text: 'Iniciar sesión',
+            cssClass: 'primary',
+            handler: () => resolve(true)
+          }
+        ]
+      })
+  
+      await alert.present()
+    })
+  }
+
   async presentOpcionesVista(): Promise<string> {
     return new Promise(async (resolve, reject) => {      
       const actionSheet = await this.actionSheetCtrl.create({

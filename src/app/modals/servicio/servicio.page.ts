@@ -4,7 +4,9 @@ import { Subscription } from 'rxjs';
 
 import { SocialSharing } from '@ionic-native/social-sharing/ngx';
 
+import { NegocioServiciosService } from 'src/app/services/negocio-servicios.service';
 import { DisparadoresService } from 'src/app/services/disparadores.service';
+
 import { Producto } from 'src/app/interfaces/producto';
 
 @Component({
@@ -15,7 +17,9 @@ import { Producto } from 'src/app/interfaces/producto';
 export class ServicioPage implements OnInit {
 
   @Input() servicio: Producto
-  @Input() whats: String
+  @Input() categoria: string
+  @Input() idNegocio: string
+  @Input() whats: string
 
   back: Subscription
 
@@ -23,6 +27,7 @@ export class ServicioPage implements OnInit {
     private platform: Platform,
     private modalCtrl: ModalController,
     private socialSharing: SocialSharing,
+    private servicioService: NegocioServiciosService,
     private alertService: DisparadoresService,
   ) { }
 
@@ -30,8 +35,12 @@ export class ServicioPage implements OnInit {
     this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
       this.regresar()
     })
+    if (!this.whats) this.getWhats()
   }
 
+  async getWhats() {
+    this.whats = await this.servicioService.getWhats(this.categoria, this.idNegocio)
+  }
   
   async contactViaWhatsApp() {
     const tel = '+52' + this.whats

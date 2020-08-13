@@ -6,7 +6,6 @@ import { TarjetaPage } from 'src/app/modals/tarjeta/tarjeta.page';
 
 import { DisparadoresService } from 'src/app/services/disparadores.service';
 import { PagosService } from 'src/app/services/pagos.service';
-import { UidService } from 'src/app/services/uid.service';
 
 import { FormaPago } from 'src/app/interfaces/forma-pago.interface';
 import { FormaPagoPermitida } from 'src/app/interfaces/pedido';
@@ -34,25 +33,11 @@ export class FormasPagoPage implements OnInit {
     private modalCtrl: ModalController,
     private alertService: DisparadoresService,
     private pagoService: PagosService,
-    private uidService: UidService,
   ) { }
 
   ngOnInit() {
     this.getTarjetas()
     this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
-  }
-
-  loadConekta() {
-    return new Promise((resolve, reject) => {      
-      this.script = document.createElement('script')
-      this.script.src = 'https://cdn.conekta.io/js/latest/conekta.js'
-      this.script.async = true
-      document.body.appendChild(this.script)
-      this.uidService.setConekta()
-      setTimeout(() => {
-        resolve()
-      }, 1000)
-    })
   }
 
   getTarjetas() {
@@ -62,8 +47,6 @@ export class FormasPagoPage implements OnInit {
   }
 
   async nuevaTarjeta() {
-    const conekta = this.uidService.getConekta()
-    if (!conekta) await this.loadConekta()
     if (this.back) this.back.unsubscribe()
     const modal = await this.modalCtrl.create({
       component: TarjetaPage,
