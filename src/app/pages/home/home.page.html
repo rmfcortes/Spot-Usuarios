@@ -171,7 +171,7 @@
 
     <!-- + Populares -->
     <div *ngIf="pedidosReady && catsReady && promosReady && vendidosReady && visitadosReady && popularesReady && masConsultados">
-        <ion-card style="margin-top: 0.75rem;">
+        <ion-card style="margin-top: 0.75rem;" *ngIf="negociosPopulares.length > 0">
             <ion-item-divider>
                 <h3 style="color: black;" *ngIf="negociosPopulares.length > 0">Los más populares</h3>
             </ion-item-divider>

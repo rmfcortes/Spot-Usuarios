@@ -1,5 +1,5 @@
 import { ModalController, Platform } from '@ionic/angular';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import { DisparadoresService } from 'src/app/services/disparadores.service';
@@ -43,7 +43,6 @@ export class TarjetaPage implements OnInit {
 
   back: Subscription
 
-  secret: string
   stripe: any
   style = {
     base: {
@@ -68,6 +67,7 @@ export class TarjetaPage implements OnInit {
   cardInvalid = true
 
   constructor(
+    private ngZone: NgZone,
     private platform: Platform,
     private modalCtrl: ModalController,
     private animationService: AnimationsService,
@@ -82,21 +82,19 @@ export class TarjetaPage implements OnInit {
     this.card.mount('#card')
     this.listenCard()
     this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
-    this.pagoService.newCard()
-    .then(res => this.secret = res)
-    .catch(err => console.log(err))
   }
 
   listenCard() {
-    const that = this
     this.card.on('ready', ev => {
-      this.cardReady = true
+      this.ngZone.run(() => this.cardReady = true)
     })
-    this.card.on('change', function(event) {
-      document.querySelector("#card-error").textContent = event.error ? event.error.message : "";
-      that.cardInvalid = event.complete ? false : true
-      if (event.error) that.cardInvalid = true
-      if (event.complete) that.card.blur()
+    this.card.on('change', event => {
+      this.ngZone.run(() => {
+        document.querySelector("#card-error").textContent = event.error ? event.error.message : ""
+        this.cardInvalid = event.complete ? false : true
+        if (event.error) this.cardInvalid = true
+        if (event.complete) this.card.blur()
+      })
     })
   }
 
@@ -117,33 +115,40 @@ export class TarjetaPage implements OnInit {
 
   async agregarTarjeta() {
     this.loading = true
-    const that = this
-    this.stripe.confirmCardPayment(this.secret, {
-      payment_method: {
-        card: this.card,
-        billing_details: {
-          name: this.nombre
-        }
-      },
-      setup_future_usage: 'off_session'
-    })
-    .then(async (result) => {
-      if (result.error) return this.commonService.presentAlert('Error', result.error.message)
-      await this.pagoService.saveCard(result.paymentIntent.payment_method)
-      const nuevaCard = await this.pagoService.getLastCard(result.paymentIntent.payment_method)
+    try {
+      const secret = await this.pagoService.newCard()
+      this.stripe.confirmCardPayment(secret, {
+        payment_method: {
+          card: this.card,
+          billing_details: {
+            name: this.nombre
+          }
+        },
+        setup_future_usage: 'off_session'
+      })
+      .then(async (result) => {
+        this.ngZone.run(async () => {
+          if (result.error) {
+            this.loading = false
+            return this.commonService.presentAlert('Error', result.error.message)
+          }
+          await this.pagoService.saveCard(result.paymentIntent.payment_method)
+          const nuevaCard = await this.pagoService.getLastCard(result.paymentIntent.payment_method)
+          this.loading = false
+          this.commonService.presentToast('Tarjeta agregada con éxito')
+          if (this.back) this.back.unsubscribe()
+          this.modalCtrl.dismiss(nuevaCard)
+        })
+      })
+      .catch(err => {
+        this.loading = false
+        this.commonService.presentAlert('', err)
+      })
+    } catch (error) {
       this.loading = false
-      this.commonService.presentToast('Tarjeta agregada con éxito')
-      if (this.back) this.back.unsubscribe()
-      this.modalCtrl.dismiss(nuevaCard)
-    })
-    .catch(err => {
-      this.loading = false
-    })
-  }
-
-  tarjetaInvalida(msn: string) {
-    this.loading = false
-    this.commonService.presentAlert('Error', msn)
+      this.commonService.presentAlert('', error)
+    }
+    
   }
 
   async regresar() {

@@ -137,9 +137,10 @@ export class HomePage implements OnInit, OnDestroy {
     })
     if (this.uid) this.getPedidosActivos()
     const modal = this.uidService.getModal()
-    if (modal) {
-      modal.setAttribute('style', 'display: initial !important')
-    }
+    this.uidService.setModal(false)
+    if (modal) this.onBusqueda()
+    const ofertas = this.uidService.getOfertas()
+    if (ofertas) this.verOfertas()
   }
 
   getUid() {
@@ -339,32 +340,57 @@ export class HomePage implements OnInit, OnDestroy {
   // Acciones
 
   async login() {
+    if (this.back) this.back.unsubscribe()
     const modal = await this.modalController.create({
       cssClass: 'my-custom-modal-css',
       component: LoginPage,
+    })
+
+    modal.onWillDismiss().then(() => {
+      this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
+        const nombre = 'app'
+        navigator[nombre].exitApp()
+      })
     })
 
     return await modal.present()
   }
 
   async onBusqueda() {
+    if (this.back) this.back.unsubscribe()
     const modal = await this.modalController.create({
       component: BusquedaPage,
+    })
+
+    modal.onWillDismiss().then(() => {
+      this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
+        const nombre = 'app'
+        navigator[nombre].exitApp()
+      })
     })
 
     return await modal.present()
   }
 
   async verOfertas() {
+    if (this.back) this.back.unsubscribe()
     const modal = await this.modalController.create({
       component: OfertasPage,
       componentProps: {categoria: 'todas', categorias: this.categorias, subCategoria: 'todos', batch: this.batch}
+    })
+
+    modal.onWillDismiss().then(() => {
+      this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
+        const nombre = 'app'
+        navigator[nombre].exitApp()
+      })
     })
 
     return modal.present()
   }
 
   async verCategorias() {
+    if (this.back) this.back.unsubscribe()
     const modal = await this.modalController.create({
       component: CategoriasPage,
       cssClass: 'modal-categorias',
@@ -375,6 +401,12 @@ export class HomePage implements OnInit, OnDestroy {
 
     modal.onWillDismiss().then(resp => {
       if (resp.data) this.irACategoria(resp.data)
+      else {
+        this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
+          const nombre = 'app'
+          navigator[nombre].exitApp()
+        })
+      }
     })
 
     return await modal.present()
@@ -383,6 +415,7 @@ export class HomePage implements OnInit, OnDestroy {
   // Redirección
 
   verPedido(pedido: Pedido) {
+    if (this.back) this.back.unsubscribe()
     this.router.navigate(['/avances', pedido.id])
   }
 
@@ -393,6 +426,7 @@ export class HomePage implements OnInit, OnDestroy {
       this.categoriaService.setVisitaCategoria(this.uid, prod.categoria)
     }
     this.categoriaService.setVisita(prod.idNegocio)
+    if (this.back) this.back.unsubscribe()
     if (prod.tipo === 'productos') {
       this.router.navigate([`negocio/${prod.categoria}/${prod.idNegocio}`])
     } else {
@@ -420,6 +454,8 @@ export class HomePage implements OnInit, OnDestroy {
     producto.cantidad = 1
     producto.total = producto.precio
     producto.complementos = []
+
+    if (this.back) this.back.unsubscribe()
     const modal = await this.modalController.create({
       component: ProductoPage,
       enterAnimation,
@@ -430,6 +466,11 @@ export class HomePage implements OnInit, OnDestroy {
       if (resp.data) {
         producto.cantidad = resp.data
         setTimeout(() => this.verCarrito(producto, oferta), 100)
+      } else {
+        this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
+          const nombre = 'app'
+          navigator[nombre].exitApp()
+        })
       }
     })
     if (this.uid) {
@@ -456,12 +497,22 @@ export class HomePage implements OnInit, OnDestroy {
       this.alertService.presentAlert('', 'La publicación de este servicio ha sido pausada')
       return
     }
+
+    if (this.back) this.back.unsubscribe()
     const modal = await this.modalController.create({
       component: ServicioPage,
       enterAnimation,
       leaveAnimation,
       componentProps: {producto, categoria: servicio.categoria, idNegocio: servicio.idNegocio}
     })
+
+    modal.onWillDismiss().then(() => {
+      this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
+        const nombre = 'app'
+        navigator[nombre].exitApp()
+      })
+    })
+
     this.categoriaService.setVisitaNegocio(this.uid, servicio.idNegocio)
     this.categoriaService.setVisitaCategoria(this.uid, servicio.categoria)
     return await modal.present()
@@ -471,6 +522,7 @@ export class HomePage implements OnInit, OnDestroy {
     const idNegocio = oferta.idNegocio
     producto = await this.cartService.updateCart(idNegocio, producto)
 
+    if (this.back) this.back.unsubscribe()
     const modal = await this.modalController.create({
       component: CuentaPage,
       enterAnimation,
@@ -481,6 +533,11 @@ export class HomePage implements OnInit, OnDestroy {
     modal.onWillDismiss().then(resp => {
       if (resp.data && resp.data === 'add') {
         this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`])
+      } else {
+        this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
+          const nombre = 'app'
+          navigator[nombre].exitApp()
+        })
       }
     })
 
@@ -493,6 +550,7 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   irACategoria(categoria: string) {
+    if (this.back) this.back.unsubscribe()
     this.router.navigate(['/categoria', categoria])
     if (this.uid) this.categoriaService.setVisitaCategoria(this.uid, categoria)
   }

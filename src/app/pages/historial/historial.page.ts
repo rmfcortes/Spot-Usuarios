@@ -80,6 +80,7 @@ export class HistorialPage implements OnInit {
   }
 
   async verPedido(pedido: Pedido) {
+    if (this.back) this.back.unsubscribe()
     const modal = await this.modalCtrl.create({
       component: PedidoActivoPage,
       enterAnimation,
@@ -87,6 +88,10 @@ export class HistorialPage implements OnInit {
       componentProps: {pedido}
     })
 
+    modal.onWillDismiss().then(() => {
+      this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.router.navigate(['/home']))
+    })
+  
     return await modal.present()
   }
 

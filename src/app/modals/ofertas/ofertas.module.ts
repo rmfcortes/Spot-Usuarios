@@ -7,6 +7,9 @@ import { IonicModule } from '@ionic/angular';
 import { OfertasPage } from './ofertas.page';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { CategoriasPageModule } from '../categorias/categorias.module';
+import { LoginPageModule } from '../login/login.module';
+import { ProductoPageModule } from '../producto/producto.module';
+import { CuentaPageModule } from '../cuenta/cuenta.module';
 
 @NgModule({
   imports: [
@@ -14,6 +17,9 @@ import { CategoriasPageModule } from '../categorias/categorias.module';
     FormsModule,
     IonicModule,
     SharedModule,
+    LoginPageModule,
+    CuentaPageModule,
+    ProductoPageModule,
     CategoriasPageModule,
   ],
   declarations: [OfertasPage],

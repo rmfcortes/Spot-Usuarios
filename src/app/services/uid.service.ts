@@ -15,8 +15,9 @@ export class UidService {
   region: string
   direccion: Direccion
   costoEnvio: CostoEnvio
-  modalBusqueda: any
-
+  modalOfertas: boolean
+  modalBusqueda: boolean
+  
   public usuario = new BehaviorSubject(null)
   change = new BehaviorSubject<boolean>(false)
 
@@ -75,12 +76,20 @@ export class UidService {
     this.costoEnvio = costo
   }
 
-  setModal(modal) {
+  setModal(modal: boolean) {
     this.modalBusqueda = modal
   }
 
   getModal() {
     return this.modalBusqueda
+  }    
+  
+  setOfertas(value: boolean) {
+    this.modalOfertas = value
   }
+
+  getOfertas() {
+    return this.modalOfertas
+  }  
 
 }

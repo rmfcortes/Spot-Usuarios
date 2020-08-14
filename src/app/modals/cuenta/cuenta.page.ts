@@ -223,6 +223,7 @@ export class CuentaPage implements OnInit {
       leaveAnimation,
       componentProps: {producto, idNegocio: this.idNegocio, modifica: true}
     })
+
     modal.onWillDismiss().then(async (resp) => {
       if (resp.data) {
         const uid = this.uidService.getUid()
@@ -235,6 +236,7 @@ export class CuentaPage implements OnInit {
       }
       this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.closeCart())
     })
+    
     return await modal.present()
   }
 

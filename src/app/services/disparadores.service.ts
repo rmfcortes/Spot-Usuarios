@@ -31,7 +31,7 @@ export class DisparadoresService {
           },
           {
             text: 'Iniciar sesión',
-            cssClass: 'primary',
+            cssClass: 'btn_aceptar',
             handler: () => resolve(true)
           }
         ]
@@ -148,7 +148,7 @@ export class DisparadoresService {
           },
           {
             text: 'Ok',
-            cssClass: 'secondary',
+            cssClass: 'btn_aceptar',
             handler: (blah) => {
               resolve(true);
             }
@@ -176,7 +176,7 @@ export class DisparadoresService {
           },
           {
             text: 'Actualizar',
-            cssClass: 'secondary',
+            cssClass: 'btn_aceptar',
             handler: (blah) => {
               resolve(true);
             }
@@ -230,7 +230,8 @@ export class DisparadoresService {
               resolve(false)
             }
           }, {
-            text: 'Agregar',
+            text: 'Guardar',
+            cssClass: 'btn_aceptar',
             handler: (data) => {
               resolve(data)
             }

@@ -263,6 +263,7 @@ export class NegocioPage {
 
   // Acciones
   async muestraProducto(producto: Producto) {
+    if (this.back) this.back.unsubscribe()
     if (!this.negocio.abierto) {
       this.commonService.presentAlert('', 'Esta tienda esta cerrada, por favor vuelve más tarde')
       return
@@ -285,12 +286,14 @@ export class NegocioPage {
       if (resp.data) {
         producto = await this.cartService.updateCart(this.negocio.id, producto)
         this.cuenta = await this.negocioService.getCart(this.uid, this.negocio.id)
+        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
       }
     })
     return await modal.present()
   }
   
   async verCuenta() {
+    if (this.back) this.back.unsubscribe()
     const modal = await this.modalController.create({
       component: CuentaPage,
       enterAnimation,
@@ -300,6 +303,7 @@ export class NegocioPage {
     modal.onWillDismiss().then(async () => {
       this.cuenta = await this.negocioService.getCart(this.uid, this.negocio.id)
       this.productos.forEach(async(p) => p.productos = await this.negocioService.comparaCart(p.productos))
+      this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
     })
     return await modal.present()
   }
@@ -375,6 +379,7 @@ export class NegocioPage {
   }
 
   async verInfo() {
+    if (this.back) this.back.unsubscribe()
     const datos: DatosParaCuenta = {
       logo: this.negocio.foto,
       direccion: this.negocio.direccion,
@@ -382,11 +387,16 @@ export class NegocioPage {
       idNegocio: this.negocio.id,
       categoria: this.categoria
     }
+
     const modal = await this.modalController.create({
       component: InfoSucursalPage,
       enterAnimation,
       leaveAnimation,
       componentProps : {datos, abierto: this.negocio.abierto}
+    })
+    
+    modal.onWillDismiss().then(() => {
+      this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
     })
 
     return await modal.present()
@@ -400,11 +410,15 @@ export class NegocioPage {
 
   // Login
   async presentLogin() {
+    if (this.back) this.back.unsubscribe()
     const modal = await this.modalController.create({
       component: LoginPage,
       cssClass: 'my-custom-modal-css',
     })
-    modal.onWillDismiss().then(() => this.uid = this.uidService.getUid())
+    modal.onWillDismiss().then(() => {
+      this.uid = this.uidService.getUid()
+      this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
+    })
     return await modal.present()
   }
 

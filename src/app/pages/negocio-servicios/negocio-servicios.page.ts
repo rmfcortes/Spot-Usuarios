@@ -61,7 +61,7 @@ export class NegocioServiciosPage{
 
   cargandoProds = true
 
-  backButtonSubscription: Subscription
+  back: Subscription
 
   origen_categoria = false
 
@@ -81,7 +81,7 @@ export class NegocioServiciosPage{
     this.origen_categoria = history.state.origen_categoria
     this.categoria = this.activatedRoute.snapshot.paramMap.get('cat')
     this.getNegocio()
-    this.backButtonSubscription = this.platform.backButton.subscribeWithPriority(9999, () => {
+    this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
       this.regresar()
     })
   }
@@ -158,7 +158,7 @@ export class NegocioServiciosPage{
         if (event) event.target.complete()
         resolve()
       }
-    });
+    })
   }
 
   async evaluaServicios(servicios, event?) {
@@ -207,7 +207,7 @@ export class NegocioServiciosPage{
       if (event) event.target.complete()
       this.cargandoProds = false
       resolve()
-    });
+    })
   }
 
   loadDataLista(event) {
@@ -293,12 +293,18 @@ export class NegocioServiciosPage{
   // Acciones
 
   async verServicio(servicio: Producto) {
+    if (this.back) this.back.unsubscribe()
     const modal = await this.modalController.create({
       component: ServicioPage,
       enterAnimation,
       leaveAnimation,
       componentProps: {servicio, whats: this.whats}
     })
+
+    modal.onWillDismiss().then(() => {
+      this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
+    })
+
     this.negServicios.setConsulta(servicio, this.categoria, this.negocio.id, this.negocio.nombre)
     return await modal.present()
   }
@@ -316,6 +322,7 @@ export class NegocioServiciosPage{
   }
 
   async verInfo() {
+    if (this.back) this.back.unsubscribe()
     const datos: DatosParaCuenta = {
       logo: this.negocio.foto,
       direccion: this.negocio.direccion,
@@ -329,6 +336,10 @@ export class NegocioServiciosPage{
       componentProps : {datos, abierto: this.negocio.abierto}
     })
 
+    modal.onWillDismiss().then(() => {
+      this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
+    })
+
     return await modal.present()
   }
 
@@ -340,7 +351,7 @@ export class NegocioServiciosPage{
   // Salida
 
   regresar() {
-    if (this.backButtonSubscription) this.backButtonSubscription.unsubscribe()
+    if (this.back) this.back.unsubscribe()
     if (this.origen_categoria) this.router.navigate(['/categoria', this.categoria])
     else this.router.navigate(['/home'])
   }

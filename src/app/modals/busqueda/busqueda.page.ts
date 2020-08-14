@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
 import { ModalController, Platform } from '@ionic/angular';
+import { Component, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import { InfoSucursalPage } from '../info-sucursal/info-sucursal.page';
@@ -61,6 +61,8 @@ export class BusquedaPage implements OnInit {
 
   batch: number
 
+  reOpenSub: Subscription
+
   constructor(
     private router: Router,
     private platform: Platform,
@@ -78,20 +80,29 @@ export class BusquedaPage implements OnInit {
   ngOnInit() {
     this.getBatch()
     this.getAnteriores()
+    this.getLastResults()
     this.uid = this.uidService.getUid()
+  }
+
+  getLastResults() {
+    this.lista = this.busquedaService.getLista()
+    this.negocios = this.busquedaService.getNegocios()
+    this.servicios = this.busquedaService.getServicios()
+    this.productos = this.busquedaService.getProductos()
+    this.pagina_algolia = this.busquedaService.getPagina()
+    if (this.negocios.resultados.length > 0 ||
+        this.productos.resultados.length > 0 ||
+        this.servicios.resultados.length > 0 ||
+        this.pagina_algolia > 0) this.pristine = false
   }
 
   ionViewDidEnter() {
     const el: any = document.getElementById('inputSearch')
     el.setFocus()
-    this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-      this.regresar()
-    })
+    this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
   }  
   
   ionViewDidLeave() {
-    const el: any = document.getElementById('inputSearch')
-    el.setFocus()
     if (this.back) this.back.unsubscribe()
   }
 
@@ -106,6 +117,7 @@ export class BusquedaPage implements OnInit {
 
   paginaChange(pagina: string) {
     this.lista = pagina
+    this.busquedaService.setLista(pagina)
     if (this.pagina_algolia > 0) {
       switch (pagina) {
         case 'productos':
@@ -137,7 +149,10 @@ export class BusquedaPage implements OnInit {
     this.pristine = false
     this.buscando = true
     this.busqueda.pagina = this.pagina_algolia
-    this.busquedaService.buscar(this.busqueda)
+    this.ultimas_busquedas.unshift(this.busqueda.texto)
+    this.ultimas_busquedas = this.ultimas_busquedas.filter((value, index, self) => self.indexOf(value) === index)
+    if (this.ultimas_busquedas.length > 20) this.ultimas_busquedas.splice(20)
+    this.busquedaService.buscar(this.busqueda, this.ultimas_busquedas)
     this.busquedaService.esperaResultados(this.busqueda, this.lista, this.batch)
     .then(resultado => {
       this.pagina_algolia++
@@ -209,6 +224,8 @@ export class BusquedaPage implements OnInit {
     producto.cantidad = 1
     producto.total = producto.precio
     producto.complementos = []
+
+    if (this.back) this.back.unsubscribe()
     const modal = await this.modalCtrl.create({
       component: ProductoPage,
       enterAnimation,
@@ -219,6 +236,8 @@ export class BusquedaPage implements OnInit {
       if (resp.data) {
         producto.cantidad = resp.data
         setTimeout(() => this.verCarrito(producto, productoAlgolia), 100)
+      } else {
+        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
       }
     })
     this.categoriaService.setVisitaNegocio(this.uid, productoAlgolia.idNegocio)
@@ -229,7 +248,7 @@ export class BusquedaPage implements OnInit {
   async verCarrito(producto: Producto, productoAlgolia: ProductoAlgolia) {
     const idNegocio = productoAlgolia.idNegocio
     producto = await this.cartService.updateCart(idNegocio, producto)
-
+    if (this.back) this.back.unsubscribe()
     const modal = await this.modalCtrl.create({
       component: CuentaPage,
       enterAnimation,
@@ -239,8 +258,11 @@ export class BusquedaPage implements OnInit {
 
     modal.onWillDismiss().then(resp => {
       if (resp.data && resp.data === 'add') {
-        setTimeout(() => this.regresar(), 750)
+        this.uidService.setModal(true)
+        setTimeout(() => this.modalCtrl.dismiss(), 500)
         this.router.navigate([`negocio/${productoAlgolia.categoria}/${productoAlgolia.idNegocio}`])
+      } else {
+        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
       }
     })
 
@@ -263,29 +285,36 @@ export class BusquedaPage implements OnInit {
       this.commonService.presentAlert('', 'La publicación de este servicio ha sido pausada')
       return
     }
+    if (this.back) this.back.unsubscribe()
     const modal = await this.modalCtrl.create({
       component: ServicioPage,
       enterAnimation,
       leaveAnimation,
       componentProps: {producto, categoria: productoAlgolia.categoria, idNegocio: productoAlgolia.idNegocio}
     })
+
+    modal.onWillDismiss().then(() => {
+      this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
+    })
+
     this.categoriaService.setVisitaNegocio(this.uid, productoAlgolia.idNegocio)
     this.categoriaService.setVisitaCategoria(this.uid, productoAlgolia.categoria)
     return await modal.present()
   }
 
   verNegocio(negocio: NegocioAlgolia)  {
-    const modal = document.getElementsByClassName('sc-ion-modal-md-h')[0]
-    this.uidService.setModal(modal)
+    this.uidService.setModal(true)
+    if (this.back) this.back.unsubscribe()
     if (this.uid) {
       this.categoriaService.setVisitaNegocio(this.uid, negocio.objectID)
       this.categoriaService.setVisitaCategoria(this.uid, negocio.categoria)
     }
     this.router.navigate([`negocio/${negocio.categoria}/${negocio.objectID}`])
-    modal.setAttribute('style', 'display: none !important')
+    setTimeout(() => this.modalCtrl.dismiss(), 500) 
   }
 
   async verDetallesTienda(abierto: boolean, producto: ProductoAlgolia) {
+    if (this.back) this.back.unsubscribe()
     const direccion = await this.productoService.getDireccionNegocio(producto.idNegocio)
     const datos: DatosParaCuenta = {
       logo: '',
@@ -301,6 +330,10 @@ export class BusquedaPage implements OnInit {
       componentProps : {datos, abierto, verHorario: true}
     })
 
+    modal.onWillDismiss().then(() => {
+      this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
+    })
+
     return await modal.present()
   }
   
@@ -310,18 +343,21 @@ export class BusquedaPage implements OnInit {
   }
 
   async presentLogin() {
+    if (this.back) this.back.unsubscribe()
     const modal = await this.modalCtrl.create({
       component: LoginPage,
       cssClass: 'my-custom-modal-css',
     })
-    modal.onWillDismiss().then(() => this.uid = this.uidService.getUid())
+    modal.onWillDismiss().then(() => {
+      this.uid = this.uidService.getUid()
+      this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
+    })
     return await modal.present()
   }
 
   regresar() {
     if (this.busqueda.id) this.busquedaService.borraResultados(this.busqueda.id)
     if (this.back) this.back.unsubscribe()
-    this.uidService.setModal(null)
     this.modalCtrl.dismiss()
   }
 
@@ -341,9 +377,7 @@ export class BusquedaPage implements OnInit {
   trackNegocios(index:number, el: NegocioAlgolia): string {
     return el.objectID
   }
-
 }
-
 
 export interface Busqueda {
   pagina?: number

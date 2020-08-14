@@ -8,6 +8,12 @@ import { UidService } from './uid.service';
 })
 export class OfertasService {
 
+  subCategoria = 'todos'
+  categoria = 'todas'
+  ofertas: Oferta[]
+  lastKey: string
+  noMore = false
+
   constructor(
     private db: AngularFireDatabase,
     private uidService: UidService,
@@ -83,6 +89,54 @@ export class OfertasService {
           }
         }
       })
+    }
+
+    setOfertas(ofertas: Oferta[]) {
+      this.ofertas = ofertas
+    }
+
+    setSubCategoria(sub: string) {
+      this.subCategoria = sub
+    }
+
+    setCategoria(cat: string) {
+      this.categoria = cat
+    }
+
+    setLasKey(key: string){
+      this.lastKey = key
+    }
+
+    setNoMore(value: boolean) {
+      this.noMore = value
+    }
+
+    getLastOfertas() {
+      return this.ofertas
+    }
+
+    getSubCategoria() {
+      return this.subCategoria
+    }
+
+    getCategoria() {
+      return this.categoria
+    }
+
+    getLastKey() {
+      return this.lastKey
+    }
+
+    getNoMore() {
+      return this.noMore
+    }
+
+    resetOfertas(){
+      this.ofertas = []
+      this.lastKey = ''
+      this.categoria = 'todas'
+      this.subCategoria = 'todos'
+      this.noMore = false
     }
 
 }

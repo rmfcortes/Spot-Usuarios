@@ -24,6 +24,9 @@ export class BusquedaService {
     resultados: []
   }
 
+  pagina_algolia = 0
+  lista = 'productos'
+
   constructor(
     private db: AngularFireDatabase,
     private uidService: UidService,
@@ -59,13 +62,13 @@ export class BusquedaService {
     })
   }
 
-  buscar(busqueda: Busqueda) {
+  buscar(busqueda: Busqueda, busquedas: string[]) {
     const region = this.uidService.getRegion()
     const uid = this.uidService.getUid()
     busqueda.id = this.db.createPushId() 
     this.db.object(`busqueda/${region}/${busqueda.id}`).set(busqueda)
     if (uid) {
-      this.db.object(`usuarios/${uid}/busquedas/${busqueda.texto}`).set(busqueda.texto)
+      this.db.object(`usuarios/${uid}/busquedas`).set(busquedas)
       this.db.object(`usuarios/${uid}/ultima_busqueda`).set(busqueda.id)
     }
   }
@@ -75,8 +78,11 @@ export class BusquedaService {
       const region = this.uidService.getRegion()
       const resSub = this.db.object(`busqueda_resultados/${region}/${busqueda.id}`).valueChanges()
       .subscribe((resultado: any) => {
-        if (resultado && resultado[lista] && resultado[lista][busqueda.pagina]) 
+        if (resultado && resultado[lista] && resultado[lista][busqueda.pagina]) {
           resolve(resultado[lista][busqueda.pagina])
+          this.lista = lista
+          this.pagina_algolia++
+        }
         if (resultado && resultado['negocios']) {
           resSub.unsubscribe()
 
@@ -122,6 +128,11 @@ export class BusquedaService {
       hayMas: true,
       resultados: []
     }
+    this.pagina_algolia = 0
+  }
+
+  setLista(lista: string) {
+    this.lista = lista
   }
 
   getNegocios() {
@@ -132,6 +143,12 @@ export class BusquedaService {
   }  
   getServicios() {
     return this.servicios
+  }
+  getPagina() {
+    return this.pagina_algolia
+  }  
+  getLista() {
+    return this.lista
   }
 
   borraResultados(idBusqueda) {

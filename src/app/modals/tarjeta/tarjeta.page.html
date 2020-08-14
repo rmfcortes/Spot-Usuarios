@@ -5,7 +5,7 @@
                 <ion-icon slot="start" name="chevron-back"></ion-icon>
             </ion-button>
         </ion-buttons>
-        <ion-title style="font-weight: 700;">Tarjeta de crédito/débito</ion-title>
+        <ion-title style="font-weight: 700;">Tarjeta de crédito / débito</ion-title>
     </ion-toolbar>
 </ion-header>
 
@@ -14,7 +14,7 @@
         <form id="payment-form" #forma="ngForm" (ngSubmit)="agregarTarjeta()">
             <ion-card>
                 <ion-item lines="none">
-                    <ion-label position="floating">Nombre</ion-label>
+                    <ion-label position="floating">Titular de tarjeta</ion-label>
                     <ion-input (keyup.enter)="$event.target.blur()"  [(ngModel)]="nombre" type="text" placeholder="Juan Perez García" required name="nombre"></ion-input>
                 </ion-item>                
             </ion-card>
@@ -22,7 +22,7 @@
                 <div id="card"><!--Stripe.js injects the Card Element--></div>
             </ion-card>
             <p id="card-error" role="alert"></p>
-            <ion-button type="submit" id="button" expand="block" class="gradient--" [disabled]="loading || cardInvalid || !forma.valid || !secret || !cardReady" shape="round" style="margin-top: 2rem; font-weight: 700;">
+            <ion-button type="submit" id="button" expand="block" class="gradient--" [disabled]="loading || cardInvalid || !forma.valid || !cardReady" shape="round" style="margin-top: 2rem; font-weight: 700;">
                 Guardar tarjeta
                 <ion-spinner slot="end" *ngIf="loading" name="dots"></ion-spinner>
             </ion-button>

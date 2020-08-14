@@ -317,6 +317,7 @@ export class CategoriaPage implements OnInit, OnDestroy{
 
   async verNegocio(negocio: Negocio) {
     const uid = this.uidService.getUid()
+    if (this.back) this.back.unsubscribe()
     if (uid) this.categoriaService.setVisitaNegocio(uid, negocio.id)
     this.categoriaService.setVisita(negocio.id)
     if (negocio.tipo === 'productos') {
@@ -327,10 +328,17 @@ export class CategoriaPage implements OnInit, OnDestroy{
   }
 
   async verOfertas() {
+    if (this.back) this.back.unsubscribe()
     const modal = await this.modalController.create({
       component: OfertasPage,
       componentProps: {categoria: this.categoria, categorias: this.categorias,
                     subCategoria: this.subCategoria, batch: this.batchOfertas, subCategorias: this.subCategorias}
+    })
+
+    modal.onWillDismiss().then(() => {
+      this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
+        this.router.navigate(['/home'])
+      })
     })
 
     return modal.present()
@@ -338,12 +346,14 @@ export class CategoriaPage implements OnInit, OnDestroy{
 
   async irAOferta(oferta: Oferta) {
     const uid = this.uidService.getUid()
+    if (this.back) this.back.unsubscribe()
     if (uid) this.categoriaService.setVisitaNegocio(uid, oferta.idNegocio)
     this.categoriaService.setVisita(oferta.idNegocio)
     this.router.navigate(['/negocio', oferta.categoria, oferta.idNegocio], {state: {origen_categoria: true}})
   }
 
   async verProducto(oferta: Oferta, tipo: string) {
+    if (this.back) this.back.unsubscribe()
     if (tipo === 'oferta') tipo = oferta.tipo
     if (tipo === 'productos') {
       this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`])
@@ -358,6 +368,7 @@ export class CategoriaPage implements OnInit, OnDestroy{
   }
 
   async verCategorias() {
+    if (this.back) this.back.unsubscribe()
     const modal = await this.modalController.create({
       component: CategoriasPage,
       cssClass: 'modal-categorias',
@@ -368,12 +379,18 @@ export class CategoriaPage implements OnInit, OnDestroy{
 
     modal.onWillDismiss().then(resp => {
       if (resp.data) this.irACategoria(resp.data)
+      else {
+        this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
+            this.router.navigate(['/home'])
+          })
+      }
     })
 
     return await modal.present()
   }
 
   irACategoria(categoria: string) {
+    if (this.back) this.back.unsubscribe()
     if (this.uid) this.categoriaService.setVisitaCategoria(this.uid, categoria)
     this.router.navigate(['/categoria', categoria])
   }

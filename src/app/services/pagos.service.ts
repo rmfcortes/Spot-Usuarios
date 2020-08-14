@@ -57,7 +57,11 @@ export class PagosService {
       }
       if (this.platform.is ('cordova')) {
         this.http.post('https://us-central1-revistaojo-9a8d3.cloudfunctions.net/request', body, {Authorization: 'secret-key-test'})
-        .then(res => resolve(res),
+        .then((res: HTTPResponse) => {
+          if (res.status === 200) resolve(res.data)
+          if (res.error) reject(res.error)
+          reject('Lo sentimos algo salió mal, no pudimos registrar tu tarjeta')
+        },
          err => {
            const region = this.uidService.getRegion()
            const error = {
