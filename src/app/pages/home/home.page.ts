@@ -445,7 +445,7 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   async muestraProducto(oferta: Oferta) {
-    if (oferta.tipo === 'servicios') return
+    if (oferta.tipo === 'servicios') return this.deOfertaAServicio(oferta)
     if (oferta.agotado) {
       this.alertService.presentAlert('Producto agotado', 'Lo sentimos, este producto está temporalmente agotado')
       return
@@ -473,6 +473,10 @@ export class HomePage implements OnInit, OnDestroy {
       componentProps: {producto, idNegocio: oferta.idNegocio, busqueda: true}
     })
     modal.onWillDismiss().then(async (resp) => {
+      if (resp.data && resp.data === 'ver_mas') {
+        this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`])
+        return
+      }
       if (resp.data) {
         producto.cantidad = resp.data
         setTimeout(() => this.verCarrito(producto, oferta), 100)
@@ -497,6 +501,10 @@ export class HomePage implements OnInit, OnDestroy {
     return await modal.present()
   }
 
+  deOfertaAServicio(serv: any) {
+    this.muestraServicio(serv)
+  }
+
   async muestraServicio(servicio: MasVendido) {
     if (servicio.agotado) {
       this.alertService.presentAlert('Servicio agotado', 'Lo sentimos, este servicio está temporalmente agotado')
@@ -508,21 +516,23 @@ export class HomePage implements OnInit, OnDestroy {
       this.alertService.presentAlert('', 'Esta tienda esta cerrada, por favor vuelve más tarde')
       return
     }    
-    let producto = await this.productoService.getProducto(servicio.idNegocio, servicio.id, 'servicios')
-    if (!producto) {
-      this.alertService.presentAlert('', 'La publicación de este servicio ha sido pausada')
-      return
-    }
 
     if (this.back) this.back.unsubscribe()
     const modal = await this.modalController.create({
       component: ServicioPage,
       enterAnimation,
       leaveAnimation,
-      componentProps: {producto, categoria: servicio.categoria, idNegocio: servicio.idNegocio}
+      componentProps: {servicio, categoria: servicio.categoria, idNegocio: servicio.idNegocio}
     })
 
-    modal.onDidDismiss().then(() => {
+    modal.onWillDismiss().then(resp => {
+      if (resp.data && resp.data === 'ver_mas') {
+        this.router.navigate([`negocio-servicios/${servicio.categoria}/${servicio.idNegocio}`])
+      }
+    })
+
+    modal.onDidDismiss().then(resp => {
+      if (resp.data && resp.data === 'ver_mas') return
       setTimeout(() => {
         this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
           const nombre = 'app'

@@ -119,6 +119,7 @@ export class CategoriaPage implements OnInit, OnDestroy{
   }
 
   ionViewWillEnter() {
+    this.categoria = this.activatedRoute.snapshot.paramMap.get('cat')
     this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
       this.router.navigate(['/home'])
     })
@@ -368,7 +369,8 @@ export class CategoriaPage implements OnInit, OnDestroy{
     const modal = await this.modalController.create({
       component: OfertasPage,
       componentProps: {categoria: this.categoria, categorias: this.categorias,
-                    subCategoria: this.subCategoria, batch: this.batchOfertas, subCategorias: this.subCategorias}
+                    subCategoria: this.subCategoria, batch: this.batchOfertas, subCategorias: this.subCategorias,
+                    fromCats: true}
     })
 
     modal.onDidDismiss().then(resp => {
@@ -412,6 +414,10 @@ export class CategoriaPage implements OnInit, OnDestroy{
       componentProps: {producto, idNegocio: oferta.idNegocio, busqueda: true}
     })
     modal.onWillDismiss().then(async (resp) => {
+      if (resp.data && resp.data === 'ver_mas') {
+        this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`], {state: {origen_categoria: true}})
+        return
+      }
       if (resp.data) {
         producto.cantidad = resp.data
         setTimeout(() => this.verCarrito(producto, oferta), 100)
@@ -447,21 +453,23 @@ export class CategoriaPage implements OnInit, OnDestroy{
       this.alertService.presentAlert('', 'Esta tienda esta cerrada, por favor vuelve más tarde')
       return
     }    
-    let producto = await this.productoService.getProducto(servicio.idNegocio, servicio.id, 'servicios')
-    if (!producto) {
-      this.alertService.presentAlert('', 'La publicación de este servicio ha sido pausada')
-      return
-    }
 
     if (this.back) this.back.unsubscribe()
     const modal = await this.modalController.create({
       component: ServicioPage,
       enterAnimation,
       leaveAnimation,
-      componentProps: {producto, categoria: servicio.categoria, idNegocio: servicio.idNegocio}
+      componentProps: {servicio, categoria: servicio.categoria, idNegocio: servicio.idNegocio}
     })
 
-    modal.onDidDismiss().then(() => {
+    modal.onWillDismiss().then(resp => {
+      if (resp.data && resp.data === 'ver_mas') {
+        this.router.navigate([`negocio-servicios/${servicio.categoria}/${servicio.idNegocio}`], {state: {origen_categoria: true}})
+      }
+    })
+
+    modal.onDidDismiss().then(resp => {
+      if (resp.data && resp.data === 'ver_mas') return
       setTimeout(() => {
         this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
           const nombre = 'app'
@@ -469,7 +477,6 @@ export class CategoriaPage implements OnInit, OnDestroy{
         })
       }, 100)
     })
-
     this.categoriaService.setVisitaNegocio(this.uid, servicio.idNegocio)
     this.categoriaService.setVisitaCategoria(this.uid, servicio.categoria)
     return await modal.present()

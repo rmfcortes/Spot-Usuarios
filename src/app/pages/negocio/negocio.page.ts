@@ -279,7 +279,7 @@ export class NegocioPage {
       component: ProductoPage,
       enterAnimation,
       leaveAnimation,
-      componentProps: {producto, idNegocio: this.negocio.id}
+      componentProps: {producto, idNegocio: this.negocio.id, fromProdPage: true}
     })
     modal.onWillDismiss().then(async (resp) => {
       if (resp.data) {

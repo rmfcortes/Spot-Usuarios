@@ -16,6 +16,7 @@ import { Producto, ListaComplementos, ListaComplementosElegidos, Complemento } f
 export class ProductoPage implements OnInit {
 
   @ViewChild('brinca', {static: false}) inputCant: ElementRef
+  @Input() fromProdPage: boolean
   @Input() producto: Producto
   @Input() idNegocio: string
   @Input() modifica: boolean
@@ -177,7 +178,6 @@ export class ProductoPage implements OnInit {
     this.producto.total = this.producto.cantidad * unidad
   }
 
-
   // Salida
 
   agregarProducto() {
@@ -209,6 +209,11 @@ export class ProductoPage implements OnInit {
     this.producto.cantidad = this.producto.cantidad
     this.producto.complementos = this.elegidos
     this.modalCtrl.dismiss(this.producto.cantidad)
+  }
+
+  verMas() {
+    if (this.back) this.back.unsubscribe()
+    this.modalCtrl.dismiss('ver_mas')
   }
 
   cerrar() {

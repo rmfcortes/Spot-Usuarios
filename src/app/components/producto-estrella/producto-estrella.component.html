@@ -15,17 +15,11 @@
                     </ion-col>
                     <ion-col size="12">
                         <ion-item lines="none">
-                            <ion-label class="ion-text-wrap">
+                            <ion-label>
                                 <!-- <h2>{{(item.nombre.length > 15) ? (item.nombre | slice:0:15) + '...' : item.nombre}}</h2> -->
-                                <div class="nombreProducto">
-                                    <strong>{{item.nombre}}</strong>
-                                </div>
-                                <div style="height: 0.5rem"></div>
-                                <div class="nombreNegocio">
-                                    {{item.nombreNegocio}}
-                                </div>
-                                <div style="height: 0.5rem"></div>
-                                <h2 *ngIf="item.precio" style="color: var(--ion-color-primary)">{{item.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}</h2>
+                                <h3>{{item.nombre}}</h3>
+                                <h3 style="font-weight: 400; color: var(--ion-color-medium)">{{item.nombreNegocio}}</h3>
+                                <h3 style="font-weight: 700; color: var(--ion-color-primary)">{{item.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}</h3>
                             </ion-label>
                         </ion-item>
                     </ion-col>

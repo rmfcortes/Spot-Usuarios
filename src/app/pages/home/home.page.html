@@ -143,7 +143,7 @@
 
         <!-- + consultados -->
     <div *ngIf="pedidosReady && catsReady && promosReady && vendidosReady && masConsultados && masConsultados.length > 0">
-        <app-producto-estrella [titulo]="'Servicios más consultados'" [masVendidos]="masConsultados" (verProd)="muestraProducto($event)"></app-producto-estrella>
+        <app-producto-estrella [titulo]="'Servicios más consultados'" [masVendidos]="masConsultados" (verProd)="muestraServicio($event)"></app-producto-estrella>
     </div>
 
 

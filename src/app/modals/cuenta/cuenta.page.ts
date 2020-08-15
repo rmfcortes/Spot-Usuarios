@@ -221,7 +221,7 @@ export class CuentaPage implements OnInit {
       component: ProductoPage,
       enterAnimation,
       leaveAnimation,
-      componentProps: {producto, idNegocio: this.idNegocio, modifica: true}
+      componentProps: {producto, idNegocio: this.idNegocio, modifica: true, fromProdPage: true}
     })
 
     modal.onWillDismiss().then(async (resp) => {

@@ -39,6 +39,7 @@ export class OfertasPage implements OnInit {
   @Input() categoria: string
   @Input() categorias: string[]
   @Input() subCategoria: string
+  @Input() fromCats: boolean
 
   lastKey = ''
   ofertasReady = false
@@ -171,6 +172,13 @@ export class OfertasPage implements OnInit {
       componentProps: {producto, idNegocio: oferta.idNegocio, busqueda: true}
     })
     modal.onWillDismiss().then(resp => {
+      if (resp.data && resp.data === 'ver_mas') {
+        this.uidSerice.setOfertas(true)
+        setTimeout(() => this.modalCtrl.dismiss('en_negociopage'), 500)
+        if (this.fromCats) this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`], {state: {origen_categoria: true}})
+        else  this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`])
+        return
+      }
       if (resp.data) {
         producto.cantidad = resp.data
         setTimeout(() => this.verCarrito(producto, oferta), 100)
@@ -208,8 +216,9 @@ export class OfertasPage implements OnInit {
     modal.onWillDismiss().then(resp => {
       if (resp.data && resp.data === 'add') {
         this.uidSerice.setOfertas(true)
-        this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`])
         setTimeout(() => this.modalCtrl.dismiss('en_negociopage'), 500)
+        if (this.fromCats) this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`], {state: {origen_categoria: true}})
+        else  this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`])
       }
     })
 
@@ -245,7 +254,6 @@ export class OfertasPage implements OnInit {
 
     return await modal.present()
   }
-
 
   async verCategorias() {
     if (this.back) this.back.unsubscribe()

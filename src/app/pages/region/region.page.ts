@@ -34,7 +34,7 @@ export class RegionPage implements OnInit {
     modal.onWillDismiss().then(resp => {
       if (resp.data) {
         this.regionService.setRegion(resp.data)
-        this.router.navigate(['/home'])
+        this.router.navigate(['/home'], { replaceUrl: true })
       }
     })
     return await modal.present()

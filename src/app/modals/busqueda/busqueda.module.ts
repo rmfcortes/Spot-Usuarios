@@ -10,6 +10,7 @@ import { LoginPageModule } from '../login/login.module';
 import { InfoSucursalPageModule } from '../info-sucursal/info-sucursal.module';
 import { CuentaPageModule } from '../cuenta/cuenta.module';
 import { ServicioPageModule } from '../servicio/servicio.module';
+import { NgxMasonryModule } from 'ngx-masonry';
 
 @NgModule({
   imports: [
@@ -18,6 +19,7 @@ import { ServicioPageModule } from '../servicio/servicio.module';
     IonicModule,
     LoginPageModule,
     CuentaPageModule,
+    NgxMasonryModule,
     ServicioPageModule,
     ProductoPageModule,
     InfoSucursalPageModule,

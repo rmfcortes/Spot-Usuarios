@@ -2,6 +2,8 @@ import { ModalController, Platform } from '@ionic/angular';
 import { Component, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 
+import { NgxMasonryComponent, NgxMasonryOptions } from 'ngx-masonry';
+
 import { InfoSucursalPage } from '../info-sucursal/info-sucursal.page';
 import { ServicioPage } from '../servicio/servicio.page';
 import { ProductoPage } from '../producto/producto.page';
@@ -30,6 +32,10 @@ import { Router } from '@angular/router';
   styleUrls: ['./busqueda.page.scss'],
 })
 export class BusquedaPage implements OnInit {
+
+  public myOptions: NgxMasonryOptions = {
+    gutter: 10
+  }
 
   busqueda: Busqueda = {texto: ''}
   buscando = false
@@ -233,6 +239,12 @@ export class BusquedaPage implements OnInit {
       componentProps: {producto, idNegocio: productoAlgolia.idNegocio, busqueda: true}
     })
     modal.onWillDismiss().then(resp => {
+      if (resp.data && resp.data === 'ver_mas') {
+        this.uidService.setModal(true)
+        setTimeout(() => this.modalCtrl.dismiss('en_negociopage'), 500)
+        this.router.navigate([`negocio/${productoAlgolia.categoria}/${productoAlgolia.idNegocio}`])
+        return
+      }
       if (resp.data) {
         producto.cantidad = resp.data
         setTimeout(() => this.verCarrito(producto, productoAlgolia), 100)
@@ -294,22 +306,29 @@ export class BusquedaPage implements OnInit {
       this.commonService.presentAlert('', 'Esta tienda esta cerrada, por favor vuelve más tarde')
       return
     }    
-    let producto = await this.productoService.getProducto(productoAlgolia.idNegocio, productoAlgolia.objectID, 'servicios')
-    if (!producto) {
-      this.commonService.presentAlert('', 'La publicación de este servicio ha sido pausada')
-      return
-    }
     if (this.back) this.back.unsubscribe()
     const modal = await this.modalCtrl.create({
       component: ServicioPage,
       enterAnimation,
       leaveAnimation,
-      componentProps: {producto, categoria: productoAlgolia.categoria, idNegocio: productoAlgolia.idNegocio}
+      componentProps: {servicio: productoAlgolia, categoria: productoAlgolia.categoria, idNegocio: productoAlgolia.idNegocio}
     })
 
-    modal.onDidDismiss().then(() => {
+    modal.onWillDismiss().then(resp => {
+      if (resp.data && resp.data === 'ver_mas') {
+        this.uidService.setModal(true)
+        setTimeout(() => this.modalCtrl.dismiss('en_negociopage'), 500)
+        this.router.navigate([`negocio-servicios/${productoAlgolia.categoria}/${productoAlgolia.idNegocio}`])
+      }
+    })
+
+    modal.onDidDismiss().then(resp => {
+      if (resp.data && resp.data === 'ver_mas') return
       setTimeout(() => {
-        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
+        this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
+          const nombre = 'app'
+          navigator[nombre].exitApp()
+        })
       }, 100)
     })
 

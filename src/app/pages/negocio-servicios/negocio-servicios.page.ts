@@ -298,7 +298,7 @@ export class NegocioServiciosPage{
       component: ServicioPage,
       enterAnimation,
       leaveAnimation,
-      componentProps: {servicio, whats: this.whats}
+      componentProps: {servicio, whats: this.whats, fromServPage: true}
     })
 
     modal.onDidDismiss().then(() => {

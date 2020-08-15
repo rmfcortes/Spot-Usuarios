@@ -16,6 +16,7 @@ import { Producto } from 'src/app/interfaces/producto';
 })
 export class ServicioPage implements OnInit {
 
+  @Input() fromServPage: boolean
   @Input() servicio: Producto
   @Input() categoria: string
   @Input() idNegocio: string
@@ -50,6 +51,11 @@ export class ServicioPage implements OnInit {
     ).catch(err => {
       this.alertService.presentAlert('Error', err)
     })
+  }
+
+  verMas() {
+    if (this.back) this.back.unsubscribe()
+    this.modalCtrl.dismiss('ver_mas')
   }
 
   regresar() {

@@ -210,7 +210,7 @@ export class AvancesPage implements OnInit {
     })
     .catch(() => {
       this.alertService.presentAlert('', 'Este pedido ha sido entregado o cancelado, por favor revisa en tu historial')
-      .then(() => this.router.navigate(['/home']))
+      .then(() => this.router.navigate(['/home'], { replaceUrl: true }))
     })
   }
 
@@ -474,7 +474,7 @@ export class AvancesPage implements OnInit {
     if (this.entregadoSub) this.entregadoSub.unsubscribe()
     if (this.repartidorSub) this.repartidorSub.unsubscribe()
     this.pedidoService.trackAvances(this.pedido.id).query.ref.off('child_added')
-    this.router.navigate(['/home'])
+    this.router.navigate(['/home'], { replaceUrl: true })
   }
 
   ionViewWillLeave() {

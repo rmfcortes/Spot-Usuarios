@@ -43,8 +43,116 @@
 
   <!-- Lista productos -->
   <div *ngIf="lista === 'productos'">
-    <ion-card style="padding-bottom: 1rem;" *ngIf="productos.resultados.length > 0">
-      <ion-item *ngFor="let prod of productos.resultados; let y = index; trackBy: trackProducts" style="--padding-start: 0; margin-top: 1rem; cursor: pointer;" lines="none" detail (click)="muestraProducto(prod)">
+      <ngx-masonry [options]="myOptions" style="width: 100%; padding: 0.75rem;" *ngIf="productos.resultados.length > 0">
+        <div ngxMasonryItem *ngFor="let prod of productos.resultados; trackBy: trackProducts" style="width: 44%; margin-bottom: 0.5rem;">
+            <ng-container *ngIf="!prod.agotado; else agotadoTemp">
+                <ion-card class="card radius10 background-card" style="cursor: pointer;" (click)="muestraProducto(prod)">
+                    <img [src]="prod.url" width="100%">
+                    <div class="price-box" *ngIf="prod.precio">
+                        {{prod.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}
+                    </div>
+                    <div class="promo-box-masonry" *ngIf="prod.descuento">
+                        {{prod.descuento}}%
+                    </div>                        
+                    <div class="promo-box-masonry" *ngIf="prod.dosxuno">
+                        2x1
+                    </div>
+                    <h6 class="ion-text-wrap" style="margin: 0.5rem 0.5rem 1rem 0.5rem">{{prod.nombre}}</h6>
+                </ion-card>                                
+            </ng-container>
+            <ng-template #agotadoTemp>
+                <ion-card class="card radius10 background-card" style="cursor: pointer;" (click)="muestraProducto(prod)">
+                    <div style="position: relative;">
+                        <img [src]="prod.url" class="agotado" width="100%">
+                        <ion-badge color="dark" class="centrar" mode="ios">Agotado</ion-badge>
+                    </div>
+                    <div class="price-box" style="background: var(--ion-color-medium);" *ngIf="prod.precio">
+                        {{prod.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}
+                    </div>
+                    <h6 class="ion-text-wrap" style="margin: 0 0.5rem 1rem 0.5rem">{{prod.nombre}}</h6>
+                </ion-card>                
+            </ng-template>
+        </div>
+    </ngx-masonry>
+    <!-- <ion-item *ngFor="let prod of productos.resultados; let y = index; trackBy: trackProducts" style="--padding-start: 0; margin-top: 1rem; cursor: pointer;" lines="none" detail (click)="muestraProducto(prod)">
+        <ion-grid class="ion-no-padding">
+            <ion-row>
+                <ion-col size="4">
+                    <ion-img [src]="prod.url" [ngClass]="{'agotado' : prod.agotado}" (ionImgWillLoad)="ionImgWillLoad($event)"></ion-img>
+                    <div class="promo-box" *ngIf="prod.descuento && !prod.agotado">
+                        {{prod.descuento}}%
+                    </div>                        
+                    <div class="promo-box" *ngIf="prod.dosxuno  && !prod.agotado">
+                        2x1
+                    </div>
+                    <ion-badge class="centrar ion-text-wrap" color="dark" mode="ios" *ngIf="prod.agotado">Agotado</ion-badge>
+                </ion-col>
+                <ion-col size="8">
+                    <ng-container *ngIf="!prod.agotado; else agotadoTemp">                            
+                        <ion-item lines="none">
+                            <ion-label class="ion-text-wrap">
+                                <h2>{{(prod.nombre.length > 25) ? (prod.nombre | slice:0:25) + '...' : prod.nombre}}</h2>
+                                <h2 style="font-weight: 400; color: var(--ion-color-medium);">{{prod.nombreNegocio}}</h2>
+                            </ion-label>
+                            <ion-badge *ngIf="prod.precio" color="primary" mode="ios">{{prod.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}</ion-badge>
+                        </ion-item>
+                    </ng-container>
+                    <ng-template #agotadoTemp>
+                        <ion-item lines="none">
+                            <ion-label class="ion-text-wrap">
+                                <h2 style="color: var(--ion-color-medium);">{{(prod.nombre.length > 25) ? (prod.nombre | slice:0:25) + '...' : prod.nombre}}</h2>
+                                <h2 style="font-weight: 400; color: var(--ion-color-medium);">{{prod.nombreNegocio}}</h2>
+                            </ion-label>
+                            <ion-badge *ngIf="prod.precio" color="medium" mode="ios">{{prod.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}</ion-badge>
+                        </ion-item>
+                    </ng-template>
+                </ion-col>
+            </ion-row>
+        </ion-grid>
+    </ion-item> -->
+    <ion-item lines="none" style="text-align: center;" *ngIf="productos.resultados.length > 0">
+      <ion-label color="medium">No hay más resultados</ion-label>
+    </ion-item>
+    <ion-item lines="none" style="text-align: center;" *ngIf="!pristine && productos.resultados.length === 0 && !buscando">
+      <ion-label color="medium">No hay productos que coincidan con tu búsqueda</ion-label>
+    </ion-item>
+  </div>
+
+
+    <!-- Lista servicios -->
+    <div *ngIf="lista === 'servicios'">
+      <ngx-masonry [options]="myOptions" style="width: 100%; padding: 0.75rem;" *ngIf="servicios.resultados.length > 0">
+        <div ngxMasonryItem *ngFor="let prod of servicios.resultados; trackBy: trackProducts" style="width: 44%; margin-bottom: 0.5rem;">
+            <ng-container *ngIf="!prod.agotado; else agotadoTemp">
+                <ion-card class="card radius10 background-card" style="cursor: pointer;" (click)="muestraServicio(prod)">
+                    <img [src]="prod.url" width="100%">
+                    <div class="price-box" *ngIf="prod.precio">
+                        {{prod.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}
+                    </div>
+                    <div class="promo-box-masonry" *ngIf="prod.descuento">
+                        {{prod.descuento}}%
+                    </div>                        
+                    <div class="promo-box-masonry" *ngIf="prod.dosxuno">
+                        2x1
+                    </div>
+                    <h6 class="ion-text-wrap" style="margin: 0.5rem 0.5rem 1rem 0.5rem">{{prod.nombre}}</h6>
+                </ion-card>                                
+            </ng-container>
+            <ng-template #agotadoTemp>
+                <ion-card class="card radius10 background-card" style="cursor: pointer;" (click)="muestraServicio(prod)">
+                    <div style="position: relative;">
+                        <img [src]="prod.url" class="agotado" width="100%">
+                        <ion-badge color="dark" class="centrar" mode="ios">Agotado</ion-badge>
+                    </div>
+                    <div class="price-box" style="background: var(--ion-color-medium);" *ngIf="prod.precio">
+                        {{prod.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}
+                    </div>
+                    <h6 class="ion-text-wrap" style="margin: 0 0.5rem 1rem 0.5rem">{{prod.nombre}}</h6>
+                </ion-card>                
+            </ng-template>
+        </div>
+      </ngx-masonry>
+      <!-- <ion-item *ngFor="let prod of servicios.resultados; let y = index; trackBy: trackProducts" style="--padding-start: 0; margin-top: 1rem; cursor: pointer;" lines="none" detail (click)="muestraProducto(prod)">
           <ion-grid class="ion-no-padding">
               <ion-row>
                   <ion-col size="4">
@@ -79,60 +187,10 @@
                   </ion-col>
               </ion-row>
           </ion-grid>
-      </ion-item>
-      <ion-item lines="none" style="text-align: center;">
+      </ion-item> -->
+      <ion-item lines="none" style="text-align: center;" *ngIf="servicios.resultados.length > 0">
         <ion-label color="medium">No hay más resultados</ion-label>
       </ion-item>
-    </ion-card>
-    <ion-item lines="none" style="text-align: center;" *ngIf="!pristine && productos.resultados.length === 0 && !buscando">
-      <ion-label color="medium">No hay productos que coincidan con tu búsqueda</ion-label>
-    </ion-item>
-  </div>
-
-
-    <!-- Lista servicios -->
-    <div *ngIf="lista === 'servicios'">
-      <ion-card style="padding-bottom: 1rem;" *ngIf="servicios.resultados.length > 0">
-        <ion-item *ngFor="let prod of servicios.resultados; let y = index; trackBy: trackProducts" style="--padding-start: 0; margin-top: 1rem; cursor: pointer;" lines="none" detail (click)="muestraProducto(prod)">
-            <ion-grid class="ion-no-padding">
-                <ion-row>
-                    <ion-col size="4">
-                        <ion-img [src]="prod.url" [ngClass]="{'agotado' : prod.agotado}" (ionImgWillLoad)="ionImgWillLoad($event)"></ion-img>
-                        <div class="promo-box" *ngIf="prod.descuento && !prod.agotado">
-                            {{prod.descuento}}%
-                        </div>                        
-                        <div class="promo-box" *ngIf="prod.dosxuno  && !prod.agotado">
-                            2x1
-                        </div>
-                        <ion-badge class="centrar ion-text-wrap" color="dark" mode="ios" *ngIf="prod.agotado">Agotado</ion-badge>
-                    </ion-col>
-                    <ion-col size="8">
-                        <ng-container *ngIf="!prod.agotado; else agotadoTemp">                            
-                            <ion-item lines="none">
-                                <ion-label class="ion-text-wrap">
-                                    <h2>{{(prod.nombre.length > 25) ? (prod.nombre | slice:0:25) + '...' : prod.nombre}}</h2>
-                                    <h2 style="font-weight: 400; color: var(--ion-color-medium);">{{prod.nombreNegocio}}</h2>
-                                </ion-label>
-                                <ion-badge *ngIf="prod.precio" color="primary" mode="ios">{{prod.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}</ion-badge>
-                            </ion-item>
-                        </ng-container>
-                        <ng-template #agotadoTemp>
-                            <ion-item lines="none">
-                                <ion-label class="ion-text-wrap">
-                                    <h2 style="color: var(--ion-color-medium);">{{(prod.nombre.length > 25) ? (prod.nombre | slice:0:25) + '...' : prod.nombre}}</h2>
-                                    <h2 style="font-weight: 400; color: var(--ion-color-medium);">{{prod.nombreNegocio}}</h2>
-                                </ion-label>
-                                <ion-badge *ngIf="prod.precio" color="medium" mode="ios">{{prod.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}</ion-badge>
-                            </ion-item>
-                        </ng-template>
-                    </ion-col>
-                </ion-row>
-            </ion-grid>
-        </ion-item>
-        <ion-item lines="none" style="text-align: center;">
-          <ion-label color="medium">No hay más resultados</ion-label>
-        </ion-item>
-      </ion-card>
       <ion-item lines="none" style="text-align: center;" *ngIf="!pristine && servicios.resultados.length === 0 && !buscando">
         <ion-label color="medium">No hay servicios que coincidan con tu búsqueda</ion-label>
       </ion-item>

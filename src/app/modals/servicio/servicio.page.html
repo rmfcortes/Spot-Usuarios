@@ -25,5 +25,8 @@
             Contactar 
             <ion-icon slot="end" name="logo-whatsapp"></ion-icon>
         </ion-button>
+        <ion-button class="boton-cart" (click)="verMas()" fill="outline" expand="block" shape="round" *ngIf="!fromServPage">
+            Ver más servicios de esta tienda 
+        </ion-button>
     </ion-toolbar>
 </ion-footer>
