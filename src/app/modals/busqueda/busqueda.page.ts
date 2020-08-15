@@ -236,8 +236,13 @@ export class BusquedaPage implements OnInit {
       if (resp.data) {
         producto.cantidad = resp.data
         setTimeout(() => this.verCarrito(producto, productoAlgolia), 100)
-      } else {
-        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
+      }
+    })
+    modal.onDidDismiss().then(resp => {
+      if (!resp.data) {
+        setTimeout(() => {
+          this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
+        }, 100)
       }
     })
     this.categoriaService.setVisitaNegocio(this.uid, productoAlgolia.idNegocio)
@@ -259,10 +264,19 @@ export class BusquedaPage implements OnInit {
     modal.onWillDismiss().then(resp => {
       if (resp.data && resp.data === 'add') {
         this.uidService.setModal(true)
-        setTimeout(() => this.modalCtrl.dismiss(), 500)
+        setTimeout(() => this.modalCtrl.dismiss('en_negociopage'), 500)
         this.router.navigate([`negocio/${productoAlgolia.categoria}/${productoAlgolia.idNegocio}`])
       } else {
         this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
+      }
+    })
+
+    modal.onDidDismiss().then(resp => {
+      if (resp.data && resp.data === 'add') return
+      else {
+        setTimeout(() => {
+          this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
+        }, 100)
       }
     })
 
@@ -293,8 +307,10 @@ export class BusquedaPage implements OnInit {
       componentProps: {producto, categoria: productoAlgolia.categoria, idNegocio: productoAlgolia.idNegocio}
     })
 
-    modal.onWillDismiss().then(() => {
-      this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
+    modal.onDidDismiss().then(() => {
+      setTimeout(() => {
+        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
+      }, 100)
     })
 
     this.categoriaService.setVisitaNegocio(this.uid, productoAlgolia.idNegocio)
@@ -310,7 +326,7 @@ export class BusquedaPage implements OnInit {
       this.categoriaService.setVisitaCategoria(this.uid, negocio.categoria)
     }
     this.router.navigate([`negocio/${negocio.categoria}/${negocio.objectID}`])
-    setTimeout(() => this.modalCtrl.dismiss(), 500) 
+    setTimeout(() => this.modalCtrl.dismiss('en_negociopage'), 500) 
   }
 
   async verDetallesTienda(abierto: boolean, producto: ProductoAlgolia) {
@@ -330,10 +346,11 @@ export class BusquedaPage implements OnInit {
       componentProps : {datos, abierto, verHorario: true}
     })
 
-    modal.onWillDismiss().then(() => {
-      this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
+    modal.onDidDismiss().then(() => {
+      setTimeout(() => {
+        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
+      }, 100)
     })
-
     return await modal.present()
   }
   
@@ -350,7 +367,12 @@ export class BusquedaPage implements OnInit {
     })
     modal.onWillDismiss().then(() => {
       this.uid = this.uidService.getUid()
-      this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
+    })
+
+    modal.onDidDismiss().then(() => {
+      setTimeout(() => {
+        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
+      }, 100)
     })
     return await modal.present()
   }

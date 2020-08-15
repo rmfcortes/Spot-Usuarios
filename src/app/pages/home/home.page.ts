@@ -346,11 +346,13 @@ export class HomePage implements OnInit, OnDestroy {
       component: LoginPage,
     })
 
-    modal.onWillDismiss().then(() => {
-      this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-        const nombre = 'app'
-        navigator[nombre].exitApp()
-      })
+    modal.onDidDismiss().then(() => {
+      setTimeout(() => {
+        this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
+          const nombre = 'app'
+          navigator[nombre].exitApp()
+        })
+      }, 100)
     })
 
     return await modal.present()
@@ -362,7 +364,8 @@ export class HomePage implements OnInit, OnDestroy {
       component: BusquedaPage,
     })
 
-    modal.onWillDismiss().then(() => {
+    modal.onDidDismiss().then(resp => {
+      if (resp && resp.data === 'en_negociopage') return
       this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
         const nombre = 'app'
         navigator[nombre].exitApp()
@@ -379,11 +382,14 @@ export class HomePage implements OnInit, OnDestroy {
       componentProps: {categoria: 'todas', categorias: this.categorias, subCategoria: 'todos', batch: this.batch}
     })
 
-    modal.onWillDismiss().then(() => {
-      this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-        const nombre = 'app'
-        navigator[nombre].exitApp()
-      })
+    modal.onDidDismiss().then(resp => {
+      if (resp.data && resp.data === 'en_negociopage') return
+      setTimeout(() => {        
+        this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
+          const nombre = 'app'
+          navigator[nombre].exitApp()
+        })
+      }, 100)
     })
 
     return modal.present()
@@ -401,12 +407,16 @@ export class HomePage implements OnInit, OnDestroy {
 
     modal.onWillDismiss().then(resp => {
       if (resp.data) this.irACategoria(resp.data)
-      else {
+    })
+
+    modal.onDidDismiss().then(resp => {
+      if (resp.data) return
+      setTimeout(() => {
         this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
           const nombre = 'app'
           navigator[nombre].exitApp()
         })
-      }
+      }, 100)
     })
 
     return await modal.present()
@@ -466,13 +476,19 @@ export class HomePage implements OnInit, OnDestroy {
       if (resp.data) {
         producto.cantidad = resp.data
         setTimeout(() => this.verCarrito(producto, oferta), 100)
-      } else {
+      }
+    })
+
+    modal.onDidDismiss().then(resp => {
+      if (resp.data) return
+      setTimeout(() => {
         this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
           const nombre = 'app'
           navigator[nombre].exitApp()
         })
-      }
+      }, 100)
     })
+
     if (this.uid) {
       this.categoriaService.setVisitaCategoria(this.uid, oferta.categoria)
       this.categoriaService.setVisitaNegocio(this.uid, oferta.idNegocio)
@@ -506,11 +522,13 @@ export class HomePage implements OnInit, OnDestroy {
       componentProps: {producto, categoria: servicio.categoria, idNegocio: servicio.idNegocio}
     })
 
-    modal.onWillDismiss().then(() => {
-      this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-        const nombre = 'app'
-        navigator[nombre].exitApp()
-      })
+    modal.onDidDismiss().then(() => {
+      setTimeout(() => {
+        this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
+          const nombre = 'app'
+          navigator[nombre].exitApp()
+        })
+      }, 100)
     })
 
     this.categoriaService.setVisitaNegocio(this.uid, servicio.idNegocio)
@@ -533,12 +551,17 @@ export class HomePage implements OnInit, OnDestroy {
     modal.onWillDismiss().then(resp => {
       if (resp.data && resp.data === 'add') {
         this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`])
-      } else {
+      }
+    })
+
+    modal.onDidDismiss().then(resp => {
+      if (resp.data && resp.data === 'add') return
+      setTimeout(() => {
         this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
           const nombre = 'app'
           navigator[nombre].exitApp()
         })
-      }
+      }, 100)
     })
 
     return await modal.present()

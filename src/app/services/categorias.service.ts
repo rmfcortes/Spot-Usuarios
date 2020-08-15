@@ -234,7 +234,6 @@ export class CategoriasService {
         data.orderByChild('envio_gratis_pedMin').limitToLast(batch).endAt(lastValue, lastKey)).valueChanges()
           .subscribe((negocios: Negocio[]) => {
             negocioSub.unsubscribe()
-            negocios = negocios.filter(n => n.repartidores_propios)
             resolve(negocios)
           })
       } else {
@@ -242,14 +241,11 @@ export class CategoriasService {
           data.orderByChild('envio_gratis_pedMin').limitToLast(batch)).valueChanges()
             .subscribe((negocios: Negocio[]) => {
               negocioSub.unsubscribe()
-              negocios = negocios.filter(n => n.repartidores_propios)
-              negocios = negocios.filter(n => n.envio_gratis_pedMin)
               resolve(negocios)
             })
       }
     })
   }
-
 
   getNegociosServicioDomicilio(status, categoria, subCategoria, batch, lastKey?, lastValue?): Promise<Negocio[]> {
     return new Promise((resolve, reject) => {
@@ -259,7 +255,6 @@ export class CategoriasService {
         data.orderByChild('tipo').equalTo('productos').limitToLast(batch).endAt(lastValue, lastKey)).valueChanges()
           .subscribe((negocios: Negocio[]) => {
             negocioSub.unsubscribe()
-            negocios = negocios.filter(n => n.repartidores_propios)
             resolve(negocios)
           })
       } else {
@@ -267,8 +262,6 @@ export class CategoriasService {
           data.orderByChild('tipo').equalTo('productos').limitToLast(batch)).valueChanges()
             .subscribe((negocios: Negocio[]) => {
               negocioSub.unsubscribe()
-              negocios = negocios.filter(n => n.repartidores_propios)
-              negocios = negocios.filter(n => n.envio_gratis_pedMin)
               resolve(negocios)
             })
       }

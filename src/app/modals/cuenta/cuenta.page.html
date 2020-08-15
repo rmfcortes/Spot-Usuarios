@@ -69,13 +69,13 @@
                 </ion-list>
                 <hr class="linea">
                 <ion-item lines="none" style="margin-bottom: 1rem;" *ngIf="!busqueda">
-                    <ion-button (click)="closeCart()" expand="block" fill="outline" color="medium" class="btn_agregar ion-text-wrap">
+                    <ion-button (click)="closeCart()" expand="block" fill="outline" color="primary" class="btn_agregar ion-text-wrap">
                         <ion-icon name="cart-outline" style="margin-right: 0.5rem;"></ion-icon>
                         Agregar más productos
                     </ion-button>
                 </ion-item>                
                 <ion-item lines="none" style="margin-bottom: 1rem;" *ngIf="busqueda">
-                    <ion-button (click)="verMas()" expand="block" fill="outline" color="medium" class="btn_agregar ion-text-wrap">
+                    <ion-button (click)="verMas()" expand="block" fill="outline" color="primary" class="btn_agregar ion-text-wrap">
                         <ion-icon name="cart-outline" style="margin-right: 0.5rem;"></ion-icon>
                         Ver más productos de esta tienda
                     </ion-button>
@@ -119,15 +119,19 @@
                                 </div>
                             </div>
                             <ion-label style="margin-left: 2rem;">**** {{formaPago.forma}}</ion-label>
-                        </ion-item>           
-                        <ion-item lines="none" style="text-align: center;" *ngIf="infopagos">
-                            <ion-label color="medium" style="font-size: smaller;" class="ion-text-wrap">{{infopagos}}</ion-label>
-                        </ion-item>                        
+                        </ion-item>                               
                     </ion-list>
-                    <ion-item lines="none" style="margin-bottom: 1rem;">
-                        <ion-button (click)="formasPago()" expand="block" fill="outline" color="medium" class="btn_agregar ion-text-wrap">
+                    <hr class="linea">
+                    <ion-item lines="none" style="margin-bottom: 1rem;" *ngIf="!formaPago">
+                        <ion-button (click)="formasPago()" expand="block" fill="outline" color="primary" class="btn_agregar ion-text-wrap">
                             <ion-icon name="card-outline" style="margin-right: 0.5rem;"></ion-icon>
                             Elegir forma pago
+                        </ion-button>
+                    </ion-item>                    
+                    <ion-item lines="none" style="margin-bottom: 1rem;" *ngIf="formaPago">
+                        <ion-button (click)="formasPago()" expand="block" fill="outline" color="primary" class="btn_agregar ion-text-wrap">
+                            <ion-icon name="card-outline" style="margin-right: 0.5rem;"></ion-icon>
+                            Cambiar forma pago
                         </ion-button>
                     </ion-item>
                 </div>
@@ -135,7 +139,7 @@
                 <div style="height: 1.5rem; background: #fdf8f1e5;"></div>
                 <!-- Propina -->
                 <div style="width: 90%; left: 5%; position: relative; padding-top: 1rem; padding-bottom: 1rem;">
-                    <ion-label color="medium">Propina: {{propina | currency : 'CAD' : 'symbol-narrow':'1.0-2'}}</ion-label>
+                    <ion-label color="dark">Propina: {{propina | currency : 'CAD' : 'symbol-narrow':'1.0-2'}}</ion-label>
                     <ion-item lines="none" style="text-align: center;">
                         <ion-button (click)="calculaPropina(i)" *ngFor="let boton of botones_propina; let i = index" [ngClass]="{'gradient-- relleno' : propina_sel === i}" fill="outline" shape="round">
                             {{boton.texto}}</ion-button>
@@ -320,8 +324,19 @@
             <h2>Forma de pago:</h2>
             <p>Efectivo</p>
         </ion-label>
+        <ion-badge color="light" mode="ios" style="font-weight: 700; font-size: 18px;">{{cuenta + datosNegocio.envio + comision + propina - descuento | currency:'CAD':'symbol-narrow':'1.0-2'}}</ion-badge>
+    </ion-item>    
+    <ion-item lines="none" *ngIf="formaPago && formaPago.id === 'terminal'">
+        <ion-thumbnail style="max-width: 1.5rem;" slot="start">
+            <img style="object-fit: contain;" src="../../../assets/img/iconos/terminal.png" />
+        </ion-thumbnail>
+        <ion-label class="ion-text-wrap">
+            <h2>Forma de pago:</h2>
+            <p>Terminal (tarjeta en físico)</p>
+        </ion-label>
+        <ion-badge color="light" mode="ios" style="font-weight: 700; font-size: 18px;">{{cuenta + datosNegocio.envio + comision + propina - descuento | currency:'CAD':'symbol-narrow':'1.0-2'}}</ion-badge>
     </ion-item>
-    <ion-item lines="none" *ngIf="formaPago && formaPago.id !== 'efectivo'">
+    <ion-item lines="none" *ngIf="formaPago && formaPago.id !== 'efectivo' && formaPago.id !== 'terminal'">
         <div [ngSwitch]="formaPago.tipo">
             <div *ngSwitchCase="'visa'">
                 <ion-thumbnail>

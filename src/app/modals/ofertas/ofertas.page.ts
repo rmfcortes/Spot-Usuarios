@@ -170,16 +170,21 @@ export class OfertasPage implements OnInit {
       leaveAnimation,
       componentProps: {producto, idNegocio: oferta.idNegocio, busqueda: true}
     })
-    modal.onWillDismiss().then(async (resp) => {
+    modal.onWillDismiss().then(resp => {
       if (resp.data) {
         producto.cantidad = resp.data
         setTimeout(() => this.verCarrito(producto, oferta), 100)
-      } else {
-        this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-          this.regresar()
-        })
       }
     })
+
+    modal.onDidDismiss().then(resp => {
+      if (!resp.data) {
+        setTimeout(() => {
+          this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
+        }, 100)
+      }
+    })
+
     if (this.uid) {
       this.categoriaService.setVisitaCategoria(this.uid, oferta.categoria)
       this.categoriaService.setVisitaNegocio(this.uid, oferta.idNegocio)
@@ -204,11 +209,16 @@ export class OfertasPage implements OnInit {
       if (resp.data && resp.data === 'add') {
         this.uidSerice.setOfertas(true)
         this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`])
-        setTimeout(() => this.modalCtrl.dismiss(), 500)
-      } else {
-        this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-          this.regresar()
-        })
+        setTimeout(() => this.modalCtrl.dismiss('en_negociopage'), 500)
+      }
+    })
+
+    modal.onDidDismiss().then(resp => {
+      if (resp.data && resp.data === 'add') return
+      else {
+        setTimeout(() => {
+          this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
+        }, 100)
       }
     })
 
@@ -227,10 +237,10 @@ export class OfertasPage implements OnInit {
       component: LoginPage,
     })
 
-    modal.onWillDismiss().then(() => {
-      this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-        this.regresar()
-      })
+    modal.onDidDismiss().then(() => {
+      setTimeout(() => {
+        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
+      }, 100)
     })
 
     return await modal.present()
@@ -257,7 +267,12 @@ export class OfertasPage implements OnInit {
         this.getSubCategorias()
         this.resetOfertas()
       }
-      this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
+    })
+
+    modal.onDidDismiss().then(() => {
+      setTimeout(() => {
+        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
+      }, 100)
     })
 
     return await modal.present()

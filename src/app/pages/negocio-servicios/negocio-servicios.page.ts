@@ -301,8 +301,10 @@ export class NegocioServiciosPage{
       componentProps: {servicio, whats: this.whats}
     })
 
-    modal.onWillDismiss().then(() => {
-      this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
+    modal.onDidDismiss().then(() => {
+      setTimeout(() => {
+        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
+      }, 100)
     })
 
     this.negServicios.setConsulta(servicio, this.categoria, this.negocio.id, this.negocio.nombre)
@@ -336,8 +338,10 @@ export class NegocioServiciosPage{
       componentProps : {datos, abierto: this.negocio.abierto}
     })
 
-    modal.onWillDismiss().then(() => {
-      this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
+    modal.onDidDismiss().then(() => {
+      setTimeout(() => {
+        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
+      }, 100)
     })
 
     return await modal.present()

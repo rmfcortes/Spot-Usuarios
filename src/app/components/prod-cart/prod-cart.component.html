@@ -8,14 +8,14 @@
               <ion-item lines="none">
                   <ion-label class="ion-text-wrap">
                       <h2>{{(prod.nombre.length > 25) ? (prod.nombre | slice:0:25) + '...' : prod.nombre}}</h2>
-                      <h2 *ngIf="prod.precio" class="primario">{{prod.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}</h2>
+                      <h2 *ngIf="prod.precio" class="medium">{{prod.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}</h2>
                       <h2 *ngIf="prod.descuento">-{{(prod.precio * (prod.descuento / 100)) | currency:'CAD':'symbol-narrow':'1.0-2'}} descuento</h2>
                       <h2 *ngIf="prod.dosxuno">2x1</h2>
                       <div *ngFor="let complemento of prod.complementos; trackBy: trackProdComplementos">
                           <p style="color: var(--ion-color-medium)" *ngFor="let item of complemento.complementos; trackBy: trackComplementos ">+ {{item.precio | currency:'CAD':'symbol-narrow':'1.0-2'}} / {{item.nombre}}</p>
                       </div>
                   </ion-label>
-                  <ion-badge class="gradient--" mode="ios" *ngIf="prod.cantidad">{{prod.cantidad}}</ion-badge>
+                  <ion-badge color="dark" mode="ios" *ngIf="prod.cantidad">{{prod.cantidad}}</ion-badge>
               </ion-item>
           </ion-col>
       </ion-row>

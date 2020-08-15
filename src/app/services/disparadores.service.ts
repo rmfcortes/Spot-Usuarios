@@ -132,25 +132,25 @@ export class DisparadoresService {
     await alert.present()
   }
 
-  async presentAlertAction(titulo, msn) {
+  async presentAlertAction(titulo: string, msn: string, btnAceptar: string, btnCancelar: string) {
     return new Promise(async (resolve, reject) => {
       const alert = await this.alertController.create({
         header: titulo,
         message: msn,
         buttons: [
           {
-            text: 'Cancelar',
+            text: btnCancelar,
             role: 'cancel',
             cssClass: 'secondary',
             handler: (blah) => {
-              resolve(false);
+              resolve(false)
             }
           },
           {
-            text: 'Ok',
+            text: btnAceptar,
             cssClass: 'btn_aceptar',
-            handler: (blah) => {
-              resolve(true);
+            handler: () => {
+              resolve(true)
             }
           }
         ]

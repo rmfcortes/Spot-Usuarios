@@ -1,6 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AlertController, ModalController, IonInfiniteScroll, Platform } from '@ionic/angular';
+import { ModalController, IonInfiniteScroll, Platform } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 
 import { InfoSucursalPage } from 'src/app/modals/info-sucursal/info-sucursal.page';
@@ -13,7 +13,7 @@ import { NegocioService } from 'src/app/services/negocio.service';
 import { CartService } from 'src/app/services/cart.service';
 import { UidService } from 'src/app/services/uid.service';
 
-import { Negocio, DatosParaCuenta, InfoPasillos, ProductoPasillo, InfoGral } from 'src/app/interfaces/negocio';
+import { Negocio, DatosParaCuenta, InfoPasillos, ProductoPasillo } from 'src/app/interfaces/negocio';
 import { CostoEnvio } from '../../interfaces/envio.interface';
 import { Direccion } from '../../interfaces/direcciones';
 import { Producto } from 'src/app/interfaces/producto';
@@ -74,7 +74,6 @@ export class NegocioPage {
     private platform: Platform,
     private activatedRoute: ActivatedRoute,
     private modalController: ModalController,
-    private alertController: AlertController,
     private commonService: DisparadoresService,
     private negocioService: NegocioService,
     private storageService: StorageService,
@@ -286,8 +285,12 @@ export class NegocioPage {
       if (resp.data) {
         producto = await this.cartService.updateCart(this.negocio.id, producto)
         this.cuenta = await this.negocioService.getCart(this.uid, this.negocio.id)
-        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
       }
+    })
+    modal.onDidDismiss().then(() => {
+      setTimeout(() => {
+        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
+      }, 100)
     })
     return await modal.present()
   }
@@ -303,7 +306,12 @@ export class NegocioPage {
     modal.onWillDismiss().then(async () => {
       this.cuenta = await this.negocioService.getCart(this.uid, this.negocio.id)
       this.productos.forEach(async(p) => p.productos = await this.negocioService.comparaCart(p.productos))
-      this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
+    })
+
+    modal.onDidDismiss().then(() => {
+      setTimeout(() => {
+        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
+      }, 100)
     })
     return await modal.present()
   }
@@ -395,8 +403,10 @@ export class NegocioPage {
       componentProps : {datos, abierto: this.negocio.abierto}
     })
     
-    modal.onWillDismiss().then(() => {
-      this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
+    modal.onDidDismiss().then(() => {
+      setTimeout(() => {
+        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
+      }, 100)
     })
 
     return await modal.present()
@@ -417,8 +427,14 @@ export class NegocioPage {
     })
     modal.onWillDismiss().then(() => {
       this.uid = this.uidService.getUid()
-      this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
     })
+
+    modal.onDidDismiss().then(() => {
+      setTimeout(() => {
+        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
+      }, 100)
+    })
+
     return await modal.present()
   }
 

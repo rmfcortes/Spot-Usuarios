@@ -4,22 +4,31 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import { CategoriasPage } from 'src/app/modals/categorias/categorias.page';
+import { ServicioPage } from 'src/app/modals/servicio/servicio.page';
+import { ProductoPage } from 'src/app/modals/producto/producto.page';
 import { OfertasPage } from 'src/app/modals/ofertas/ofertas.page';
+import { CuentaPage } from 'src/app/modals/cuenta/cuenta.page';
+import { LoginPage } from 'src/app/modals/login/login.page';
 
 import { DisparadoresService } from 'src/app/services/disparadores.service';
 import { CategoriasService } from 'src/app/services/categorias.service';
+import { AnimationsService } from 'src/app/services/animations.service';
+import { ProductoService } from 'src/app/services/producto.service';
 import { OfertasService } from 'src/app/services/ofertas.service';
+import { NegocioService } from 'src/app/services/negocio.service';
+import { CartService } from 'src/app/services/cart.service';
 import { UidService } from 'src/app/services/uid.service';
 
 import { Categoria, SubCategoria } from 'src/app/interfaces/categoria.interface';
-import { Negocio, Oferta, InfoGral } from 'src/app/interfaces/negocio';
+import { MasVendido, Producto } from 'src/app/interfaces/producto';
 import { CostoEnvio } from 'src/app/interfaces/envio.interface';
+import { Negocio, Oferta } from 'src/app/interfaces/negocio';
 import { Direccion } from 'src/app/interfaces/direcciones';
-import { MasVendido } from 'src/app/interfaces/producto';
 
 import { enterAnimationCategoria } from 'src/app/animations/enterCat';
 import { leaveAnimationCategoria } from 'src/app/animations/leaveCat';
-import { AnimationsService } from 'src/app/services/animations.service';
+import { enterAnimation } from 'src/app/animations/enter';
+import { leaveAnimation } from 'src/app/animations/leave';
 
 @Component({
   selector: 'app-categoria',
@@ -35,6 +44,7 @@ export class CategoriaPage implements OnInit, OnDestroy{
   subCategorias: SubCategoria[] = []
   ofertas: Oferta[] = []
   negocios: Negocio[] = []
+  filtrados: Negocio[] = []
   status = 'abiertos'
 
   masConsultados: MasVendido[] = []
@@ -90,7 +100,10 @@ export class CategoriaPage implements OnInit, OnDestroy{
     private categoriaService: CategoriasService,
     private animationService: AnimationsService,
     private alertService: DisparadoresService,
+    private productoService: ProductoService,
+    private negocioService: NegocioService,
     private ofertaService: OfertasService,
+    private cartService: CartService,
     private uidService: UidService,
   ) { }
 
@@ -110,6 +123,8 @@ export class CategoriaPage implements OnInit, OnDestroy{
       this.router.navigate(['/home'])
     })
     this.uid = this.uidService.getUid()
+    const ofertas = this.uidService.getOfertas()
+    if (ofertas) this.verOfertas()
   }
 
   async setFiltro(filtro: string) {
@@ -191,28 +206,49 @@ export class CategoriaPage implements OnInit, OnDestroy{
         if (negocios.length === this.batch + 1) {
           this.lastKey = negocios[0].id
           this.lastValue = negocios[0].promedio
-          negocios.shift()
+          if (this.filtro === 'envio_gratis') {
+            negocios = negocios.filter(n => n.repartidores_propios && n.envio_gratis_pedMin)
+            await this.costoEnvio(negocios)
+            this.negocios = this.negocios.concat(negocios.reverse())
+            this.filtrados = this.filtrados.concat(negocios.reverse())
+            if (this.filtrados.length < this.batch)  return this.getNegocios(event, animarFiltros)
+            return this.muestraProductos(event, animarFiltros)
+          } else {
+            negocios.shift()
+          }
         } else if (this.status === 'abiertos') {
           this.status = 'cerrados'
           this.lastKey = ''
           this.lastValue = ''
-          await this.costoEnvio(negocios)
-          this.negocios = this.negocios.concat(negocios.reverse())
-          if (event) event.target.complete()
+          if (this.filtro === 'envio_gratis') {
+            negocios = negocios.filter(n => n.repartidores_propios && n.envio_gratis_pedMin)
+            await this.costoEnvio(negocios)
+            this.negocios = this.negocios.concat(negocios.reverse())
+            this.filtrados = this.filtrados.concat(negocios.reverse())
+          } else {
+            await this.costoEnvio(negocios)
+            this.negocios = this.negocios.concat(negocios.reverse())
+          }
           this.getNegocios(event, animarFiltros)
           return
         } else {
           this.noMore = true
         }
+        if (this.filtro === 'envio_gratis') negocios = negocios.filter(n => n.repartidores_propios && n.envio_gratis_pedMin)
         await this.costoEnvio(negocios)
         this.negocios = this.negocios.concat(negocios.reverse())
-        if (this.negocios.length && this.primer_vez) this.hayNegocios = true
-        if (event) event.target.complete()  
-        this.negociosReady = true
-        if (animarFiltros && !event) this.animacionEntrada('filtros')
-        if (!event) this.animacionEntrada('productos')
+        this.muestraProductos(event, animarFiltros)
       })
       .catch((err) => console.log(err))
+  }
+
+  muestraProductos(event?, animarFiltros?: boolean) {
+    this.filtrados = []
+    if (this.negocios.length && this.primer_vez) this.hayNegocios = true
+    if (event) event.target.complete()  
+    this.negociosReady = true
+    if (animarFiltros && !event) this.animacionEntrada('filtros')
+    if (!event) this.animacionEntrada('productos')
   }
 
   getMasVendidos() {
@@ -335,36 +371,163 @@ export class CategoriaPage implements OnInit, OnDestroy{
                     subCategoria: this.subCategoria, batch: this.batchOfertas, subCategorias: this.subCategorias}
     })
 
-    modal.onWillDismiss().then(() => {
-      this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-        this.router.navigate(['/home'])
-      })
+    modal.onDidDismiss().then(resp => {
+      if (resp.data && resp.data === 'en_negociopage') return
+      setTimeout(() => {
+        this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
+          this.router.navigate(['/home'])
+        })
+      }, 100)
     })
 
     return modal.present()
   }
 
-  async irAOferta(oferta: Oferta) {
-    const uid = this.uidService.getUid()
-    if (this.back) this.back.unsubscribe()
-    if (uid) this.categoriaService.setVisitaNegocio(uid, oferta.idNegocio)
-    this.categoriaService.setVisita(oferta.idNegocio)
-    this.router.navigate(['/negocio', oferta.categoria, oferta.idNegocio], {state: {origen_categoria: true}})
-  }
-
-  async verProducto(oferta: Oferta, tipo: string) {
-    if (this.back) this.back.unsubscribe()
-    if (tipo === 'oferta') tipo = oferta.tipo
-    if (tipo === 'productos') {
-      this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`])
-    } else {
-      this.router.navigate([`negocio-servicios/${oferta.categoria}/${oferta.idNegocio}`])
+  async muestraProducto(oferta: Oferta) {
+    if (oferta.tipo === 'servicios') return
+    if (oferta.agotado) {
+      this.alertService.presentAlert('Producto agotado', 'Lo sentimos, este producto está temporalmente agotado')
+      return
     }
+    if (!this.uid) return this.presentAlertNotLogin()
+    const abierto = await this.negocioService.isOpen(oferta.idNegocio)
+    if (!abierto) {
+      this.alertService.presentAlert('', 'Esta tienda esta cerrada, por favor vuelve más tarde')
+      return
+    }    
+    const producto = await this.productoService.getProducto(oferta.idNegocio, oferta.id, 'productos')
+    if (!producto) {
+      this.alertService.presentAlert('', 'La publicación de este producto ha sido pausada')
+      return
+    }
+    producto.cantidad = 1
+    producto.total = producto.precio
+    producto.complementos = []
+
+    if (this.back) this.back.unsubscribe()
+    const modal = await this.modalController.create({
+      component: ProductoPage,
+      enterAnimation,
+      leaveAnimation,
+      componentProps: {producto, idNegocio: oferta.idNegocio, busqueda: true}
+    })
+    modal.onWillDismiss().then(async (resp) => {
+      if (resp.data) {
+        producto.cantidad = resp.data
+        setTimeout(() => this.verCarrito(producto, oferta), 100)
+      }
+    })
+
+    modal.onDidDismiss().then(resp => {
+      if (resp.data) return
+      setTimeout(() => {
+        this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
+          const nombre = 'app'
+          navigator[nombre].exitApp()
+        })
+      }, 100)
+    })
+
     if (this.uid) {
       this.categoriaService.setVisitaCategoria(this.uid, oferta.categoria)
       this.categoriaService.setVisitaNegocio(this.uid, oferta.idNegocio)
     }
     this.categoriaService.setVisita(oferta.idNegocio)
+    return await modal.present()
+  }
+
+  async muestraServicio(servicio: MasVendido) {
+    if (servicio.agotado) {
+      this.alertService.presentAlert('Servicio agotado', 'Lo sentimos, este servicio está temporalmente agotado')
+      return
+    }
+    if (!this.uid) return this.presentAlertNotLogin()
+    const abierto = await this.negocioService.isOpen(servicio.idNegocio)
+    if (!abierto) {
+      this.alertService.presentAlert('', 'Esta tienda esta cerrada, por favor vuelve más tarde')
+      return
+    }    
+    let producto = await this.productoService.getProducto(servicio.idNegocio, servicio.id, 'servicios')
+    if (!producto) {
+      this.alertService.presentAlert('', 'La publicación de este servicio ha sido pausada')
+      return
+    }
+
+    if (this.back) this.back.unsubscribe()
+    const modal = await this.modalController.create({
+      component: ServicioPage,
+      enterAnimation,
+      leaveAnimation,
+      componentProps: {producto, categoria: servicio.categoria, idNegocio: servicio.idNegocio}
+    })
+
+    modal.onDidDismiss().then(() => {
+      setTimeout(() => {
+        this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
+          const nombre = 'app'
+          navigator[nombre].exitApp()
+        })
+      }, 100)
+    })
+
+    this.categoriaService.setVisitaNegocio(this.uid, servicio.idNegocio)
+    this.categoriaService.setVisitaCategoria(this.uid, servicio.categoria)
+    return await modal.present()
+  }
+
+  async verCarrito(producto: Producto, oferta: Oferta) {
+    const idNegocio = oferta.idNegocio
+    producto = await this.cartService.updateCart(idNegocio, producto)
+
+    if (this.back) this.back.unsubscribe()
+    const modal = await this.modalController.create({
+      component: CuentaPage,
+      enterAnimation,
+      leaveAnimation,
+      componentProps: {idNegocio, categoria: oferta.categoria, busqueda: true}
+    })
+
+    modal.onWillDismiss().then(resp => {
+      if (resp.data && resp.data === 'add') {
+        this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`], {state: {origen_categoria: true}})
+      }
+    })
+
+    modal.onDidDismiss().then(resp => {
+      if (resp.data && resp.data === 'add') return
+      setTimeout(() => {
+        this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
+          const nombre = 'app'
+          navigator[nombre].exitApp()
+        })
+      }, 100)
+    })
+
+    return await modal.present()
+  }
+
+  presentAlertNotLogin() {
+    this.alertService.presentAlertNotLogin()
+    .then(res => res ? this.login() : null)
+  }
+
+  async login() {
+    if (this.back) this.back.unsubscribe()
+    const modal = await this.modalController.create({
+      cssClass: 'my-custom-modal-css',
+      component: LoginPage,
+    })
+
+    modal.onDidDismiss().then(() => {
+      setTimeout(() => {
+        this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
+          const nombre = 'app'
+          navigator[nombre].exitApp()
+        })
+      }, 100)
+    })
+
+    return await modal.present()
   }
 
   async verCategorias() {
@@ -379,10 +542,13 @@ export class CategoriaPage implements OnInit, OnDestroy{
 
     modal.onWillDismiss().then(resp => {
       if (resp.data) this.irACategoria(resp.data)
-      else {
-        this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-            this.router.navigate(['/home'])
-          })
+    })
+
+    modal.onDidDismiss().then(resp => {
+      if (!resp.data) {
+        setTimeout(() => {
+          this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.router.navigate(['/home']))
+        }, 100)
       }
     })
 

@@ -43,7 +43,11 @@ export class PedidoActivoPage implements OnInit {
      componentProps: { pedido: this.pedido }
     })
       
-    modal.onWillDismiss().then(() => this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar()))
+    modal.onDidDismiss().then(() => {
+      setTimeout(() => {
+        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
+      }, 100)
+    })
 
     return await modal.present()
   }

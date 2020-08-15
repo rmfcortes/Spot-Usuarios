@@ -88,8 +88,10 @@ export class HistorialPage implements OnInit {
       componentProps: {pedido}
     })
 
-    modal.onWillDismiss().then(() => {
-      this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.router.navigate(['/home']))
+    modal.onDidDismiss().then(() => {
+      setTimeout(() => {
+        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.router.navigate(['/home']))
+      }, 100)
     })
   
     return await modal.present()

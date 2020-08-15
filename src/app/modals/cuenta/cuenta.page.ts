@@ -201,7 +201,7 @@ export class CuentaPage implements OnInit {
         } else {
           if (this.datosNegocio.formas_pago.tarjeta || this.datosNegocio.formas_pago.terminal) {
             this.formaPago = forma
-            this.comision = ((this.cuenta * 0.045) + 3.5) * 1.16
+            this.comision = ((this.cuenta * 0.05) + 4) * 1.16
           } else {
             this.comision = 0
             this.formaPago = this.pago_en_efectivo
@@ -234,7 +234,12 @@ export class CuentaPage implements OnInit {
         this.datosNegocio.envio = await this.costoEnvio()
         this.calculaPropina(this.propina_sel)
       }
-      this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.closeCart())
+    })
+
+    modal.onDidDismiss().then(() => {
+      setTimeout(() => {
+        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.closeCart())
+      }, 100)
     })
     
     return await modal.present()
@@ -251,13 +256,17 @@ export class CuentaPage implements OnInit {
         this.direccion = resp.data
         this.datosNegocio.envio = await this.costoEnvio()
       }
-      this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.closeCart())
+    })
+    modal.onDidDismiss().then(() => {
+      setTimeout(() => {
+        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.closeCart())
+      }, 100)
     })
     return await modal.present()
   }
 
   deleteProducto(i) {
-    this.alertSerivce.presentAlertAction('Quitar artículo', '¿Estás seguro que deseas eliminar este artículo?')
+    this.alertSerivce.presentAlertAction('Quitar artículo', '¿Estás seguro que deseas eliminar este artículo?', 'Quitar de la lista', 'Conservar')
     .then(async (resp) => {
       if (resp) {
         this.cartService.deleteProd(this.datosNegocio.idNegocio, this.cart[i])
@@ -285,15 +294,20 @@ export class CuentaPage implements OnInit {
       component: FormasPagoPage,
       enterAnimation: enterAnimationDerecha,
       leaveAnimation: leaveAnimationDerecha,
-      componentProps: {formas_pago_aceptadas: this.datosNegocio.formas_pago}
+      componentProps: {formas_pago_aceptadas: this.datosNegocio.formas_pago, infopagos: this.infopagos}
     })
     modal.onWillDismiss().then(resp => {
-      this.formaPago = resp.data ? resp.data : null
+      this.formaPago = resp.data ? resp.data : this.formaPago
       if (this.formaPago) {
         if (this.formaPago.forma === 'efectivo') this.comision = 0
-        else this.comision = ((this.cuenta * 0.045) + 3.5) * 1.16
+        else this.comision = ((this.cuenta * 0.05) + 4) * 1.16
       }
-      this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.closeCart())
+    })
+
+    modal.onDidDismiss().then(() => {
+      setTimeout(() => {
+        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.closeCart())
+      }, 100)
     })
 
     return await modal.present()
@@ -315,7 +329,8 @@ export class CuentaPage implements OnInit {
       if (!this.direccion) {
         this.alertSerivce.presentAlertAction(
           'Agrega dirección',
-          'Por favor agrega una dirección de entrega antes de continuar con el pedido.')
+          'Por favor agrega una dirección de entrega antes de continuar con el pedido.',
+          'Agregar dirección', 'Cancelar')
           .then(resp => {
             if (resp) this.mostrarDirecciones()
             return
@@ -325,7 +340,8 @@ export class CuentaPage implements OnInit {
       if (!this.formaPago) {
         this.alertSerivce.presentAlertAction(
           'Forma de pago',
-          'Antes de continuar por favor agrega una forma de pago'
+          'Antes de continuar por favor agrega una forma de pago',
+          'Agregar forma de pago', 'Cancelar'
         ).then(resp => {
           if (resp) this.formasPago()
           return

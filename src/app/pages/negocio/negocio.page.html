@@ -54,9 +54,9 @@
                 <div style="background: white; z-index: 150; position: sticky; top: 2.5rem">
                     <div class="scrolling-wrapper">
                         <div class="card">
-                            <ion-chip mode="ios" [ngClass]="{'sel' : pasilloFiltro === ''}" (click)="resetProds()">
-                                <ion-label color="light" *ngIf="pasilloFiltro === ''">Todos</ion-label>
-                                <ion-label  *ngIf="pasilloFiltro !== ''">Todos</ion-label>
+                            <ion-chip mode="ios" [ngClass]="{'sel' : !pasilloFiltro}" (click)="resetProds()">
+                                <ion-label color="light" *ngIf="!pasilloFiltro">Todos</ion-label>
+                                <ion-label  *ngIf="pasilloFiltro">Todos</ion-label>
                             </ion-chip>
                         </div>
                         <div class="card">
