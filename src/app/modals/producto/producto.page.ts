@@ -1,10 +1,8 @@
 import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
-import { ModalController, Platform } from '@ionic/angular';
-import { Subscription } from 'rxjs';
+import { ModalController } from '@ionic/angular';
 
 import { AnimationsService } from 'src/app/services/animations.service';
 import { ProductoService } from 'src/app/services/producto.service';
-import { UidService } from 'src/app/services/uid.service';
 
 import { Producto, ListaComplementos, ListaComplementosElegidos, Complemento } from 'src/app/interfaces/producto';
 
@@ -25,7 +23,6 @@ export class ProductoPage implements OnInit {
   elegidos: ListaComplementosElegidos[] = []
   variables: ListaComplementos[]
   obligatoriosPendientes = []
-  back: Subscription
 
   canContinue = false
   showDesc = true
@@ -33,20 +30,15 @@ export class ProductoPage implements OnInit {
   recalculando = true
 
   constructor(
-    private platform: Platform,
     private modalCtrl: ModalController,
     private animationService: AnimationsService,
     private productoService: ProductoService,
-    private uidService: UidService,
   ) { }
 
   // Info entrada
 
   ngOnInit() {
     this.getVariables()
-    this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-      this.cerrar()
-    })
   }
 
   async getVariables() {
@@ -212,13 +204,10 @@ export class ProductoPage implements OnInit {
   }
 
   verMas() {
-    if (this.back) this.back.unsubscribe()
     this.modalCtrl.dismiss('ver_mas')
   }
 
   cerrar() {
-    if (this.back) this.back.unsubscribe()
-    // this.producto.cantidad = 0;
     this.modalCtrl.dismiss(null)
   }
 

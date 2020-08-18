@@ -1,7 +1,5 @@
-import { ModalController, Platform } from '@ionic/angular';
+import { ModalController } from '@ionic/angular';
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { Subscription } from 'rxjs';
 
 import { PedidoActivoPage } from 'src/app/modals/pedido-activo/pedido-activo.page';
 
@@ -28,11 +26,7 @@ export class HistorialPage implements OnInit {
 
   historialReady = false
 
-  back: Subscription
-
   constructor(
-    private router: Router,
-    private platform: Platform,
     private modalCtrl: ModalController,
     private historialService: HistorialService,
   ) { }
@@ -41,23 +35,13 @@ export class HistorialPage implements OnInit {
     this.getPedidos()
   }
 
-  ionViewWillEnter() {
-    this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-      this.router.navigate(['/home'])
-    })
-  }
-
-  ionViewWillLeave() {
-    if (this.back) this.back.unsubscribe()
-  }
-
   getPedidos(event?) {
     this.historialService.getHistorial(this.batch + 1, this.lastKey).then(historial => this.cargaHistorial(historial, event))
   }
 
   cargaHistorial(historial, event) {
     if (historial.length === this.batch + 1) {
-      this.lastKey = historial[0].id;
+      this.lastKey = historial[0].id
       historial.shift()
     } else {
       this.noMore = true
@@ -80,18 +64,11 @@ export class HistorialPage implements OnInit {
   }
 
   async verPedido(pedido: Pedido) {
-    if (this.back) this.back.unsubscribe()
     const modal = await this.modalCtrl.create({
       component: PedidoActivoPage,
       enterAnimation,
       leaveAnimation,
       componentProps: {pedido}
-    })
-
-    modal.onDidDismiss().then(() => {
-      setTimeout(() => {
-        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.router.navigate(['/home']))
-      }, 100)
     })
   
     return await modal.present()

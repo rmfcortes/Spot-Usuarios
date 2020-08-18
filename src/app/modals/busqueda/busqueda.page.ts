@@ -60,8 +60,6 @@ export class BusquedaPage implements OnInit {
 
   uid: string
 
-  back: Subscription
-
   ultimas_busquedas: string[] = []
   pristine = true
 
@@ -71,7 +69,6 @@ export class BusquedaPage implements OnInit {
 
   constructor(
     private router: Router,
-    private platform: Platform,
     private modalCtrl: ModalController,
     private animationService: AnimationsService,
     private categoriaService: CategoriasService,
@@ -105,11 +102,9 @@ export class BusquedaPage implements OnInit {
   ionViewDidEnter() {
     const el: any = document.getElementById('inputSearch')
     el.setFocus()
-    this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
   }  
   
   ionViewDidLeave() {
-    if (this.back) this.back.unsubscribe()
   }
 
   async getAnteriores() {
@@ -222,7 +217,7 @@ export class BusquedaPage implements OnInit {
       this.commonService.presentAlert('', 'Esta tienda esta cerrada, por favor vuelve más tarde')
       return
     }    
-    let producto = await this.productoService.getProducto(productoAlgolia.idNegocio, productoAlgolia.objectID, 'productos')
+    let producto = await this.productoService.getProducto(productoAlgolia.idNegocio, productoAlgolia.objectID)
     if (!producto) {
       this.commonService.presentAlert('', 'La publicación de este producto ha sido pausada')
       return
@@ -231,7 +226,6 @@ export class BusquedaPage implements OnInit {
     producto.total = producto.precio
     producto.complementos = []
 
-    if (this.back) this.back.unsubscribe()
     const modal = await this.modalCtrl.create({
       component: ProductoPage,
       enterAnimation,
@@ -242,7 +236,7 @@ export class BusquedaPage implements OnInit {
       if (resp.data && resp.data === 'ver_mas') {
         this.uidService.setModal(true)
         setTimeout(() => this.modalCtrl.dismiss('en_negociopage'), 500)
-        this.router.navigate([`negocio/${productoAlgolia.categoria}/${productoAlgolia.idNegocio}`])
+        this.router.navigate([`negocio/${productoAlgolia.categoria}/${productoAlgolia.idNegocio}`], { skipLocationChange: true })
         return
       }
       if (resp.data) {
@@ -250,13 +244,7 @@ export class BusquedaPage implements OnInit {
         setTimeout(() => this.verCarrito(producto, productoAlgolia), 100)
       }
     })
-    modal.onDidDismiss().then(resp => {
-      if (!resp.data) {
-        setTimeout(() => {
-          this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
-        }, 100)
-      }
-    })
+
     this.categoriaService.setVisitaNegocio(this.uid, productoAlgolia.idNegocio)
     this.categoriaService.setVisitaCategoria(this.uid, productoAlgolia.categoria)
     return await modal.present()
@@ -265,7 +253,6 @@ export class BusquedaPage implements OnInit {
   async verCarrito(producto: Producto, productoAlgolia: ProductoAlgolia) {
     const idNegocio = productoAlgolia.idNegocio
     producto = await this.cartService.updateCart(idNegocio, producto)
-    if (this.back) this.back.unsubscribe()
     const modal = await this.modalCtrl.create({
       component: CuentaPage,
       enterAnimation,
@@ -277,18 +264,7 @@ export class BusquedaPage implements OnInit {
       if (resp.data && resp.data === 'add') {
         this.uidService.setModal(true)
         setTimeout(() => this.modalCtrl.dismiss('en_negociopage'), 500)
-        this.router.navigate([`negocio/${productoAlgolia.categoria}/${productoAlgolia.idNegocio}`])
-      } else {
-        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
-      }
-    })
-
-    modal.onDidDismiss().then(resp => {
-      if (resp.data && resp.data === 'add') return
-      else {
-        setTimeout(() => {
-          this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
-        }, 100)
+        this.router.navigate([`negocio/${productoAlgolia.categoria}/${productoAlgolia.idNegocio}`], { skipLocationChange: true })
       }
     })
 
@@ -305,31 +281,21 @@ export class BusquedaPage implements OnInit {
     if (!abierto) {
       this.commonService.presentAlert('', 'Esta tienda esta cerrada, por favor vuelve más tarde')
       return
-    }    
-    if (this.back) this.back.unsubscribe()
+    }
+    const servicio = await this.productoService.getProducto(productoAlgolia.idNegocio, productoAlgolia.objectID)
     const modal = await this.modalCtrl.create({
       component: ServicioPage,
       enterAnimation,
       leaveAnimation,
-      componentProps: {servicio: productoAlgolia, categoria: productoAlgolia.categoria, idNegocio: productoAlgolia.idNegocio}
+      componentProps: {servicio, categoria: productoAlgolia.categoria, idNegocio: productoAlgolia.idNegocio}
     })
 
     modal.onWillDismiss().then(resp => {
       if (resp.data && resp.data === 'ver_mas') {
         this.uidService.setModal(true)
         setTimeout(() => this.modalCtrl.dismiss('en_negociopage'), 500)
-        this.router.navigate([`negocio-servicios/${productoAlgolia.categoria}/${productoAlgolia.idNegocio}`])
+        this.router.navigate([`negocio-servicios/${productoAlgolia.categoria}/${productoAlgolia.idNegocio}`], { skipLocationChange: true })
       }
-    })
-
-    modal.onDidDismiss().then(resp => {
-      if (resp.data && resp.data === 'ver_mas') return
-      setTimeout(() => {
-        this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-          const nombre = 'app'
-          navigator[nombre].exitApp()
-        })
-      }, 100)
     })
 
     this.categoriaService.setVisitaNegocio(this.uid, productoAlgolia.idNegocio)
@@ -339,17 +305,15 @@ export class BusquedaPage implements OnInit {
 
   verNegocio(negocio: NegocioAlgolia)  {
     this.uidService.setModal(true)
-    if (this.back) this.back.unsubscribe()
     if (this.uid) {
       this.categoriaService.setVisitaNegocio(this.uid, negocio.objectID)
       this.categoriaService.setVisitaCategoria(this.uid, negocio.categoria)
     }
-    this.router.navigate([`negocio/${negocio.categoria}/${negocio.objectID}`])
+    this.router.navigate([`negocio/${negocio.categoria}/${negocio.objectID}`], { skipLocationChange: true })
     setTimeout(() => this.modalCtrl.dismiss('en_negociopage'), 500) 
   }
 
   async verDetallesTienda(abierto: boolean, producto: ProductoAlgolia) {
-    if (this.back) this.back.unsubscribe()
     const direccion = await this.productoService.getDireccionNegocio(producto.idNegocio)
     const datos: DatosParaCuenta = {
       logo: '',
@@ -365,11 +329,6 @@ export class BusquedaPage implements OnInit {
       componentProps : {datos, abierto, verHorario: true}
     })
 
-    modal.onDidDismiss().then(() => {
-      setTimeout(() => {
-        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
-      }, 100)
-    })
     return await modal.present()
   }
   
@@ -379,7 +338,6 @@ export class BusquedaPage implements OnInit {
   }
 
   async presentLogin() {
-    if (this.back) this.back.unsubscribe()
     const modal = await this.modalCtrl.create({
       component: LoginPage,
       cssClass: 'my-custom-modal-css',
@@ -388,17 +346,11 @@ export class BusquedaPage implements OnInit {
       this.uid = this.uidService.getUid()
     })
 
-    modal.onDidDismiss().then(() => {
-      setTimeout(() => {
-        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
-      }, 100)
-    })
     return await modal.present()
   }
 
   regresar() {
     if (this.busqueda.id) this.busquedaService.borraResultados(this.busqueda.id)
-    if (this.back) this.back.unsubscribe()
     this.modalCtrl.dismiss()
   }
 

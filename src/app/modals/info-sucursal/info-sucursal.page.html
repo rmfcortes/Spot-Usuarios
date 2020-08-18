@@ -61,7 +61,7 @@
         </ion-grid>
         <div [style.display]="mapReady ? 'initial' : 'none'">
             <agm-map [latitude]="negocio.datos.direccion.lat" [longitude]="negocio.datos.direccion.lng" [zoom]="17" (mapReady)="mapLoaded($event)" [disableDefaultUI]="true">
-                <agm-marker [latitude]="negocio.datos.direccion.lat" [longitude]="negocio.datos.direccion.lng" [iconUrl]='{"url": icon,"scaledSize": {"height": 60, "width": 60}}'></agm-marker>
+                <agm-marker [latitude]="negocio.datos.direccion.lat" [longitude]="negocio.datos.direccion.lng" [iconUrl]='{"url": icon,"scaledSize": {"height": 90, "width": 60}}'></agm-marker>
             </agm-map>
         </div>
     </div>

@@ -1,6 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { ModalController, Platform } from '@ionic/angular';
-import { Subscription } from 'rxjs';
+import { ModalController } from '@ionic/angular';
 
 import { SocialSharing } from '@ionic-native/social-sharing/ngx';
 
@@ -22,10 +21,7 @@ export class ServicioPage implements OnInit {
   @Input() idNegocio: string
   @Input() whats: string
 
-  back: Subscription
-
   constructor(
-    private platform: Platform,
     private modalCtrl: ModalController,
     private socialSharing: SocialSharing,
     private servicioService: NegocioServiciosService,
@@ -33,10 +29,8 @@ export class ServicioPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-      this.regresar()
-    })
     if (!this.whats) this.getWhats()
+    this.servicioService.setConsulta(this.servicio, this.categoria, this.idNegocio)
   }
 
   async getWhats() {
@@ -51,15 +45,14 @@ export class ServicioPage implements OnInit {
     ).catch(err => {
       this.alertService.presentAlert('Error', err)
     })
+    
   }
 
   verMas() {
-    if (this.back) this.back.unsubscribe()
     this.modalCtrl.dismiss('ver_mas')
   }
 
   regresar() {
-    if (this.back) this.back.unsubscribe()
     this.modalCtrl.dismiss()
   }
 

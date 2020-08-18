@@ -1,11 +1,11 @@
 <h3 style="margin-left: 1rem">{{titulo}}</h3>
 <ion-slides [options]="slideVendidos">
     <ion-slide *ngFor="let item of masVendidos" (click)="verProducto(item)">
-        <ion-card>                    
-            <ion-grid fixed>
+        <ion-card style="width: 100%;">                    
+            <ion-grid class="ion-no-padding" fixed>
                 <ion-row>
                     <ion-col size="12">
-                        <preload-image [ratio]="{w: 1, h: 0.75}" [src]="item.url" style="border-radius: 10px;"></preload-image>
+                        <preload-image [ratio]="{w: 1, h: 0.75}" [src]="item.url" style="border-radius: 10px;" class="shadow"></preload-image>
                         <div class="price-box" *ngIf="item.descuento">
                             {{item.descuento}}%
                         </div>                        
@@ -13,6 +13,8 @@
                             2x1
                         </div>
                     </ion-col>
+                </ion-row>                
+                <ion-row>
                     <ion-col size="12">
                         <ion-item lines="none">
                             <ion-label>

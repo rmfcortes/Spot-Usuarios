@@ -21,7 +21,7 @@ export class DisparadoresService {
     return new Promise(async (resolve, reject) => {      
       const alert = await this.alertController.create({
         header: 'Inicia sesión',
-        message: `Para darte la mejor experiencia, por favor inicia sesión antes de continuar con tu pedido. <br> ¡Es muy sencillo!`,
+        message: `Para darte la mejor experiencia, por favor inicia sesión antes de continuar con tu pedido. <br> <strong>¡Es GRATIS y muy sencillo!</strong>`,
         buttons: [
           {
             text: 'Cancelar',

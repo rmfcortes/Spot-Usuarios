@@ -25,9 +25,9 @@ export class ProductoService {
 
 
   //// Para Busqueda Modal
-  getProducto(idNegocio: string, idProducto: string, origen: string): Promise<Producto> {
+  getProducto(idNegocio: string, idProducto: string): Promise<Producto> {
     return new Promise((resolve, reject) => {
-      const prodSub = this.db.object(`${origen}/${idNegocio}/${idProducto}`).valueChanges()
+      const prodSub = this.db.object(`productos/${idNegocio}/${idProducto}`).valueChanges()
       .subscribe((producto: Producto) => {
         prodSub.unsubscribe()
         resolve(producto)

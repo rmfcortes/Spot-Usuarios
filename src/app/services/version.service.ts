@@ -28,6 +28,7 @@ export class VersionService {
       if (phoneVersionArr[0] > fireVersionArr[0]) return
       if (phoneVersionArr[1] > fireVersionArr[1]) return
       if (phoneVersionArr[2] > fireVersionArr[2]) return
+      if (phoneVersionArr[0] === fireVersionArr[0] && phoneVersionArr[1] === fireVersionArr[1] && phoneVersionArr[2] === fireVersionArr[2]) return
       this.alertService.presentAlertUpdate('Nueva versión de Plaza', 'Hay una versión de Plaza, '+
       'Obtén las últimas funcionalidades tu app. Trabajamos constantemente para darte el mejor servicio')
       .then(async (resp) => {

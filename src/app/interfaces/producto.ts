@@ -17,6 +17,7 @@ export interface Producto {
     total?: number;
     descuento?: number;
     dosxuno?: boolean;
+    objectID?: string;
 }
 
 export interface ProductoAlgolia {

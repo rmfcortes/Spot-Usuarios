@@ -1,6 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { ModalController, Platform } from '@ionic/angular';
-import { Subscription } from 'rxjs';
+import { ModalController } from '@ionic/angular';
 
 import { TarjetaPage } from 'src/app/modals/tarjeta/tarjeta.page';
 
@@ -27,10 +26,7 @@ export class FormasPagoPage implements OnInit {
   tarjetas: FormaPago[] = [ ]
   script: HTMLScriptElement
 
-  back: Subscription
-
   constructor(
-    private platform: Platform,
     private modalCtrl: ModalController,
     private alertService: DisparadoresService,
     private pagoService: PagosService,
@@ -38,7 +34,6 @@ export class FormasPagoPage implements OnInit {
 
   ngOnInit() {
     this.getTarjetas()
-    this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
   }
 
   getTarjetas() {
@@ -48,7 +43,6 @@ export class FormasPagoPage implements OnInit {
   }
 
   async nuevaTarjeta() {
-    if (this.back) this.back.unsubscribe()
     const modal = await this.modalCtrl.create({
       component: TarjetaPage,
       enterAnimation: enterAnimationDerecha,
@@ -58,12 +52,6 @@ export class FormasPagoPage implements OnInit {
 
     modal.onWillDismiss().then(resp => {
       if (resp.data) this.tarjetas.push(resp.data)
-    })
-
-    modal.onDidDismiss().then(() => {
-      setTimeout(() => {
-        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
-      }, 100)
     })
 
     return await modal.present()
@@ -86,7 +74,6 @@ export class FormasPagoPage implements OnInit {
   }
 
   regresar() {
-    if (this.back) this.back.unsubscribe()
     this.modalCtrl.dismiss()
   }
 

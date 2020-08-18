@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, NgZone, Input } from '@angular/core';
-import { ModalController, IonContent, Platform } from '@ionic/angular';
+import { ModalController, IonContent } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 
 import { ChatService } from 'src/app/services/chat.service';
@@ -29,11 +29,9 @@ export class ChatPage implements OnInit {
 
   stateSub: Subscription
   notiSub: Subscription
-  back: Subscription
 
   constructor(
     private ngZone: NgZone,
-    private platform: Platform,
     private modalController: ModalController,
     private pedidoService: PedidoService,
     private chatService: ChatService,
@@ -49,9 +47,6 @@ export class ChatPage implements OnInit {
     this.listenState()
     this.listenEntregado()
     this.listenNotification()
-    this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-      this.regresar()
-    })
   }
 
   listenEntregado() {
@@ -110,7 +105,6 @@ export class ChatPage implements OnInit {
     this.chatService.listenTodosMsg(this.idPedido).query.ref.off('child_added')
     if (this.stateSub) this.stateSub.unsubscribe()
     if (this.notiSub) this.notiSub.unsubscribe()
-    if (this.back) this.back.unsubscribe()
     this.modalController.dismiss()
   }
 

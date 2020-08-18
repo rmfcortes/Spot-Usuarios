@@ -1,6 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { ModalController, Platform } from '@ionic/angular';
-import { Subscription } from 'rxjs';
+import { ModalController } from '@ionic/angular';
 
 import { CalificarService } from 'src/app/services/calificar.service';
 
@@ -29,16 +28,12 @@ export class CalificarPage implements OnInit {
     externo: false
   }
 
-  back: Subscription
-
   constructor(
-    private platform: Platform,
     private modalCtrl: ModalController,
     private calificarService: CalificarService,
   ) { }
 
   ngOnInit() {
-    this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
   }
 
   calificar() {
@@ -62,7 +57,6 @@ export class CalificarPage implements OnInit {
 
 
   regresar() {
-    this.back.unsubscribe()
     this.modalCtrl.dismiss()
   }
 

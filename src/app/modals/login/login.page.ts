@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { IonSlides, ModalController, Platform } from '@ionic/angular';
-import { Subscription } from 'rxjs';
+import { IonSlides, ModalController } from '@ionic/angular';
 
 import { DisparadoresService } from 'src/app/services/disparadores.service';
 import { AuthService } from 'src/app/services/auth.service';
@@ -21,35 +20,25 @@ export class LoginPage implements OnInit {
     loop: false,
     centeredSlides: true,
     speed: 800
-  };
+  }
 
-  correo: string;
-  pass: string;
+  correo: string
+  pass: string
 
   usuario = {
     nombre: '',
     pass: '',
     passConfirm: '',
     correo: '',
-  };
-
-  back: Subscription;
+  }
 
   constructor(
-    private platform: Platform,
     private commonService: DisparadoresService,
     private modalCtrl: ModalController,
     private authService: AuthService,
-
   ) { }
 
   ngOnInit() {
-  }
-
-  ionViewWillEnter() {
-    this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-      this.salir()
-    })
   }
 
   ionViewDidEnter() {
@@ -117,7 +106,6 @@ export class LoginPage implements OnInit {
   }
 
   salir(data?) {
-    if (this.back) this.back.unsubscribe()
     this.modalCtrl.dismiss(data)
   }
 

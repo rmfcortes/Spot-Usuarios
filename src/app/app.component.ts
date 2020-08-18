@@ -45,12 +45,6 @@ export class AppComponent implements OnDestroy{
 
   initializeApp() {
     this.platform.ready().then(() => {
-      this.platform.backButton.subscribeWithPriority(9999, () => {
-        document.addEventListener('backbutton', (event) => {
-          event.preventDefault()
-          event.stopPropagation()
-        }, false)
-      })
       this.getUser()
       this.splashScreen.hide()
       this.statusBar.styleBlackTranslucent()
@@ -87,7 +81,7 @@ export class AppComponent implements OnDestroy{
     modal.onWillDismiss().then(resp => {
       if (resp.data) {
         this.regionService.setRegion(resp.data)
-        this.router.navigate(['/home'])
+        this.router.navigate(['/home'], {replaceUrl: true})
       }
     })
     return await modal.present()
@@ -95,7 +89,7 @@ export class AppComponent implements OnDestroy{
 
   salir() {
     this.authService.logout()
-    this.router.navigate(['/home'])
+    this.router.navigate(['/home'], {replaceUrl: true})
   }
 
   ngOnDestroy() {

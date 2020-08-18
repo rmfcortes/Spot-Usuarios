@@ -1,6 +1,5 @@
-import { ModalController, Platform } from '@ionic/angular';
+import { ModalController } from '@ionic/angular';
 import { Component, OnInit, NgZone } from '@angular/core';
-import { Subscription } from 'rxjs';
 
 import { DisparadoresService } from 'src/app/services/disparadores.service';
 import { AnimationsService } from 'src/app/services/animations.service';
@@ -41,8 +40,6 @@ export class TarjetaPage implements OnInit {
 
   loading = false
 
-  back: Subscription
-
   stripe: any
   style = {
     base: {
@@ -68,7 +65,6 @@ export class TarjetaPage implements OnInit {
 
   constructor(
     private ngZone: NgZone,
-    private platform: Platform,
     private modalCtrl: ModalController,
     private animationService: AnimationsService,
     private commonService: DisparadoresService,
@@ -81,7 +77,6 @@ export class TarjetaPage implements OnInit {
     this.card = elements.create('card', {style: this.style})
     this.card.mount('#card')
     this.listenCard()
-    this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
   }
 
   listenCard() {
@@ -136,7 +131,7 @@ export class TarjetaPage implements OnInit {
           const nuevaCard = await this.pagoService.getLastCard(result.paymentIntent.payment_method)
           this.loading = false
           this.commonService.presentToast('Tarjeta agregada con éxito')
-          if (this.back) this.back.unsubscribe()
+    
           this.modalCtrl.dismiss(nuevaCard)
         })
       })
@@ -152,7 +147,6 @@ export class TarjetaPage implements OnInit {
   }
 
   async regresar() {
-    if (this.back) this.back.unsubscribe()
     this.modalCtrl.dismiss()
   }
 

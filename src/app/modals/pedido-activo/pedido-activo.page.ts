@@ -1,6 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { ModalController, Platform } from '@ionic/angular';
-import { Subscription } from 'rxjs';
+import { ModalController } from '@ionic/angular';
 
 import { CalificarPage } from '../calificar/calificar.page';
 
@@ -21,32 +20,23 @@ export class PedidoActivoPage implements OnInit {
 
   @Input() pedido: Pedido
 
-  back: Subscription
+  // back: Subscription
 
   constructor(
-    private platform: Platform,
     private modalCtrl: ModalController,
     private animationService: AnimationsService,
   ) { }
 
   ngOnInit() {
-    this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
   }
 
   async verCalificar() {
-    if (this.back) this.back.unsubscribe()
     const modal = await this.modalCtrl.create({
      cssClass: 'my-custom-modal-css',
      enterAnimation,
      leaveAnimation,
      component: CalificarPage,
      componentProps: { pedido: this.pedido }
-    })
-      
-    modal.onDidDismiss().then(() => {
-      setTimeout(() => {
-        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
-      }, 100)
     })
 
     return await modal.present()
@@ -57,7 +47,6 @@ export class PedidoActivoPage implements OnInit {
   }
 
   regresar() {
-    if (this.back) this.back.unsubscribe()
     this.modalCtrl.dismiss()
   }
 

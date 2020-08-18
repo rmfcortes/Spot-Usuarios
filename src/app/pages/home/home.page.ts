@@ -1,6 +1,6 @@
 import { Component, OnInit, NgZone, OnDestroy } from '@angular/core';
+import { ModalController } from '@ionic/angular';
 import { Router } from '@angular/router';
-import { ModalController, Platform } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 
 import { CategoriasPage } from 'src/app/modals/categorias/categorias.page';
@@ -86,8 +86,6 @@ export class HomePage implements OnInit, OnDestroy {
 
   buscando = false
 
-  back: Subscription
-
   direccion: Direccion
 
   costo_envio: CostoEnvio
@@ -95,7 +93,6 @@ export class HomePage implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private ngZone: NgZone,
-    private platform: Platform,
     private modalController: ModalController,
     private categoriaService: CategoriasService,
     private alertService: DisparadoresService,
@@ -131,10 +128,6 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   ionViewWillEnter() {
-    this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-      const nombre = 'app'
-      navigator[nombre].exitApp()
-    })
     if (this.uid) this.getPedidosActivos()
     const modal = this.uidService.getModal()
     this.uidService.setModal(false)
@@ -340,63 +333,32 @@ export class HomePage implements OnInit, OnDestroy {
   // Acciones
 
   async login() {
-    if (this.back) this.back.unsubscribe()
     const modal = await this.modalController.create({
       cssClass: 'my-custom-modal-css',
       component: LoginPage,
-    })
-
-    modal.onDidDismiss().then(() => {
-      setTimeout(() => {
-        this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-          const nombre = 'app'
-          navigator[nombre].exitApp()
-        })
-      }, 100)
     })
 
     return await modal.present()
   }
 
   async onBusqueda() {
-    if (this.back) this.back.unsubscribe()
     const modal = await this.modalController.create({
       component: BusquedaPage,
-    })
-
-    modal.onDidDismiss().then(resp => {
-      if (resp && resp.data === 'en_negociopage') return
-      this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-        const nombre = 'app'
-        navigator[nombre].exitApp()
-      })
     })
 
     return await modal.present()
   }
 
   async verOfertas() {
-    if (this.back) this.back.unsubscribe()
     const modal = await this.modalController.create({
       component: OfertasPage,
       componentProps: {categoria: 'todas', categorias: this.categorias, subCategoria: 'todos', batch: this.batch}
-    })
-
-    modal.onDidDismiss().then(resp => {
-      if (resp.data && resp.data === 'en_negociopage') return
-      setTimeout(() => {        
-        this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-          const nombre = 'app'
-          navigator[nombre].exitApp()
-        })
-      }, 100)
     })
 
     return modal.present()
   }
 
   async verCategorias() {
-    if (this.back) this.back.unsubscribe()
     const modal = await this.modalController.create({
       component: CategoriasPage,
       cssClass: 'modal-categorias',
@@ -409,24 +371,13 @@ export class HomePage implements OnInit, OnDestroy {
       if (resp.data) this.irACategoria(resp.data)
     })
 
-    modal.onDidDismiss().then(resp => {
-      if (resp.data) return
-      setTimeout(() => {
-        this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-          const nombre = 'app'
-          navigator[nombre].exitApp()
-        })
-      }, 100)
-    })
-
     return await modal.present()
   }
 
   // Redirección
 
   verPedido(pedido: Pedido) {
-    if (this.back) this.back.unsubscribe()
-    this.router.navigate(['/avances', pedido.id])
+    this.router.navigate(['/avances', pedido.id], { skipLocationChange: true })
   }
 
   async verNegocio(prod: InfoGral) {
@@ -436,16 +387,15 @@ export class HomePage implements OnInit, OnDestroy {
       this.categoriaService.setVisitaCategoria(this.uid, prod.categoria)
     }
     this.categoriaService.setVisita(prod.idNegocio)
-    if (this.back) this.back.unsubscribe()
     if (prod.tipo === 'productos') {
-      this.router.navigate([`negocio/${prod.categoria}/${prod.idNegocio}`])
+      this.router.navigate([`negocio/${prod.categoria}/${prod.idNegocio}`], { skipLocationChange: true })
     } else {
-      this.router.navigate([`negocio-servicios/${prod.categoria}/${prod.idNegocio}`])
+      this.router.navigate([`negocio-servicios/${prod.categoria}/${prod.idNegocio}`], { skipLocationChange: true })
     }
   }
 
   async muestraProducto(oferta: Oferta) {
-    if (oferta.tipo === 'servicios') return this.deOfertaAServicio(oferta)
+    if (oferta.tipo === 'servicios') return this.muestraServicio(oferta)
     if (oferta.agotado) {
       this.alertService.presentAlert('Producto agotado', 'Lo sentimos, este producto está temporalmente agotado')
       return
@@ -456,7 +406,7 @@ export class HomePage implements OnInit, OnDestroy {
       this.alertService.presentAlert('', 'Esta tienda esta cerrada, por favor vuelve más tarde')
       return
     }    
-    const producto = await this.productoService.getProducto(oferta.idNegocio, oferta.id, 'productos')
+    const producto = await this.productoService.getProducto(oferta.idNegocio, oferta.id)
     if (!producto) {
       this.alertService.presentAlert('', 'La publicación de este producto ha sido pausada')
       return
@@ -465,7 +415,6 @@ export class HomePage implements OnInit, OnDestroy {
     producto.total = producto.precio
     producto.complementos = []
 
-    if (this.back) this.back.unsubscribe()
     const modal = await this.modalController.create({
       component: ProductoPage,
       enterAnimation,
@@ -474,23 +423,13 @@ export class HomePage implements OnInit, OnDestroy {
     })
     modal.onWillDismiss().then(async (resp) => {
       if (resp.data && resp.data === 'ver_mas') {
-        this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`])
+        this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`], { skipLocationChange: true })
         return
       }
       if (resp.data) {
         producto.cantidad = resp.data
         setTimeout(() => this.verCarrito(producto, oferta), 100)
       }
-    })
-
-    modal.onDidDismiss().then(resp => {
-      if (resp.data) return
-      setTimeout(() => {
-        this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-          const nombre = 'app'
-          navigator[nombre].exitApp()
-        })
-      }, 100)
     })
 
     if (this.uid) {
@@ -501,48 +440,33 @@ export class HomePage implements OnInit, OnDestroy {
     return await modal.present()
   }
 
-  deOfertaAServicio(serv: any) {
-    this.muestraServicio(serv)
-  }
-
-  async muestraServicio(servicio: MasVendido) {
-    if (servicio.agotado) {
+  async muestraServicio(serv: Oferta) {
+    if (serv.agotado) {
       this.alertService.presentAlert('Servicio agotado', 'Lo sentimos, este servicio está temporalmente agotado')
       return
     }
     if (!this.uid) return this.presentAlertNotLogin()
-    const abierto = await this.negocioService.isOpen(servicio.idNegocio)
+    const abierto = await this.negocioService.isOpen(serv.idNegocio)
     if (!abierto) {
       this.alertService.presentAlert('', 'Esta tienda esta cerrada, por favor vuelve más tarde')
       return
     }    
-
-    if (this.back) this.back.unsubscribe()
+    const servicio = await this.productoService.getProducto(serv.idNegocio, serv.id)
     const modal = await this.modalController.create({
       component: ServicioPage,
       enterAnimation,
       leaveAnimation,
-      componentProps: {servicio, categoria: servicio.categoria, idNegocio: servicio.idNegocio}
+      componentProps: {servicio, categoria: serv.categoria, idNegocio: serv.idNegocio}
     })
 
     modal.onWillDismiss().then(resp => {
       if (resp.data && resp.data === 'ver_mas') {
-        this.router.navigate([`negocio-servicios/${servicio.categoria}/${servicio.idNegocio}`])
+        this.router.navigate([`negocio-servicios/${serv.categoria}/${serv.idNegocio}`], { skipLocationChange: true })
       }
     })
 
-    modal.onDidDismiss().then(resp => {
-      if (resp.data && resp.data === 'ver_mas') return
-      setTimeout(() => {
-        this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-          const nombre = 'app'
-          navigator[nombre].exitApp()
-        })
-      }, 100)
-    })
-
-    this.categoriaService.setVisitaNegocio(this.uid, servicio.idNegocio)
-    this.categoriaService.setVisitaCategoria(this.uid, servicio.categoria)
+    this.categoriaService.setVisitaNegocio(this.uid, serv.idNegocio)
+    this.categoriaService.setVisitaCategoria(this.uid, serv.categoria)
     return await modal.present()
   }
 
@@ -550,7 +474,6 @@ export class HomePage implements OnInit, OnDestroy {
     const idNegocio = oferta.idNegocio
     producto = await this.cartService.updateCart(idNegocio, producto)
 
-    if (this.back) this.back.unsubscribe()
     const modal = await this.modalController.create({
       component: CuentaPage,
       enterAnimation,
@@ -560,18 +483,8 @@ export class HomePage implements OnInit, OnDestroy {
 
     modal.onWillDismiss().then(resp => {
       if (resp.data && resp.data === 'add') {
-        this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`])
+        this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`], { skipLocationChange: true })
       }
-    })
-
-    modal.onDidDismiss().then(resp => {
-      if (resp.data && resp.data === 'add') return
-      setTimeout(() => {
-        this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-          const nombre = 'app'
-          navigator[nombre].exitApp()
-        })
-      }, 100)
     })
 
     return await modal.present()
@@ -583,13 +496,8 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   irACategoria(categoria: string) {
-    if (this.back) this.back.unsubscribe()
     this.router.navigate(['/categoria', categoria])
     if (this.uid) this.categoriaService.setVisitaCategoria(this.uid, categoria)
-  }
-
-  ionViewWillLeave() {
-    if (this.back) this.back.unsubscribe()
   }
 
   ngOnDestroy() {

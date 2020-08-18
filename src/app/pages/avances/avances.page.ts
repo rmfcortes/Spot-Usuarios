@@ -1,6 +1,6 @@
 import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnInit, NgZone } from '@angular/core';
-import { Platform, ModalController } from '@ionic/angular';
+import { ModalController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 
 import { CallNumber } from '@ionic-native/call-number/ngx';
@@ -68,13 +68,10 @@ export class AvancesPage implements OnInit {
 
   infoReady = false
 
-  back: Subscription
-
 
   constructor(
     private router: Router,
     private ngZone: NgZone,
-    private platform: Platform,
     private callNumber: CallNumber,
     private modalCtrl: ModalController,
     private activatedRoute: ActivatedRoute,
@@ -87,7 +84,6 @@ export class AvancesPage implements OnInit {
   }
 
   ionViewWillEnter() {
-    this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
     const id = this.activatedRoute.snapshot.paramMap.get('id')
     this.getPedido(id)
   }
@@ -365,7 +361,6 @@ export class AvancesPage implements OnInit {
     // Acciones
 
   async verPedido() {
-    if (this.back) this.back.unsubscribe()
     const modal = await this.modalCtrl.create({
       component: PedidoActivoPage,
       enterAnimation,
@@ -373,17 +368,10 @@ export class AvancesPage implements OnInit {
       componentProps: {pedido: this.pedido}
     })
 
-    modal.onDidDismiss().then(() => {
-      setTimeout(() => {
-        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
-      }, 100)
-    })
-
     return await modal.present()
   }
 
   async verCalificar() {
-    if (this.back) this.back.unsubscribe()
     const modal = await this.modalCtrl.create({
       cssClass: 'my-custom-modal-css',
       enterAnimation,
@@ -417,7 +405,6 @@ export class AvancesPage implements OnInit {
   }
 
   async muestraChat() {
-    if (this.back) this.back.unsubscribe()
     if (this.msgSub) this.msgSub.unsubscribe()
     const modal = await this.modalCtrl.create({
       component: ChatPage,
@@ -431,16 +418,10 @@ export class AvancesPage implements OnInit {
       }
     })
 
-    modal.onDidDismiss().then(() => {
-      this.listenNewMsg()
-      this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
-    })
-
     return await modal.present()
   }
 
   async muestraPermisos() {
-    if (this.back) this.back.unsubscribe()
     const modal = await this.modalCtrl.create({
       component: PermisosPage,
     })
@@ -453,12 +434,6 @@ export class AvancesPage implements OnInit {
       }
     })
 
-    modal.onDidDismiss().then(() => {
-      setTimeout(() => {
-        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
-      }, 100)
-    })
-
     return await modal.present()
   }
 
@@ -466,7 +441,6 @@ export class AvancesPage implements OnInit {
   async regresar() {
     if (this.pedido.cancelado_by_negocio) this.pedidoService.removePedidoCancelado(this.pedido)
     // if (this.map) this.map.remove()
-    if (this.back) this.back.unsubscribe()
     if (this.msgSub) this.msgSub.unsubscribe()
     if (this.pedidoSub) this.pedidoSub.unsubscribe()
     if (this.canceladoSub) this.canceladoSub.unsubscribe()
@@ -475,10 +449,6 @@ export class AvancesPage implements OnInit {
     if (this.repartidorSub) this.repartidorSub.unsubscribe()
     this.pedidoService.trackAvances(this.pedido.id).query.ref.off('child_added')
     this.router.navigate(['/home'], { replaceUrl: true })
-  }
-
-  ionViewWillLeave() {
-    if (this.back) this.back.unsubscribe()
   }
 
 }

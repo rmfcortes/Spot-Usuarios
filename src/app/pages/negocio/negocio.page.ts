@@ -1,7 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ModalController, IonInfiniteScroll, Platform } from '@ionic/angular';
-import { Subscription } from 'rxjs';
+import { ModalController, IonInfiniteScroll } from '@ionic/angular';
 
 import { InfoSucursalPage } from 'src/app/modals/info-sucursal/info-sucursal.page';
 import { ProductoPage } from 'src/app/modals/producto/producto.page';
@@ -63,15 +62,12 @@ export class NegocioPage {
   hasOfertas = false
   error = false
 
-  back: Subscription
-
   origen_categoria = false
 
   costo_envio: CostoEnvio
 
   constructor(
     private router: Router,
-    private platform: Platform,
     private activatedRoute: ActivatedRoute,
     private modalController: ModalController,
     private commonService: DisparadoresService,
@@ -79,7 +75,11 @@ export class NegocioPage {
     private storageService: StorageService,
     private cartService: CartService,
     private uidService: UidService,
-  ) { }
+  ) {
+    if (this.router.getCurrentNavigation().extras.state) {
+      this.origen_categoria = this.router.getCurrentNavigation().extras.state.origen_categoria
+    } else this.origen_categoria = false
+  }
 
   // Get info inicial
 
@@ -91,12 +91,8 @@ export class NegocioPage {
     this.infiniteCall = 1
     this.productosCargados = 0
     this.uid = this.uidService.getUid()
-    this.origen_categoria = history.state.origen_categoria
     this.categoria = this.activatedRoute.snapshot.paramMap.get('cat')
     this.getNegocio()
-    this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-      this.regresar()
-    })
   }
 
   async getNegocio() {
@@ -262,7 +258,6 @@ export class NegocioPage {
 
   // Acciones
   async muestraProducto(producto: Producto) {
-    if (this.back) this.back.unsubscribe()
     if (!this.negocio.abierto) {
       this.commonService.presentAlert('', 'Esta tienda esta cerrada, por favor vuelve más tarde')
       return
@@ -287,16 +282,10 @@ export class NegocioPage {
         this.cuenta = await this.negocioService.getCart(this.uid, this.negocio.id)
       }
     })
-    modal.onDidDismiss().then(() => {
-      setTimeout(() => {
-        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
-      }, 100)
-    })
     return await modal.present()
   }
   
   async verCuenta() {
-    if (this.back) this.back.unsubscribe()
     const modal = await this.modalController.create({
       component: CuentaPage,
       enterAnimation,
@@ -308,11 +297,6 @@ export class NegocioPage {
       this.productos.forEach(async(p) => p.productos = await this.negocioService.comparaCart(p.productos))
     })
 
-    modal.onDidDismiss().then(() => {
-      setTimeout(() => {
-        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
-      }, 100)
-    })
     return await modal.present()
   }
 
@@ -387,7 +371,6 @@ export class NegocioPage {
   }
 
   async verInfo() {
-    if (this.back) this.back.unsubscribe()
     const datos: DatosParaCuenta = {
       logo: this.negocio.foto,
       direccion: this.negocio.direccion,
@@ -402,12 +385,6 @@ export class NegocioPage {
       leaveAnimation,
       componentProps : {datos, abierto: this.negocio.abierto}
     })
-    
-    modal.onDidDismiss().then(() => {
-      setTimeout(() => {
-        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
-      }, 100)
-    })
 
     return await modal.present()
   }
@@ -420,7 +397,6 @@ export class NegocioPage {
 
   // Login
   async presentLogin() {
-    if (this.back) this.back.unsubscribe()
     const modal = await this.modalController.create({
       component: LoginPage,
       cssClass: 'my-custom-modal-css',
@@ -429,21 +405,14 @@ export class NegocioPage {
       this.uid = this.uidService.getUid()
     })
 
-    modal.onDidDismiss().then(() => {
-      setTimeout(() => {
-        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
-      }, 100)
-    })
-
     return await modal.present()
   }
 
   // Salida
 
   regresar() {
-    if (this.back) this.back.unsubscribe()
-    if (this.origen_categoria) this.router.navigate(['/categoria', this.categoria])
-    else this.router.navigate(['/home'])
+    if (this.origen_categoria) this.router.navigate(['/categoria', this.categoria], { skipLocationChange: true })
+    else this.router.navigate(['/home'], { replaceUrl: true })
   }
 
   // Mensajes

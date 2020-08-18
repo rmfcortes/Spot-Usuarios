@@ -1,6 +1,5 @@
 import { Component, OnInit, NgZone, Input } from '@angular/core';
-import { ModalController, Platform } from '@ionic/angular';
-import { Subscription } from 'rxjs';
+import { ModalController } from '@ionic/angular';
 
 import { } from 'googlemaps';
 
@@ -49,7 +48,6 @@ export class DireccionesPage implements OnInit {
 
   icon = '../../../assets/img/iconos/pin.png';
 
-  back: Subscription
   sugerencias = []
 
   geocoder: google.maps.Geocoder
@@ -58,7 +56,6 @@ export class DireccionesPage implements OnInit {
 
   constructor(
     private ngZone: NgZone,
-    private platform: Platform,
     private modalCtrl: ModalController,
     private direccionService: DireccionService,
     private alertService: DisparadoresService,
@@ -93,12 +90,6 @@ export class DireccionesPage implements OnInit {
     this.direccionService.getDirecciones()
     .then(direcciones => this.direcciones = direcciones)
     .catch(err => console.log(err))
-  }
-
-  ionViewWillEnter() {
-    this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-      this.regresar()
-    })
   }
 
   updateSearchResults(){
@@ -208,14 +199,12 @@ export class DireccionesPage implements OnInit {
   }
 
   setDireccion() {
-    if (this.back) this.back.unsubscribe()
     this.direccionService.guardarDireccion(this.direccion)
     if (!this.changeRegion) this.modalCtrl.dismiss(this.direccion)
     else this.modalCtrl.dismiss(this.region.referencia)
   }
 
   regresar() {
-    if (this.back) this.back.unsubscribe()
     this.modalCtrl.dismiss(null)
   }
 

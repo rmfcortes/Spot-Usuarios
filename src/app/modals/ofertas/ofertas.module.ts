@@ -10,6 +10,7 @@ import { CategoriasPageModule } from '../categorias/categorias.module';
 import { LoginPageModule } from '../login/login.module';
 import { ProductoPageModule } from '../producto/producto.module';
 import { CuentaPageModule } from '../cuenta/cuenta.module';
+import { ServicioPageModule } from '../servicio/servicio.module';
 
 @NgModule({
   imports: [
@@ -19,6 +20,7 @@ import { CuentaPageModule } from '../cuenta/cuenta.module';
     SharedModule,
     LoginPageModule,
     CuentaPageModule,
+    ServicioPageModule,
     ProductoPageModule,
     CategoriasPageModule,
   ],

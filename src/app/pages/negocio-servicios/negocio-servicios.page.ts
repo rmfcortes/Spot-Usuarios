@@ -1,8 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
 
-import { ModalController, IonInfiniteScroll, Platform } from '@ionic/angular';
+import { ModalController, IonInfiniteScroll } from '@ionic/angular';
 
 import { SocialSharing } from '@ionic-native/social-sharing/ngx';
 import { CallNumber } from '@ionic-native/call-number/ngx';
@@ -61,13 +60,10 @@ export class NegocioServiciosPage{
 
   cargandoProds = true
 
-  back: Subscription
-
   origen_categoria = false
 
   constructor(
     private router: Router,
-    private platform: Platform,
     private callNumber: CallNumber,
     private socialSharing: SocialSharing,
     private activatedRoute: ActivatedRoute,
@@ -75,15 +71,15 @@ export class NegocioServiciosPage{
     private negServicios: NegocioServiciosService,
     private alertService: DisparadoresService,
     private storageService: StorageService,
-  ) { }
+  ) {
+    if (this.router.getCurrentNavigation().extras.state) {
+      this.origen_categoria = this.router.getCurrentNavigation().extras.state.origen_categoria
+    } else this.origen_categoria = false
+  }
 
   ionViewWillEnter() {
-    this.origen_categoria = history.state.origen_categoria
     this.categoria = this.activatedRoute.snapshot.paramMap.get('cat')
     this.getNegocio()
-    this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-      this.regresar()
-    })
   }
 
   async getNegocio() {
@@ -105,12 +101,12 @@ export class NegocioServiciosPage{
     detalles.pasillos = detalles.pasillos.filter(p => p.cantidad)
     this.portada = detalles.portada
     this.telefono = detalles.telefono
-    this.pasillos.pasillos = detalles.pasillos
+    this.pasillos.pasillos = detalles.pasillos ? detalles.pasillos : []
     const vista = await this.storageService.getString('vista')
-    this.vista = vista ? vista : 'list-img'
+    this.vista = vista ? vista : 'block'
     this.whats = detalles.whats
-    this.pasillos.pasillos = this.pasillos.pasillos.sort((a, b) => a.prioridad - b.prioridad)
-    this.getInfoServicios()
+    if (this.pasillos.pasillos) this.pasillos.pasillos = this.pasillos.pasillos.sort((a, b) => a.prioridad - b.prioridad)
+    this.getOfertas()
   }
 
   // Get Servicios
@@ -293,21 +289,13 @@ export class NegocioServiciosPage{
   // Acciones
 
   async verServicio(servicio: Producto) {
-    if (this.back) this.back.unsubscribe()
     const modal = await this.modalController.create({
       component: ServicioPage,
       enterAnimation,
       leaveAnimation,
-      componentProps: {servicio, whats: this.whats, fromServPage: true}
+      componentProps: {servicio, whats: this.whats, fromServPage: true, categoria: this.categoria, idNegocio: this.negocio.id}
     })
 
-    modal.onDidDismiss().then(() => {
-      setTimeout(() => {
-        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
-      }, 100)
-    })
-
-    this.negServicios.setConsulta(servicio, this.categoria, this.negocio.id, this.negocio.nombre)
     return await modal.present()
   }
 
@@ -324,7 +312,6 @@ export class NegocioServiciosPage{
   }
 
   async verInfo() {
-    if (this.back) this.back.unsubscribe()
     const datos: DatosParaCuenta = {
       logo: this.negocio.foto,
       direccion: this.negocio.direccion,
@@ -338,12 +325,6 @@ export class NegocioServiciosPage{
       componentProps : {datos, abierto: this.negocio.abierto}
     })
 
-    modal.onDidDismiss().then(() => {
-      setTimeout(() => {
-        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.regresar())
-      }, 100)
-    })
-
     return await modal.present()
   }
 
@@ -355,9 +336,8 @@ export class NegocioServiciosPage{
   // Salida
 
   regresar() {
-    if (this.back) this.back.unsubscribe()
-    if (this.origen_categoria) this.router.navigate(['/categoria', this.categoria])
-    else this.router.navigate(['/home'])
+    if (this.origen_categoria) this.router.navigate(['/categoria', this.categoria], { skipLocationChange: true })
+    else this.router.navigate(['/home'], { replaceUrl: true })
   }
 
   // Auxiliares

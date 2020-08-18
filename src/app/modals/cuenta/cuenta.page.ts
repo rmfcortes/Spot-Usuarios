@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { ModalController, ActionSheetController, Platform } from '@ionic/angular';
+import { ModalController, ActionSheetController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
@@ -55,7 +55,6 @@ export class CuentaPage implements OnInit {
 
   direcciones = []
 
-  back: Subscription
   infoReady = false
 
   comision = 0
@@ -105,7 +104,6 @@ export class CuentaPage implements OnInit {
 
   constructor(
     private router: Router,
-    private platform: Platform,
     private modalCtrl: ModalController,
     private actionSheetCtrl: ActionSheetController,
     private animationService: AnimationsService,
@@ -124,9 +122,6 @@ export class CuentaPage implements OnInit {
     this.getCart()
     this.getDireccion()
     this.calculaPropina(this.propina_sel)
-    this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-      this.closeCart()
-    })
     this.pedidoService.getTelefono().then(tel => this.telefono = tel)
   }
   
@@ -216,7 +211,6 @@ export class CuentaPage implements OnInit {
 
   async muestraProducto(producto: Producto) {
     producto.total = producto.precio
-    if (this.back) this.back.unsubscribe()
     const modal = await this.modalCtrl.create({
       component: ProductoPage,
       enterAnimation,
@@ -235,18 +229,11 @@ export class CuentaPage implements OnInit {
         this.calculaPropina(this.propina_sel)
       }
     })
-
-    modal.onDidDismiss().then(() => {
-      setTimeout(() => {
-        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.closeCart())
-      }, 100)
-    })
     
     return await modal.present()
   }
 
   async mostrarDirecciones() {
-    if (this.back) this.back.unsubscribe()
     const modal = await this.modalCtrl.create({
       component: DireccionesPage,
       enterAnimation,
@@ -256,11 +243,6 @@ export class CuentaPage implements OnInit {
         this.direccion = resp.data
         this.datosNegocio.envio = await this.costoEnvio()
       }
-    })
-    modal.onDidDismiss().then(() => {
-      setTimeout(() => {
-        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.closeCart())
-      }, 100)
     })
     return await modal.present()
   }
@@ -289,7 +271,6 @@ export class CuentaPage implements OnInit {
   }
 
   async formasPago() {
-    if (this.back) this.back.unsubscribe()
     const modal = await this.modalCtrl.create({
       component: FormasPagoPage,
       enterAnimation: enterAnimationDerecha,
@@ -302,12 +283,6 @@ export class CuentaPage implements OnInit {
         if (this.formaPago.forma === 'efectivo') this.comision = 0
         else this.comision = ((this.cuenta * 0.05) + 4) * 1.16
       }
-    })
-
-    modal.onDidDismiss().then(() => {
-      setTimeout(() => {
-        this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.closeCart())
-      }, 100)
     })
 
     return await modal.present()
@@ -402,7 +377,7 @@ export class CuentaPage implements OnInit {
       }
       await this.pedidoService.createPedido(pedido)
       this.alertSerivce.dismissLoading()
-      this.router.navigate(['/avances', pedido.id])
+      this.router.navigate(['/avances', pedido.id], { skipLocationChange: true })
       this.confirmar = false
       this.claseAyuda.style.setProperty('visibility', 'hidden')
       this.animationService.salidaDebajo(this.cuadroAyuda)
@@ -420,12 +395,10 @@ export class CuentaPage implements OnInit {
   }
 
   closeCart() {
-    if (this.back) this.back.unsubscribe()
     this.modalCtrl.dismiss(this.cuenta)
   }
 
   verMas() {
-    if (this.back) this.back.unsubscribe()
     this.modalCtrl.dismiss('add')
   }
 

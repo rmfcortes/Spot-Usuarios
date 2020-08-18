@@ -1,6 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { ModalController, Platform } from '@ionic/angular';
-import { Subscription } from 'rxjs';
+import { ModalController } from '@ionic/angular';
 
 import { CallNumber } from '@ionic-native/call-number/ngx';
 
@@ -34,11 +33,7 @@ export class InfoSucursalPage implements OnInit {
 
   horario: Dia[] = []
 
-  back: Subscription
-
-
   constructor(
-    private platform: Platform,
     private callNumber: CallNumber,
     private modalController: ModalController,
     private alertService: DisparadoresService,
@@ -49,9 +44,6 @@ export class InfoSucursalPage implements OnInit {
   ngOnInit() {
     if (this.verHorario) this.despliegueHorario = true
     this.getInfo()
-    this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-      this.regresar()
-    })
   }
 
   mapLoaded(event) {
@@ -106,7 +98,6 @@ export class InfoSucursalPage implements OnInit {
   }
 
   async regresar() {
-    if (this.back) this.back.unsubscribe()
     await this.modalController.dismiss()
   }
 

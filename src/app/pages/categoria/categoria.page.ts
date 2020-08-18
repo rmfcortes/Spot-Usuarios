@@ -1,7 +1,6 @@
 import { Component, ViewChild, NgZone, OnInit, OnDestroy } from '@angular/core';
-import { IonInfiniteScroll, ModalController, Platform } from '@ionic/angular';
+import { IonInfiniteScroll, ModalController } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
 
 import { CategoriasPage } from 'src/app/modals/categorias/categorias.page';
 import { ServicioPage } from 'src/app/modals/servicio/servicio.page';
@@ -73,8 +72,6 @@ export class CategoriaPage implements OnInit, OnDestroy{
   promosReady = false
   negociosReady = false
 
-  back: Subscription
-
   direccion: Direccion
   costo_envio: CostoEnvio
 
@@ -94,7 +91,6 @@ export class CategoriaPage implements OnInit, OnDestroy{
   constructor(
     private ngZone: NgZone,
     private router: Router,
-    private platform: Platform,
     private activatedRoute: ActivatedRoute,
     private modalController: ModalController,
     private categoriaService: CategoriasService,
@@ -120,9 +116,6 @@ export class CategoriaPage implements OnInit, OnDestroy{
 
   ionViewWillEnter() {
     this.categoria = this.activatedRoute.snapshot.paramMap.get('cat')
-    this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-      this.router.navigate(['/home'])
-    })
     this.uid = this.uidService.getUid()
     const ofertas = this.uidService.getOfertas()
     if (ofertas) this.verOfertas()
@@ -354,18 +347,16 @@ export class CategoriaPage implements OnInit, OnDestroy{
 
   async verNegocio(negocio: Negocio) {
     const uid = this.uidService.getUid()
-    if (this.back) this.back.unsubscribe()
     if (uid) this.categoriaService.setVisitaNegocio(uid, negocio.id)
     this.categoriaService.setVisita(negocio.id)
     if (negocio.tipo === 'productos') {
-      this.router.navigate([`/negocio/${this.categoria}/${negocio.id}`], {state: {origen_categoria: true}})
+      this.router.navigate([`/negocio/${this.categoria}/${negocio.id}`], {skipLocationChange: true ,state: {origen_categoria: true}})
     } else {
-      this.router.navigate([`/negocio-servicios/${this.categoria}/${negocio.id}`], {state: {origen_categoria: true}})
+      this.router.navigate([`/negocio-servicios/${this.categoria}/${negocio.id}`], {skipLocationChange: true ,state: {origen_categoria: true}})
     }
   }
 
   async verOfertas() {
-    if (this.back) this.back.unsubscribe()
     const modal = await this.modalController.create({
       component: OfertasPage,
       componentProps: {categoria: this.categoria, categorias: this.categorias,
@@ -373,20 +364,11 @@ export class CategoriaPage implements OnInit, OnDestroy{
                     fromCats: true}
     })
 
-    modal.onDidDismiss().then(resp => {
-      if (resp.data && resp.data === 'en_negociopage') return
-      setTimeout(() => {
-        this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-          this.router.navigate(['/home'])
-        })
-      }, 100)
-    })
-
     return modal.present()
   }
 
   async muestraProducto(oferta: Oferta) {
-    if (oferta.tipo === 'servicios') return
+    if (oferta.tipo === 'servicios') return this.muestraServicio(oferta)
     if (oferta.agotado) {
       this.alertService.presentAlert('Producto agotado', 'Lo sentimos, este producto está temporalmente agotado')
       return
@@ -397,7 +379,7 @@ export class CategoriaPage implements OnInit, OnDestroy{
       this.alertService.presentAlert('', 'Esta tienda esta cerrada, por favor vuelve más tarde')
       return
     }    
-    const producto = await this.productoService.getProducto(oferta.idNegocio, oferta.id, 'productos')
+    const producto = await this.productoService.getProducto(oferta.idNegocio, oferta.id)
     if (!producto) {
       this.alertService.presentAlert('', 'La publicación de este producto ha sido pausada')
       return
@@ -406,7 +388,6 @@ export class CategoriaPage implements OnInit, OnDestroy{
     producto.total = producto.precio
     producto.complementos = []
 
-    if (this.back) this.back.unsubscribe()
     const modal = await this.modalController.create({
       component: ProductoPage,
       enterAnimation,
@@ -415,23 +396,13 @@ export class CategoriaPage implements OnInit, OnDestroy{
     })
     modal.onWillDismiss().then(async (resp) => {
       if (resp.data && resp.data === 'ver_mas') {
-        this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`], {state: {origen_categoria: true}})
+        this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`], {skipLocationChange: true, state: {origen_categoria: true}})
         return
       }
       if (resp.data) {
         producto.cantidad = resp.data
         setTimeout(() => this.verCarrito(producto, oferta), 100)
       }
-    })
-
-    modal.onDidDismiss().then(resp => {
-      if (resp.data) return
-      setTimeout(() => {
-        this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-          const nombre = 'app'
-          navigator[nombre].exitApp()
-        })
-      }, 100)
     })
 
     if (this.uid) {
@@ -442,51 +413,42 @@ export class CategoriaPage implements OnInit, OnDestroy{
     return await modal.present()
   }
 
-  async muestraServicio(servicio: MasVendido) {
-    if (servicio.agotado) {
+  async muestraServicio(serv: Oferta) {
+    if (serv.agotado) {
       this.alertService.presentAlert('Servicio agotado', 'Lo sentimos, este servicio está temporalmente agotado')
       return
     }
     if (!this.uid) return this.presentAlertNotLogin()
-    const abierto = await this.negocioService.isOpen(servicio.idNegocio)
+    const abierto = await this.negocioService.isOpen(serv.idNegocio)
     if (!abierto) {
       this.alertService.presentAlert('', 'Esta tienda esta cerrada, por favor vuelve más tarde')
       return
     }    
 
-    if (this.back) this.back.unsubscribe()
+    const servicio = await this.productoService.getProducto(serv.idNegocio, serv.id)
     const modal = await this.modalController.create({
       component: ServicioPage,
       enterAnimation,
       leaveAnimation,
-      componentProps: {servicio, categoria: servicio.categoria, idNegocio: servicio.idNegocio}
+      componentProps: {servicio, categoria: serv.categoria, idNegocio: serv.idNegocio}
     })
 
     modal.onWillDismiss().then(resp => {
       if (resp.data && resp.data === 'ver_mas') {
-        this.router.navigate([`negocio-servicios/${servicio.categoria}/${servicio.idNegocio}`], {state: {origen_categoria: true}})
+        this.router.navigate([`negocio-servicios/${serv.categoria}/${serv.idNegocio}`], { skipLocationChange: true, state: {origen_categoria: true} })
       }
     })
 
-    modal.onDidDismiss().then(resp => {
-      if (resp.data && resp.data === 'ver_mas') return
-      setTimeout(() => {
-        this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-          const nombre = 'app'
-          navigator[nombre].exitApp()
-        })
-      }, 100)
-    })
-    this.categoriaService.setVisitaNegocio(this.uid, servicio.idNegocio)
-    this.categoriaService.setVisitaCategoria(this.uid, servicio.categoria)
+    this.categoriaService.setVisitaNegocio(this.uid, serv.idNegocio)
+    this.categoriaService.setVisitaCategoria(this.uid, serv.categoria)
     return await modal.present()
   }
+
 
   async verCarrito(producto: Producto, oferta: Oferta) {
     const idNegocio = oferta.idNegocio
     producto = await this.cartService.updateCart(idNegocio, producto)
 
-    if (this.back) this.back.unsubscribe()
     const modal = await this.modalController.create({
       component: CuentaPage,
       enterAnimation,
@@ -496,18 +458,8 @@ export class CategoriaPage implements OnInit, OnDestroy{
 
     modal.onWillDismiss().then(resp => {
       if (resp.data && resp.data === 'add') {
-        this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`], {state: {origen_categoria: true}})
+        this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`], {skipLocationChange: true ,state: {origen_categoria: true}})
       }
-    })
-
-    modal.onDidDismiss().then(resp => {
-      if (resp.data && resp.data === 'add') return
-      setTimeout(() => {
-        this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-          const nombre = 'app'
-          navigator[nombre].exitApp()
-        })
-      }, 100)
     })
 
     return await modal.present()
@@ -519,26 +471,15 @@ export class CategoriaPage implements OnInit, OnDestroy{
   }
 
   async login() {
-    if (this.back) this.back.unsubscribe()
     const modal = await this.modalController.create({
       cssClass: 'my-custom-modal-css',
       component: LoginPage,
-    })
-
-    modal.onDidDismiss().then(() => {
-      setTimeout(() => {
-        this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
-          const nombre = 'app'
-          navigator[nombre].exitApp()
-        })
-      }, 100)
     })
 
     return await modal.present()
   }
 
   async verCategorias() {
-    if (this.back) this.back.unsubscribe()
     const modal = await this.modalController.create({
       component: CategoriasPage,
       cssClass: 'modal-categorias',
@@ -551,21 +492,12 @@ export class CategoriaPage implements OnInit, OnDestroy{
       if (resp.data) this.irACategoria(resp.data)
     })
 
-    modal.onDidDismiss().then(resp => {
-      if (!resp.data) {
-        setTimeout(() => {
-          this.back = this.platform.backButton.subscribeWithPriority(9999, () => this.router.navigate(['/home']))
-        }, 100)
-      }
-    })
-
     return await modal.present()
   }
 
   irACategoria(categoria: string) {
-    if (this.back) this.back.unsubscribe()
     if (this.uid) this.categoriaService.setVisitaCategoria(this.uid, categoria)
-    this.router.navigate(['/categoria', categoria])
+    this.router.navigate(['/categoria', categoria], { skipLocationChange: true })
   }
 
   // Filtra por categoria
@@ -603,13 +535,8 @@ export class CategoriaPage implements OnInit, OnDestroy{
     if (this.noMore) event.target.disabled = true
   }
 
-  ionViewWillLeave() {
-    if (this.back) this.back.unsubscribe()
-  }
-
   ngOnDestroy() {
     this.categoriaService.listenCambios().query.ref.off('child_changed')
-    if (this.back) this.back.unsubscribe()
   }
 
 
