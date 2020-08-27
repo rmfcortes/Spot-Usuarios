@@ -19,7 +19,7 @@ export class OfertaEstrellaComponent implements OnInit {
     initialSlide: 0,
     slidesPerView: 1.2,
     speed: 400,
-    freeMode: true
+    freeMode: false
   }
 
   constructor() { }
@@ -33,6 +33,9 @@ export class OfertaEstrellaComponent implements OnInit {
   }  
   verNegocio(oferta: Oferta) {
     this.verNeg.emit(oferta)
+  }
+
+  ionSlideDidChange(event) {
   }
 
 }

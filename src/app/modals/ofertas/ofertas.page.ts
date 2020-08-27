@@ -168,8 +168,9 @@ export class OfertasPage implements OnInit {
       if (resp.data && resp.data === 'ver_mas') {
         this.uidSerice.setOfertas(true)
         setTimeout(() => this.modalCtrl.dismiss('en_negociopage'), 500)
-        if (this.fromCats) this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`], {state: {origen_categoria: true}, skipLocationChange: true})
-        else  this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`], { skipLocationChange: true })
+        if (this.fromCats) this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`], {state: {origen_categoria: true}
+      })
+        else  this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`])
         return
       }
       if (resp.data) {
@@ -201,8 +202,8 @@ export class OfertasPage implements OnInit {
       if (resp.data && resp.data === 'add') {
         this.uidSerice.setOfertas(true)
         setTimeout(() => this.modalCtrl.dismiss('en_negociopage'), 500)
-        if (this.fromCats) this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`], {state: {origen_categoria: true}, skipLocationChange: true})
-        else  this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`], { skipLocationChange: true })
+        if (this.fromCats) this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`], {state: {origen_categoria: true}})
+        else  this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`])
       }
     })
 
@@ -233,8 +234,8 @@ export class OfertasPage implements OnInit {
       if (resp.data && resp.data === 'ver_mas') {
         this.uidSerice.setOfertas(true)
         setTimeout(() => this.modalCtrl.dismiss('en_negociopage'), 500)
-        if (this.fromCats) this.router.navigate([`negocio-servicios/${serv.categoria}/${serv.idNegocio}`], {state: {origen_categoria: true}, skipLocationChange: true})
-        else  this.router.navigate([`negocio-servicios/${serv.categoria}/${serv.idNegocio}`], { skipLocationChange: true })
+        if (this.fromCats) this.router.navigate([`negocio-servicios/${serv.categoria}/${serv.idNegocio}`], {state: {origen_categoria: true}})
+        else  this.router.navigate([`negocio-servicios/${serv.categoria}/${serv.idNegocio}`])
         return
       }
     })
@@ -253,6 +254,10 @@ export class OfertasPage implements OnInit {
     const modal = await this.modalCtrl.create({
       cssClass: 'my-custom-modal-css',
       component: LoginPage,
+    })
+
+    modal.onWillDismiss().then(() => {
+      this.uid = this.uidSerice.getUid()
     })
 
     return await modal.present()

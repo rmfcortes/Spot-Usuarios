@@ -350,9 +350,9 @@ export class CategoriaPage implements OnInit, OnDestroy{
     if (uid) this.categoriaService.setVisitaNegocio(uid, negocio.id)
     this.categoriaService.setVisita(negocio.id)
     if (negocio.tipo === 'productos') {
-      this.router.navigate([`/negocio/${this.categoria}/${negocio.id}`], {skipLocationChange: true ,state: {origen_categoria: true}})
+      this.router.navigate([`/negocio/${this.categoria}/${negocio.id}`])
     } else {
-      this.router.navigate([`/negocio-servicios/${this.categoria}/${negocio.id}`], {skipLocationChange: true ,state: {origen_categoria: true}})
+      this.router.navigate([`/negocio-servicios/${this.categoria}/${negocio.id}`])
     }
   }
 
@@ -396,7 +396,7 @@ export class CategoriaPage implements OnInit, OnDestroy{
     })
     modal.onWillDismiss().then(async (resp) => {
       if (resp.data && resp.data === 'ver_mas') {
-        this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`], {skipLocationChange: true, state: {origen_categoria: true}})
+        this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`], {state: {origen_categoria: true}})
         return
       }
       if (resp.data) {
@@ -435,7 +435,7 @@ export class CategoriaPage implements OnInit, OnDestroy{
 
     modal.onWillDismiss().then(resp => {
       if (resp.data && resp.data === 'ver_mas') {
-        this.router.navigate([`negocio-servicios/${serv.categoria}/${serv.idNegocio}`], { skipLocationChange: true, state: {origen_categoria: true} })
+        this.router.navigate([`negocio-servicios/${serv.categoria}/${serv.idNegocio}`], {state: {origen_categoria: true} })
       }
     })
 
@@ -458,7 +458,7 @@ export class CategoriaPage implements OnInit, OnDestroy{
 
     modal.onWillDismiss().then(resp => {
       if (resp.data && resp.data === 'add') {
-        this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`], {skipLocationChange: true ,state: {origen_categoria: true}})
+        this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`], {state: {origen_categoria: true}})
       }
     })
 
@@ -474,6 +474,10 @@ export class CategoriaPage implements OnInit, OnDestroy{
     const modal = await this.modalController.create({
       cssClass: 'my-custom-modal-css',
       component: LoginPage,
+    })
+
+    modal.onWillDismiss().then(() => {
+      this.uid = this.uidService.getUid()
     })
 
     return await modal.present()
@@ -497,7 +501,11 @@ export class CategoriaPage implements OnInit, OnDestroy{
 
   irACategoria(categoria: string) {
     if (this.uid) this.categoriaService.setVisitaCategoria(this.uid, categoria)
-    this.router.navigate(['/categoria', categoria], { skipLocationChange: true })
+    this.router.navigate(['/categoria', categoria])
+  }
+
+  irAHome() {
+    this.router.navigate(['/home'], {replaceUrl: true})
   }
 
   // Filtra por categoria

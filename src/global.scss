@@ -148,10 +148,11 @@ ion-thumbnail {
     color: white !important;
 }
 
-.boton-cart {
+.btn_main_activity {
     width: 80%;
     margin-left: 10%;
-    min-height: 2.5rem !important;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
+    min-height: 3rem !important;
+    margin-bottom: 1.2rem;
+    --box-shadow: -3.5px 3px 3px 3px #dfd2bd;
+    font-weight: 700;
 }

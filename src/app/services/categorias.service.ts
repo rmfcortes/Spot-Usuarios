@@ -44,10 +44,9 @@ export class CategoriasService {
   getPopulares(): Promise<InfoGral[]> {
     const region = this.uidService.getRegion()
     return new Promise((resolve, reject) => {
-      const pop = this.db.list(`functions/${region}`, data => data.orderByChild('visitas').limitToLast(15)).valueChanges()
+      const pop = this.db.list(`functions/${region}`, data => data.orderByChild('visitas').limitToLast(25)).valueChanges()
         .subscribe((populares: InfoGral[]) => {
           pop.unsubscribe()
-          populares = populares.filter(p => p.visitas)
           resolve(populares)
         })
     })

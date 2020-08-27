@@ -36,7 +36,7 @@
         <ng-container *ngIf="item.limite > 1; else limTemplate">
             <ion-list-header>
                 <ion-label color="primary">
-                    <h2>{{item.titulo | titlecase}}</h2>
+                    <h2 style="font-weight: 700;">{{item.titulo | titlecase}}</h2>
                     <p>Elige máximo {{item.limite}} opciones</p>
                 </ion-label>
                 <ion-badge color="primary" style="margin-right: 0.75rem;" *ngIf="item.obligatorio">Obligatorio</ion-badge>
@@ -50,7 +50,7 @@
         <ng-template #limTemplate>
             <ion-radio-group (ionChange)="radioSelected($event, i)" [(ngModel)]="item.radioSelected">
                 <ion-list-header>
-                    <ion-label color="primary">{{item.titulo | titlecase}}</ion-label>
+                    <ion-label color="primary" style="font-weight: 700;">{{item.titulo | titlecase}}</ion-label>
                     <ion-badge color="primary" style="margin-right: 0.75rem;" *ngIf="item.obligatorio">Obligatorio</ion-badge>
                 </ion-list-header>
                 <ion-item *ngFor="let c of item.productos; let y = index" lines="none">
@@ -63,10 +63,10 @@
     </ion-card>
     <ion-card>
         <ion-list-header>
-            <ion-label color="primary">Agregar comentarios</ion-label>
+            <ion-label color="primary" style="font-weight: 700;">Agregar comentarios</ion-label>
         </ion-list-header>
         <ion-item lines="none" style="margin-bottom: 1rem;">
-            <ion-textarea style="border: 1px rgb(184, 184, 184) solid; padding: 0.5rem;" (keyup.enter)="$event.target.blur();" [(ngModel)]="producto.observaciones" placeholder="Agrega observaciones (especifica tus preferencias en los productos)"></ion-textarea>
+            <ion-textarea style="border: 1px rgb(184, 184, 184) dashed; padding: 0.5rem; border-radius: 15px;" (keyup.enter)="$event.target.blur();" [(ngModel)]="producto.observaciones" placeholder="Agrega observaciones (especifica tus preferencias en los productos)"></ion-textarea>
         </ion-item>
     </ion-card>
     <ion-button class="boton-add" fill="clear" style="--ripple-color: transparent; --background: white" shape="round">
@@ -93,12 +93,12 @@
         <h2 class="ion-text-wrap">Paga {{producto.precio |currency :'CAD':'symbol-narrow':'1.0-0'}} y llévate 2</h2>
     </div>
     <ng-container *ngIf="modifica; else modTemplate">
-        <ion-button class="boton-cart ion-text-wrap gradient--" expand="block" (click)="agregarProducto()" [disabled]="!canContinue || recalculando" shape="round">
+        <ion-button class="btn_main_activity ion-text-wrap gradient--" expand="block" (click)="agregarProducto()" [disabled]="!canContinue || recalculando" shape="round"  style="margin-top: 2rem;">
             <strong style="margin: 0.5rem">Actualizar</strong> {{producto.total | currency:'CAD':'symbol-narrow':'1.0-0'}}
         </ion-button>
     </ng-container>
     <ng-template #modTemplate>            
-        <ion-button class="boton-cart ion-text-wrap gradient--" expand="block" (click)="agregarProducto()" [disabled]="!canContinue" shape="round">
+        <ion-button class="btn_main_activity ion-text-wrap gradient--" expand="block" (click)="agregarProducto()" [disabled]="!canContinue" shape="round" style="margin-top: 2rem;">
             <strong style="margin: 0.5rem">Agregar al carrito:</strong> {{producto.total | currency:'CAD':'symbol-narrow':'1.0-0'}}
         </ion-button>        
     </ng-template>
@@ -108,7 +108,7 @@
 
 <ion-footer *ngIf="producto && !fromProdPage" class="ion-no-border">
     <ion-toolbar class="fondo-content">
-        <ion-button class="boton-cart ion-text-wrap" (click)="verMas()" fill="outline" expand="block" shape="round">
+        <ion-button class="btn_main_activity ion-text-wrap" (click)="verMas()" fill="outline" expand="block" shape="round">
             Ver otros productos de esta tienda 
         </ion-button>
     </ion-toolbar>

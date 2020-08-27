@@ -1,8 +1,9 @@
-import { ModalController, Platform } from '@ionic/angular';
+import { ModalController } from '@ionic/angular';
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
-import { NgxMasonryComponent, NgxMasonryOptions } from 'ngx-masonry';
+import { NgxMasonryOptions } from 'ngx-masonry';
 
 import { InfoSucursalPage } from '../info-sucursal/info-sucursal.page';
 import { ServicioPage } from '../servicio/servicio.page';
@@ -24,7 +25,6 @@ import { ProductoAlgolia, Producto } from 'src/app/interfaces/producto';
 
 import { enterAnimation } from 'src/app/animations/enter';
 import { leaveAnimation } from 'src/app/animations/leave';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-busqueda',
@@ -236,7 +236,7 @@ export class BusquedaPage implements OnInit {
       if (resp.data && resp.data === 'ver_mas') {
         this.uidService.setModal(true)
         setTimeout(() => this.modalCtrl.dismiss('en_negociopage'), 500)
-        this.router.navigate([`negocio/${productoAlgolia.categoria}/${productoAlgolia.idNegocio}`], { skipLocationChange: true })
+        this.router.navigate([`negocio/${productoAlgolia.categoria}/${productoAlgolia.idNegocio}`])
         return
       }
       if (resp.data) {
@@ -264,7 +264,7 @@ export class BusquedaPage implements OnInit {
       if (resp.data && resp.data === 'add') {
         this.uidService.setModal(true)
         setTimeout(() => this.modalCtrl.dismiss('en_negociopage'), 500)
-        this.router.navigate([`negocio/${productoAlgolia.categoria}/${productoAlgolia.idNegocio}`], { skipLocationChange: true })
+        this.router.navigate([`negocio/${productoAlgolia.categoria}/${productoAlgolia.idNegocio}`])
       }
     })
 
@@ -294,7 +294,7 @@ export class BusquedaPage implements OnInit {
       if (resp.data && resp.data === 'ver_mas') {
         this.uidService.setModal(true)
         setTimeout(() => this.modalCtrl.dismiss('en_negociopage'), 500)
-        this.router.navigate([`negocio-servicios/${productoAlgolia.categoria}/${productoAlgolia.idNegocio}`], { skipLocationChange: true })
+        this.router.navigate([`negocio-servicios/${productoAlgolia.categoria}/${productoAlgolia.idNegocio}`])
       }
     })
 
@@ -309,7 +309,7 @@ export class BusquedaPage implements OnInit {
       this.categoriaService.setVisitaNegocio(this.uid, negocio.objectID)
       this.categoriaService.setVisitaCategoria(this.uid, negocio.categoria)
     }
-    this.router.navigate([`negocio/${negocio.categoria}/${negocio.objectID}`], { skipLocationChange: true })
+    this.router.navigate([`negocio/${negocio.categoria}/${negocio.objectID}`])
     setTimeout(() => this.modalCtrl.dismiss('en_negociopage'), 500) 
   }
 

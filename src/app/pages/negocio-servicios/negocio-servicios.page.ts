@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -64,6 +65,7 @@ export class NegocioServiciosPage{
 
   constructor(
     private router: Router,
+    private location: Location,
     private callNumber: CallNumber,
     private socialSharing: SocialSharing,
     private activatedRoute: ActivatedRoute,
@@ -336,8 +338,7 @@ export class NegocioServiciosPage{
   // Salida
 
   regresar() {
-    if (this.origen_categoria) this.router.navigate(['/categoria', this.categoria], { skipLocationChange: true })
-    else this.router.navigate(['/home'], { replaceUrl: true })
+    this.location.back()
   }
 
   // Auxiliares

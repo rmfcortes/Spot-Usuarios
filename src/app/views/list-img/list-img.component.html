@@ -3,7 +3,7 @@
         <ion-item lines="full">
             <h2>{{item.nombre | titlecase}}</h2>
         </ion-item>
-        <ion-item *ngFor="let prod of item.productos; let y = index; trackBy: trackProducts" style="--padding-start: 0; margin-top: 1rem; cursor: pointer;" lines="none" detail (click)="presentProduct(prod)">
+        <ion-item *ngFor="let prod of item.productos; let y = index; trackBy: trackProducts" style="--padding-start: 0; margin-top: 0.5rem; cursor: pointer;" lines="none" detail (click)="presentProduct(prod)">
             <ion-grid class="ion-no-padding">
                 <ion-row>
                     <ion-col size="4">

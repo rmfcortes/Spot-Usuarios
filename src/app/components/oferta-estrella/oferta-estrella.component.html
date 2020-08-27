@@ -8,7 +8,7 @@
       </ion-col>
   </ion-row>
 </ion-grid>
-<ion-slides [options]="slideOpts" *ngIf="ofertas.length > 0" style="margin-bottom: 1.1rem;">
+<ion-slides [options]="slideOpts" *ngIf="ofertas.length > 0" style="margin-bottom: 1.1rem;" (ionSlideDidChange)="ionSlideDidChange($event)">
   <ion-slide *ngFor="let item of ofertas" (click)="verNegocio(item)" style="padding: 0 0.5rem;">
       <preload-image [ratio]="{w: 1, h: 0.45}" [src]="item.foto" style="border-radius: 15px;"></preload-image>
   </ion-slide>

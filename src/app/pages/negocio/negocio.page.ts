@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ModalController, IonInfiniteScroll } from '@ionic/angular';
@@ -68,6 +69,7 @@ export class NegocioPage {
 
   constructor(
     private router: Router,
+    private location: Location,
     private activatedRoute: ActivatedRoute,
     private modalController: ModalController,
     private commonService: DisparadoresService,
@@ -411,8 +413,7 @@ export class NegocioPage {
   // Salida
 
   regresar() {
-    if (this.origen_categoria) this.router.navigate(['/categoria', this.categoria], { skipLocationChange: true })
-    else this.router.navigate(['/home'], { replaceUrl: true })
+    this.location.back()
   }
 
   // Mensajes

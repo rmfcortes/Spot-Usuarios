@@ -14,7 +14,7 @@
                     <ion-input (keyup.enter)="$event.target.blur();" type="email" [(ngModel)]="correo" class="input-usuario" placeholder="correo@gmail.com"></ion-input>
                     <ion-input (keyup.enter)="$event.target.blur();" type="password" [(ngModel)]="pass" class="input-usuario" placeholder="Contraseña"></ion-input>
                     <ion-label style="float: right; margin-bottom: 1.2rem; font-size: xx-small;" (click)="resetPass()">¿Olvidaste tu contraseña?</ion-label>
-                    <ion-button [disabled]="!correo || !pass" (click)="ingresarConCorreo()" class="gradient--" shape="round" expand="block">
+                    <ion-button [disabled]="!correo || !pass" (click)="ingresarConCorreo()" class="gradient-- btn_main_activity" shape="round" expand="block">
                         Iniciar sesión
                     </ion-button>
                     <ion-item lines="none" style="margin-top: 2.2rem; --background: transparent;">
@@ -45,7 +45,7 @@
                         <ion-item lines="none">
                             <ion-input (keyup.enter)="$event.target.blur()" type="password" class="input-registra" required  placeholder="Confirmar contraseña" [(ngModel)]="usuario.passConfirm" name="passConfirm" minlength="6"></ion-input>
                         </ion-item>
-                        <ion-button style="margin-top: 2rem" [disabled]="!formaCuenta.valid" expand="block" shape="round" type="submit" class="botones gradient--">
+                        <ion-button style="margin-top: 2rem" [disabled]="!formaCuenta.valid" expand="block" shape="round" type="submit" class="btn_main_activity gradient--">
                             Crear cuenta
                         </ion-button>
                     </form>

@@ -131,7 +131,7 @@
         <ion-footer class="ion-no-border">
             <ion-toolbar class="fondo-content">
                 <ng-container *ngIf="negocio && negocio.abierto; else footOpenTemplate">
-                    <ion-button class="boton-cart  gradient--" expand="block" (click)="verCuenta()" shape="round" [disabled]="!cuenta">
+                    <ion-button class="btn_main_activity gradient--" style="margin-top: 1rem;" expand="block" (click)="verCuenta()" shape="round" [disabled]="!cuenta">
                         <strong style="margin-right: 0.5rem;">Ver Carrito:</strong> {{cuenta | currency:'CAD':'symbol-narrow':'1.0-0'}}
                     </ion-button>
                 </ng-container>

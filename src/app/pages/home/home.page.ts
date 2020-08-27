@@ -90,6 +90,20 @@ export class HomePage implements OnInit, OnDestroy {
 
   costo_envio: CostoEnvio
 
+  placeHolder_search = [
+    'Encuentra de todo aquí...',
+    'Hamburguesa...',
+    'Cobija...',
+    'Blusa...',
+    'Visas...',
+    'Agua purificada...',
+    'Gas...',
+    'Pizza...',
+    'Ortodoncia...'
+  ]
+  placeHolder_search_display = ''
+  iPlaceHolder = 0
+
   constructor(
     private router: Router,
     private ngZone: NgZone,
@@ -116,6 +130,23 @@ export class HomePage implements OnInit, OnDestroy {
     this.getMasConsultados()
     this.listenCambios()
     this.listenRegion()
+    this.animatePlaceholder()
+  }
+
+  animatePlaceholder() {
+    const total_length = this.placeHolder_search[this.iPlaceHolder].length
+    const current_length = this.placeHolder_search_display.length
+    if (current_length < total_length) {
+      this.placeHolder_search_display += this.placeHolder_search[this.iPlaceHolder][current_length]
+      setTimeout(() => this.animatePlaceholder(), 100)
+    } else {
+      if (this.iPlaceHolder === this.placeHolder_search.length - 1) this.iPlaceHolder = 0
+      else this.iPlaceHolder++
+      setTimeout(() => {
+        this.placeHolder_search_display = ''
+        this.animatePlaceholder(), 1000
+      })
+    }
   }
 
   listenRegion() {
@@ -261,8 +292,10 @@ export class HomePage implements OnInit, OnDestroy {
             if (info) {
               info.visitas = x.visitas
               this.negociosVisitados.push(info)
-              this.negociosVisitados.sort((a, b) => b.visitas - a.visitas)
-              this.negociosVisitados.sort((a, b) => a.abierto === b.abierto ? 0 : a.abierto ? -1 : 1)
+              this.negociosVisitados.sort((a, b) => {
+                if (a.abierto === b.abierto) return b.visitas - a.visitas
+                return a.abierto ? -1 : 1
+              })
               this.costoEnvio(this.negociosVisitados)
             }
           })
@@ -275,10 +308,10 @@ export class HomePage implements OnInit, OnDestroy {
   getPopulares() {
     this.categoriaService.getPopulares().then(async (populares)  => {
       this.negociosPopulares = populares
-      this.negociosPopulares.sort((a, b) => b.calificaciones - a.calificaciones)
-      this.negociosPopulares.sort((a, b) => b.promedio - a.promedio)
-      this.negociosPopulares.sort((a, b) => b.visitas - a.visitas)
-      this.negociosPopulares.sort((a, b) => a.abierto === b.abierto ? 0 : a.abierto ? -1 : 1)
+      this.negociosPopulares.sort((a, b) => {
+        if (a.abierto === b.abierto) return b.visitas - a.visitas
+        return a.abierto ? -1 : 1
+      })
       this.costoEnvio(this.negociosPopulares)
       this.popularesReady = true
     })
@@ -338,6 +371,10 @@ export class HomePage implements OnInit, OnDestroy {
       component: LoginPage,
     })
 
+    modal.onWillDismiss().then(() => {
+      this.uid = this.uidService.getUid()
+    })
+
     return await modal.present()
   }
 
@@ -388,9 +425,9 @@ export class HomePage implements OnInit, OnDestroy {
     }
     this.categoriaService.setVisita(prod.idNegocio)
     if (prod.tipo === 'productos') {
-      this.router.navigate([`negocio/${prod.categoria}/${prod.idNegocio}`], { skipLocationChange: true })
+      this.router.navigate([`negocio/${prod.categoria}/${prod.idNegocio}`])
     } else {
-      this.router.navigate([`negocio-servicios/${prod.categoria}/${prod.idNegocio}`], { skipLocationChange: true })
+      this.router.navigate([`negocio-servicios/${prod.categoria}/${prod.idNegocio}`])
     }
   }
 
@@ -423,7 +460,7 @@ export class HomePage implements OnInit, OnDestroy {
     })
     modal.onWillDismiss().then(async (resp) => {
       if (resp.data && resp.data === 'ver_mas') {
-        this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`], { skipLocationChange: true })
+        this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`])
         return
       }
       if (resp.data) {
@@ -461,7 +498,7 @@ export class HomePage implements OnInit, OnDestroy {
 
     modal.onWillDismiss().then(resp => {
       if (resp.data && resp.data === 'ver_mas') {
-        this.router.navigate([`negocio-servicios/${serv.categoria}/${serv.idNegocio}`], { skipLocationChange: true })
+        this.router.navigate([`negocio-servicios/${serv.categoria}/${serv.idNegocio}`])
       }
     })
 
@@ -483,7 +520,7 @@ export class HomePage implements OnInit, OnDestroy {
 
     modal.onWillDismiss().then(resp => {
       if (resp.data && resp.data === 'add') {
-        this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`], { skipLocationChange: true })
+        this.router.navigate([`negocio/${oferta.categoria}/${oferta.idNegocio}`])
       }
     })
 
