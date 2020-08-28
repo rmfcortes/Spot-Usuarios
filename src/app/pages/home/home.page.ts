@@ -34,7 +34,6 @@ import { leaveAnimationCategoria } from 'src/app/animations/leaveCat';
 import { enterAnimation } from 'src/app/animations/enter';
 import { leaveAnimation } from 'src/app/animations/leave';
 
-
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
@@ -91,7 +90,7 @@ export class HomePage implements OnInit, OnDestroy {
   costo_envio: CostoEnvio
 
   placeHolder_search = [
-    'Encuentra de todo aquí...',
+    'Escribe tu búsqueda aquí...',
     'Hamburguesa...',
     'Cobija...',
     'Blusa...',
@@ -119,7 +118,6 @@ export class HomePage implements OnInit, OnDestroy {
     private uidService: UidService,
   ) {}
 
-
   async ngOnInit() {
     await this.getCategorias()
     this.direccion = this.uidService.getDireccion()
@@ -140,7 +138,10 @@ export class HomePage implements OnInit, OnDestroy {
       this.placeHolder_search_display += this.placeHolder_search[this.iPlaceHolder][current_length]
       setTimeout(() => this.animatePlaceholder(), 100)
     } else {
-      if (this.iPlaceHolder === this.placeHolder_search.length - 1) this.iPlaceHolder = 0
+      if (this.iPlaceHolder === this.placeHolder_search.length - 1) {
+        this.placeHolder_search_display = this.placeHolder_search[0]
+        return
+      }
       else this.iPlaceHolder++
       setTimeout(() => {
         this.placeHolder_search_display = ''

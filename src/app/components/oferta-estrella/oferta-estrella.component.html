@@ -9,8 +9,10 @@
   </ion-row>
 </ion-grid>
 <ion-slides [options]="slideOpts" *ngIf="ofertas.length > 0" style="margin-bottom: 1.1rem;" (ionSlideDidChange)="ionSlideDidChange($event)">
-  <ion-slide *ngFor="let item of ofertas" (click)="verNegocio(item)" style="padding: 0 0.5rem;">
-      <preload-image [ratio]="{w: 1, h: 0.45}" [src]="item.foto" style="border-radius: 15px;"></preload-image>
+  <ion-slide *ngFor="let item of ofertas" (click)="verNegocio(item)">
+    <ion-card style="width: 100%;">
+        <preload-image [ratio]="{w: 1, h: 0.45}" [src]="item.foto" style="border-radius: 15px;"></preload-image>
+    </ion-card>
   </ion-slide>
   <ion-slide (click)="verOfertas()" *ngIf="hayMas" style="padding: 0 0.5rem;">
       <ion-img style="width: 30%;" src="../../../assets/img/botones/verTodas.png"></ion-img>

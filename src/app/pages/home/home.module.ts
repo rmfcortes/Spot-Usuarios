@@ -18,6 +18,7 @@ import { BusquedaPageModule } from 'src/app/modals/busqueda/busqueda.module';
 import { ProductoPageModule } from 'src/app/modals/producto/producto.module';
 import { ServicioPageModule } from 'src/app/modals/servicio/servicio.module';
 import { CuentaPageModule } from 'src/app/modals/cuenta/cuenta.module';
+import { PermisosPageModule } from 'src/app/modals/permisos/permisos.module';
 
 @NgModule({
   imports: [

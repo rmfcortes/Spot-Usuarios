@@ -1,4 +1,4 @@
-<ion-content>
+<ion-content style="--background: white !important">
     <ion-img src="../../../assets/img/notifications.jpg"></ion-img>
     <ion-item lines="none" style="text-align: center;">
         <ion-label color="medium" class="ion-text-wrap">
@@ -7,9 +7,9 @@
     </ion-item>
 </ion-content>
 
-<ion-footer no-border>
+<ion-footer class="ion-no-border">
     <ion-toolbar>
-        <ion-button class="boton-margen" expand="block" shape="round" color="primary" (click)="activaPermisos()">
+        <ion-button class="btn_main_activity gradient--" expand="block" shape="round" (click)="activaPermisos()">
             Permitir notificaciones
         </ion-button>
         <ion-button expand="block" shape="round" fill="clear" color="primary" (click)="salir()">
